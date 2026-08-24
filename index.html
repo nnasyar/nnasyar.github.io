@@ -27,15 +27,19 @@
 // ============================================================================
 (function () {
   // Not: nnasyar.github.io üzerinde sunucu tarafı proxy ÇALIŞMAZ (GitHub Pages
-  // sadece düz dosya sunar). Orada doğrudan Supabase'e bağlanıyoruz — okul
-  // dışından zaten erişim engeli yok. Diğer adreslerde (Netlify/Cloudflare gibi
-  // proxy'nin çalıştığı yerlerde) kendi proxy'mizi kullanıyoruz, çünkü okul
-  // ağında supabase.co'nun kendisi engelli.
-  var DIRECT_SUPABASE_URL = "https://lvrwponfyvdxvypeewnw.supabase.co";
-  var PROXY_SUPABASE_URL = window.location.origin + "/supabase-proxy";
-  var SUPABASE_URL = (window.location.hostname === "nnasyar.github.io")
-    ? DIRECT_SUPABASE_URL
-    : PROXY_SUPABASE_URL;
+  // sadece düz dosya sunar) — orada doğrudan Supabase'e bağlanıyoruz. Netlify'da
+  // yönlendirme (redirect) yerine fonksiyonun GERÇEK adresini doğrudan
+  // kullanıyoruz (daha güvenilir). Diğer platformlarda (Cloudflare gibi)
+  // "/supabase-proxy" yolu kullanılır.
+  var host = window.location.hostname;
+  var SUPABASE_URL;
+  if (host === "nnasyar.github.io") {
+    SUPABASE_URL = "https://lvrwponfyvdxvypeewnw.supabase.co";
+  } else if (host.endsWith(".netlify.app")) {
+    SUPABASE_URL = window.location.origin + "/.netlify/functions/supabase-proxy";
+  } else {
+    SUPABASE_URL = window.location.origin + "/supabase-proxy";
+  }
   var ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2cndwb25meXZkeHZ5cGVld253Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxNjM1MDUsImV4cCI6MjEwMDczOTUwNX0.AqsnWHE3nPF_dQ8cxuqBGK_IIyqrK21gLFXgoGrGtls";
   var PANO49_TARGET = "pano49.html";
   var DUYURU_TARGET = "pano99.html?ekran=1";

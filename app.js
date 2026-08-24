@@ -673,14 +673,18 @@
         //   (Tam SQL script'i ayrıca iletildi.)
         // ============================================================================
         // Not: nnasyar.github.io üzerinde sunucu tarafı proxy ÇALIŞMAZ (GitHub Pages
-        // sadece düz dosya sunar). Orada doğrudan Supabase'e bağlanıyoruz — okul
-        // dışından zaten erişim engeli yok. Diğer adreslerde (Netlify/Cloudflare gibi
-        // proxy'nin çalıştığı yerlerde) kendi proxy'mizi kullanıyoruz, çünkü okul
-        // ağında supabase.co'nun kendisi engelli.
+        // sadece düz dosya sunar) — orada doğrudan Supabase'e bağlanıyoruz. Netlify'da
+        // yönlendirme (redirect) yerine fonksiyonun GERÇEK adresini doğrudan
+        // kullanıyoruz (daha güvenilir). Diğer platformlarda (Cloudflare gibi)
+        // "/supabase-proxy" yolu kullanılır.
+        const __host = window.location.hostname;
+        const __supabaseUrl = (__host === "nnasyar.github.io")
+            ? "https://lvrwponfyvdxvypeewnw.supabase.co"
+            : __host.endsWith(".netlify.app")
+                ? (window.location.origin + "/.netlify/functions/supabase-proxy")
+                : (window.location.origin + "/supabase-proxy");
         const SUPABASE_CONFIG = {
-            url: (window.location.hostname === "nnasyar.github.io")
-                ? "https://lvrwponfyvdxvypeewnw.supabase.co"
-                : (window.location.origin + "/supabase-proxy"),
+            url: __supabaseUrl,
             anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2cndwb25meXZkeHZ5cGVld253Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxNjM1MDUsImV4cCI6MjEwMDczOTUwNX0.AqsnWHE3nPF_dQ8cxuqBGK_IIyqrK21gLFXgoGrGtls",
             table: "pano_config",
             rowId: 1,
