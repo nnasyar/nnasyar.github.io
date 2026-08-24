@@ -26,7 +26,10 @@
 // repoya yüklerseniz aşağıdaki varsayılanlar doğrudan çalışır.
 // ============================================================================
 (function () {
-  var SUPABASE_URL = "https://lvrwponfyvdxvypeewnw.supabase.co";
+  // Not: Doğrudan supabase.co yerine kendi sitemizin üzerindeki proxy'yi
+  // kullanıyoruz (bkz. /functions/supabase-proxy). Bazı ağlarda supabase.co
+  // doğrudan engellendiği için bu, o engeli aşmamızı sağlıyor.
+  var SUPABASE_URL = window.location.origin + "/supabase-proxy";
   var ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2cndwb25meXZkeHZ5cGVld253Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxNjM1MDUsImV4cCI6MjEwMDczOTUwNX0.AqsnWHE3nPF_dQ8cxuqBGK_IIyqrK21gLFXgoGrGtls";
   var PANO49_TARGET = "pano49.html";
   var DUYURU_TARGET = "pano99.html?ekran=1";

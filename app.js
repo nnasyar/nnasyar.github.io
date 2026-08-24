@@ -673,7 +673,10 @@
         //   (Tam SQL script'i ayrıca iletildi.)
         // ============================================================================
         const SUPABASE_CONFIG = {
-            url: "https://lvrwponfyvdxvypeewnw.supabase.co",
+            // Not: Doğrudan supabase.co yerine kendi sitemizin üzerindeki proxy'yi
+            // kullanıyoruz (bkz. /functions/supabase-proxy). Bazı ağlarda supabase.co
+            // doğrudan engellendiği için bu, o engeli aşmamızı sağlıyor.
+            url: window.location.origin + "/supabase-proxy",
             anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2cndwb25meXZkeHZ5cGVld253Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxNjM1MDUsImV4cCI6MjEwMDczOTUwNX0.AqsnWHE3nPF_dQ8cxuqBGK_IIyqrK21gLFXgoGrGtls",
             table: "pano_config",
             rowId: 1,
