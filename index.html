@@ -26,10 +26,16 @@
 // repoya yüklerseniz aşağıdaki varsayılanlar doğrudan çalışır.
 // ============================================================================
 (function () {
-  // Not: Doğrudan supabase.co yerine kendi sitemizin üzerindeki proxy'yi
-  // kullanıyoruz (bkz. /functions/supabase-proxy). Bazı ağlarda supabase.co
-  // doğrudan engellendiği için bu, o engeli aşmamızı sağlıyor.
-  var SUPABASE_URL = window.location.origin + "/supabase-proxy";
+  // Not: nnasyar.github.io üzerinde sunucu tarafı proxy ÇALIŞMAZ (GitHub Pages
+  // sadece düz dosya sunar). Orada doğrudan Supabase'e bağlanıyoruz — okul
+  // dışından zaten erişim engeli yok. Diğer adreslerde (Netlify/Cloudflare gibi
+  // proxy'nin çalıştığı yerlerde) kendi proxy'mizi kullanıyoruz, çünkü okul
+  // ağında supabase.co'nun kendisi engelli.
+  var DIRECT_SUPABASE_URL = "https://lvrwponfyvdxvypeewnw.supabase.co";
+  var PROXY_SUPABASE_URL = window.location.origin + "/supabase-proxy";
+  var SUPABASE_URL = (window.location.hostname === "nnasyar.github.io")
+    ? DIRECT_SUPABASE_URL
+    : PROXY_SUPABASE_URL;
   var ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2cndwb25meXZkeHZ5cGVld253Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxNjM1MDUsImV4cCI6MjEwMDczOTUwNX0.AqsnWHE3nPF_dQ8cxuqBGK_IIyqrK21gLFXgoGrGtls";
   var PANO49_TARGET = "pano49.html";
   var DUYURU_TARGET = "pano99.html?ekran=1";

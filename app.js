@@ -672,11 +672,15 @@
         //      + storage.objects için RLS politikaları
         //   (Tam SQL script'i ayrıca iletildi.)
         // ============================================================================
+        // Not: nnasyar.github.io üzerinde sunucu tarafı proxy ÇALIŞMAZ (GitHub Pages
+        // sadece düz dosya sunar). Orada doğrudan Supabase'e bağlanıyoruz — okul
+        // dışından zaten erişim engeli yok. Diğer adreslerde (Netlify/Cloudflare gibi
+        // proxy'nin çalıştığı yerlerde) kendi proxy'mizi kullanıyoruz, çünkü okul
+        // ağında supabase.co'nun kendisi engelli.
         const SUPABASE_CONFIG = {
-            // Not: Doğrudan supabase.co yerine kendi sitemizin üzerindeki proxy'yi
-            // kullanıyoruz (bkz. /functions/supabase-proxy). Bazı ağlarda supabase.co
-            // doğrudan engellendiği için bu, o engeli aşmamızı sağlıyor.
-            url: window.location.origin + "/supabase-proxy",
+            url: (window.location.hostname === "nnasyar.github.io")
+                ? "https://lvrwponfyvdxvypeewnw.supabase.co"
+                : (window.location.origin + "/supabase-proxy"),
             anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2cndwb25meXZkeHZ5cGVld253Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxNjM1MDUsImV4cCI6MjEwMDczOTUwNX0.AqsnWHE3nPF_dQ8cxuqBGK_IIyqrK21gLFXgoGrGtls",
             table: "pano_config",
             rowId: 1,
