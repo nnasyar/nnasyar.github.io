@@ -1,0 +1,7 @@
+[build]
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/supabase-proxy/*"
+  to = "/.netlify/functions/supabase-proxy/:splat"
+  status = 200
