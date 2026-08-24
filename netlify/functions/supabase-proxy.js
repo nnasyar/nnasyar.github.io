@@ -17,9 +17,10 @@ const FUNCTION_PREFIX = "/.netlify/functions/supabase-proxy/";
 
 exports.handler = async function (event) {
   try {
-    const subPath = event.path.startsWith(FUNCTION_PREFIX)
+    const subPath = (event.path.startsWith(FUNCTION_PREFIX)
       ? event.path.slice(FUNCTION_PREFIX.length)
-      : "";
+      : ""
+    ).replace(/^\/+/, ""); // baştaki fazladan "/" karakterlerini temizle
 
     const qs = event.rawQuery
       ? event.rawQuery
