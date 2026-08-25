@@ -16,6 +16,25 @@ const SUPABASE_TARGET = "https://lvrwponfyvdxvypeewnw.supabase.co";
 const FUNCTION_PREFIX = "/.netlify/functions/supabase-proxy/";
 
 exports.handler = async function (event) {
+  // Tarayıcılar, özel başlıklar (apikey, authorization vb.) içeren isteklerden
+  // önce görünmez bir "OPTIONS" kontrol isteği (preflight) gönderir. Bunu doğru
+  // cevaplamazsak, asıl veri isteği (GET/POST) tarayıcı tarafından hiç
+  // gönderilmeden sessizce başarısız olur.
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 204,
+      headers: {
+        "access-control-allow-origin": "*",
+        "access-control-allow-methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
+        "access-control-allow-headers":
+          (event.headers && (event.headers["access-control-request-headers"] || event.headers["Access-Control-Request-Headers"])) ||
+          "apikey, authorization, content-type, prefer, x-client-info, range",
+        "access-control-max-age": "86400",
+      },
+      body: "",
+    };
+  }
+
   try {
     const subPath = (event.path.startsWith(FUNCTION_PREFIX)
       ? event.path.slice(FUNCTION_PREFIX.length)
@@ -58,6 +77,8 @@ exports.handler = async function (event) {
       responseHeaders[key] = value;
     });
     responseHeaders["access-control-allow-origin"] = "*";
+    responseHeaders["access-control-allow-methods"] = "GET, POST, PATCH, PUT, DELETE, OPTIONS";
+    responseHeaders["access-control-allow-headers"] = "apikey, authorization, content-type, prefer, x-client-info, range";
 
     return {
       statusCode: proxied.status,
