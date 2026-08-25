@@ -28,6 +28,24 @@ export default {
 };
 
 async function handleSupabaseProxy(request, url) {
+  // Tarayıcılar, özel başlıklar (apikey, authorization vb.) içeren isteklerden
+  // önce görünmez bir "OPTIONS" kontrol isteği (preflight) gönderir. Bunu doğru
+  // cevaplamazsak, asıl veri isteği (GET/POST) tarayıcı tarafından hiç
+  // gönderilmeden sessizce başarısız olur.
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "access-control-allow-origin": "*",
+        "access-control-allow-methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
+        "access-control-allow-headers":
+          request.headers.get("access-control-request-headers") ||
+          "apikey, authorization, content-type, prefer, x-client-info, range",
+        "access-control-max-age": "86400",
+      },
+    });
+  }
+
   // "/supabase-proxy/rest/v1/foo" -> "rest/v1/foo"
   const subPath = url.pathname.replace(/^\/supabase-proxy\//, "");
 
@@ -46,6 +64,8 @@ async function handleSupabaseProxy(request, url) {
 
   const responseHeaders = new Headers(proxied.headers);
   responseHeaders.set("access-control-allow-origin", "*");
+  responseHeaders.set("access-control-allow-methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS");
+  responseHeaders.set("access-control-allow-headers", "apikey, authorization, content-type, prefer, x-client-info, range");
 
   return new Response(proxied.body, {
     status: proxied.status,
