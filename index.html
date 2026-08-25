@@ -13,68 +13,16 @@
 <div class="wrap">Yükleniyor…</div>
 <script>
 // ============================================================================
-// GİRİŞ YÖNLENDİRİCİSİ (Router)
+// GİRİŞ YÖNLENDİRİCİSİ (Router) — SADELEŞTİRİLMİŞ SÜRÜM
 // ----------------------------------------------------------------------------
-// Bu sayfa, panonun kendisini İÇERMEZ. Tek işi: Supabase'teki "display_control"
-// tablosuna bakıp, o an aktif olan panonun (pano49 mu, duyuru panosu mu) gerçek
-// dosyasına YÖNLENDİRMEKTİR. Böylece bu adresi (index.html) nereden/ne zaman
-// açarsanız açın, ekrana gelen sayfa HER ZAMAN o an aktif olan panodur — siz
-// başka bir panoya geçirene kadar.
-//
-// PANO49_TARGET / DUYURU_TARGET: hedef dosyaların, bu index.html'e göre GÖRECELİ
-// yolu. Üçünü de (index.html, pano49.html, duyuru panosu dosyası) AYNI klasöre/
-// repoya yüklerseniz aşağıdaki varsayılanlar doğrudan çalışır.
+// Artık sadece TEK bir pano (pano49) kullanılıyor. Bu sayfa hiçbir ağ isteği
+// yapmadan, hiçbir Supabase kontrolüne gerek duymadan, doğrudan pano49.html'e
+// yönlendirir. Böylece:
+//   - Bir arıza noktası daha az (Supabase'e bağlı değil, asla "yanlış panoya
+//     düşme" ihtimali yok).
+//   - İnternet olmasa bile anında çalışır.
 // ============================================================================
-(function () {
-  // Not: nnasyar.github.io üzerinde sunucu tarafı proxy ÇALIŞMAZ (GitHub Pages
-  // sadece düz dosya sunar) — orada doğrudan Supabase'e bağlanıyoruz. Netlify'da
-  // yönlendirme (redirect) yerine fonksiyonun GERÇEK adresini doğrudan
-  // kullanıyoruz (daha güvenilir). Diğer platformlarda (Cloudflare gibi)
-  // "/supabase-proxy" yolu kullanılır.
-  var host = window.location.hostname;
-  var SUPABASE_URL;
-  if (host === "nnasyar.github.io") {
-    SUPABASE_URL = "https://lvrwponfyvdxvypeewnw.supabase.co";
-  } else if (host.endsWith(".netlify.app")) {
-    SUPABASE_URL = window.location.origin + "/.netlify/functions/supabase-proxy";
-  } else {
-    SUPABASE_URL = window.location.origin + "/supabase-proxy";
-  }
-  var ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2cndwb25meXZkeHZ5cGVld253Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxNjM1MDUsImV4cCI6MjEwMDczOTUwNX0.AqsnWHE3nPF_dQ8cxuqBGK_IIyqrK21gLFXgoGrGtls";
-  var PANO49_TARGET = "pano49.html";
-  var DUYURU_TARGET = "pano99.html?ekran=1";
-  // Hangi panonun (pano49 mu, duyuru mu) en son ekranda olduğunu tarayıcının
-  // kendi yerel deposuna (localStorage) da yazarız. TV internetsiz açılır/
-  // yeniden başlarsa (Supabase'e hiç ulaşılamazsa) bu sayede varsayılan olarak
-  // HER ZAMAN "pano49"a değil, EN SON GERÇEKTEN AKTİF OLAN panoya gidilir.
-  var LOCAL_KEY = "panoLastActive";
-
-  function go(target, activeValue) {
-    // replace() kullanılır ki geri tuşu bu yükleme sayfasında sonsuz döngüye
-    // girmesin; kullanıcı geri gittiğinde bir önceki GERÇEK sayfaya döner.
-    if (activeValue) {
-      try { localStorage.setItem(LOCAL_KEY, activeValue); } catch (e) { /* depolama engelliyse sessizce geç */ }
-    }
-    window.location.replace(target);
-  }
-
-  fetch(SUPABASE_URL + "/rest/v1/display_control?id=eq.1&select=active", {
-    headers: { apikey: ANON_KEY, Authorization: "Bearer " + ANON_KEY }
-  })
-    .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (rows) {
-      var active = (rows && rows[0] && rows[0].active) ? rows[0].active : "pano";
-      go(active === "duyuru" ? DUYURU_TARGET : PANO49_TARGET, active);
-    })
-    .catch(function () {
-      // Bulut erişilemezse (çevrimdışı vb.): pano49'a sabit düşmek yerine, EN SON
-      // gerçekten aktif olduğu bilinen panoya (varsa) gidilir. Hiç yerel kayıt
-      // yoksa (ilk kurulum/ilk açılış) güvenli varsayılan: pano49.
-      var lastActive = null;
-      try { lastActive = localStorage.getItem(LOCAL_KEY); } catch (e) { /* depolama engelliyse yoksay */ }
-      go(lastActive === "duyuru" ? DUYURU_TARGET : PANO49_TARGET);
-    });
-})();
+window.location.replace("pano49.html");
 </script>
 </body>
 </html>
