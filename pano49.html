@@ -42,11 +42,9 @@
 </head>
 <body class="theme-standard">
 
-    <!-- Gizli ekran geçişi tetikleyicisi: tamamen görünmez, sağ-alt köşede küçük bir
-         tıklama alanı. Tıklanınca (varsa) Yönetim Paneli PIN'i sorulur, doğruysa
-         Duyuru Panosu'na geçilir. Kazara tıklamayı azaltmak için köşede ve minik. -->
-    <div id="hidden-switch-trigger" onclick="tryHiddenDisplaySwitch()" title="" aria-hidden="true"
-         style="position:fixed; bottom:0; right:0; width:34px; height:34px; z-index:99999; opacity:0; cursor:default;"></div>
+    <!-- Not: Tek panolu (pano49) tasarıma geçildiği için "gizli ekran geçişi"
+         tetikleyicisi kaldırıldı. Böylece TV'de yanlışlıkla tıklanıp
+         "GÜVENLİK GEÇİDİ" ekranının açılması ihtimali de ortadan kalktı. -->
 
     <div class="dashboard-container" id="pano-main-dashboard">
 
@@ -66,7 +64,7 @@
 
         <!-- Üst Logo / Okul Bilgi Alanı -->
         <div class="header-bar pano-module" id="brand-dashboard-card" data-module="brand">
-            <div class="school-brand" onclick="tryOpenAdminPanel()" title="Yönetim Paneli (A veya Tıklama)">
+            <div class="school-brand" onclick="if (typeof IS_DISPLAY_MODE === 'undefined' || !IS_DISPLAY_MODE) tryOpenAdminPanel()" title="Yönetim Paneli (A veya Tıklama)">
                 <div class="brand-zone brand-zone-left" id="brand-zone-left"></div>
                 <div class="brand-zone brand-zone-center" id="brand-zone-center"></div>
                 <div class="brand-zone brand-zone-right" id="brand-zone-right"></div>

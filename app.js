@@ -1,3 +1,14 @@
+        // ============================================================================
+        // EKRAN MODU (Kiosk/TV modu) TESPİTİ
+        // ----------------------------------------------------------------------------
+        // Adres "?ekran=1" içeriyorsa (TV/kiosk gösterimi), yönetim paneli açma
+        // tetikleyicileri (logoya tıklama, 'A' tuşu) TAMAMEN devre dışı bırakılır.
+        // Böylece TV'de yanlışlıkla dokunma/tuş basımıyla "Güvenlik Geçidi" ekranının
+        // açılması imkansız hale gelir. Normal (PC'den, parametresiz) erişimde
+        // yönetim paneli her zamanki gibi çalışmaya devam eder.
+        // ============================================================================
+        const IS_DISPLAY_MODE = new URLSearchParams(window.location.search).get("ekran") === "1";
+
         const classList = [
             "1/A", "1/B", "1/C", "1/D", "2/A", "2/B", "2/C", "2/D", "3/A", "3/B", "3/C", "3/D", "4/A", "4/B", "4/C", "4/D"
         ];
@@ -2454,6 +2465,7 @@
             }
 
             document.addEventListener('keydown', function(e) {
+                if (IS_DISPLAY_MODE) return; // TV/kiosk modunda yönetim paneli tuşla açılamaz
                 if (e.key === 'a' || e.key === 'A') {
                     const isModalOpen = !document.getElementById('admin-panel').classList.contains('hidden') || 
                                         !document.getElementById('pin-prompt-modal').classList.contains('hidden');
@@ -5733,6 +5745,7 @@
         let pendingPinAction = 'panel'; // 'panel' -> Yönetim Paneli aç, 'switchDisplay' -> gizli geçiş butonu
 
         function tryOpenAdminPanel() {
+            if (IS_DISPLAY_MODE) return; // TV/kiosk modunda yönetim paneli hiçbir şekilde açılamaz
             pendingPinAction = 'panel';
             document.getElementById('pin-prompt-input').value = "";
             document.getElementById('pin-prompt-modal').classList.remove('hidden');
@@ -5742,6 +5755,7 @@
         // Ekranın bir köşesindeki görünmez butona (bkz. index.html #hidden-switch-trigger)
         // tıklanınca çağrılır. Panel girişiyle AYNI Supabase Auth hesabını kullanır.
         function tryHiddenDisplaySwitch() {
+            if (IS_DISPLAY_MODE) return; // TV/kiosk modunda bu da açılamaz
             pendingPinAction = 'switchDisplay';
             document.getElementById('pin-prompt-input').value = "";
             document.getElementById('pin-prompt-modal').classList.remove('hidden');
@@ -8937,3 +8951,40 @@
             reader.readAsText(file);
         }
 
+
+// ============================================================================
+// TV/KİOSK GÜVENLİ MOD: Yönetim panelinde veya PIN ekranında uzun süre
+// hareketsiz kalınırsa otomatik olarak kapatıp temiz gösterim ekranına döner.
+// ----------------------------------------------------------------------------
+// Amaç: Biri (bilgisayardan) yönetim paneline girip düzenleme yapıp kapatmayı
+// unutursa, ya da hedefsiz bir tıklama/uzaktan kumanda hareketi "Ekran Geçişi"
+// PIN kutusunu kazara açarsa, TV bu ekranda takılı kalmasın. Belirlenen süre
+// (varsayılan 90 saniye) boyunca hiçbir fare/klavye/dokunma etkileşimi
+// olmazsa, açık olan yönetim paneli ve/veya PIN kutusu otomatik kapatılır.
+// ============================================================================
+(function () {
+  var IDLE_LIMIT_MS = 90 * 1000; // 90 saniye
+  var lastActivity = Date.now();
+
+  ["mousemove", "mousedown", "keydown", "touchstart", "wheel"].forEach(function (evt) {
+    window.addEventListener(evt, function () { lastActivity = Date.now(); }, { passive: true });
+  });
+
+  setInterval(function () {
+    var idleFor = Date.now() - lastActivity;
+    if (idleFor < IDLE_LIMIT_MS) return;
+
+    var adminPanel = document.getElementById("admin-panel");
+    var pinModal = document.getElementById("pin-prompt-modal");
+
+    var adminOpen = adminPanel && !adminPanel.classList.contains("hidden");
+    var pinOpen = pinModal && !pinModal.classList.contains("hidden");
+
+    if (adminOpen && typeof closeAdminPanelWithoutSaving === "function") {
+      closeAdminPanelWithoutSaving();
+    }
+    if (pinOpen && typeof closePinPrompt === "function") {
+      closePinPrompt();
+    }
+  }, 5000); // her 5 saniyede bir kontrol et
+})();
