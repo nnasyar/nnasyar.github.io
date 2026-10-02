@@ -39,7 +39,6 @@
     </script>
 
     <link rel="stylesheet" href="style.css">
-    <script src="shift.js"></script>
 </head>
 <body class="theme-standard">
 
@@ -77,7 +76,6 @@
                 </div>
                 <div id="brand-name-block">
                     <div class="brand-name" id="display-school-name">2071 MELİKŞAH İLKOKULU</div>
-                    <div class="shift-badge" id="shift-badge" style="display:none"></div>
                     <div class="brand-sub" id="display-brand-sub">Yönetici Paneli için Tıklayın veya 'A' Tuşuna Basın</div>
                 </div>
             </div>
@@ -335,24 +333,15 @@
         <div class="flex flex-1 gap-6 overflow-hidden">
             <!-- Sol Menü / Sidebar -->
             <div class="w-64 bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col overflow-hidden">
-                <!-- İkili öğretimde: hangi öğretimin (sabah/öğle) zil-ders-nöbet verisi düzenleniyor -->
-                <div id="shift-edit-switcher" class="hidden mb-3 p-2.5 rounded-xl bg-slate-950 border border-yellow-500/30">
-                    <div class="text-[10px] font-bold text-yellow-400 mb-1.5 uppercase tracking-wider"><i class="fa-solid fa-repeat"></i> Düzenlenen Öğretim</div>
-                    <div class="flex gap-1.5">
-                        <button type="button" id="shift-edit-btn-morning" onclick="shiftAdminSwitch('morning')"></button>
-                        <button type="button" id="shift-edit-btn-afternoon" onclick="shiftAdminSwitch('afternoon')"></button>
-                    </div>
-                    <div id="shift-edit-info" class="text-[9px] text-slate-500 mt-1.5 leading-snug"></div>
-                </div>
                 <div class="space-y-1.5 overflow-y-auto flex-1 pr-1" id="cms-sidebar-links">
                     <button class="w-full text-left px-4 py-3 bg-cyan-600 text-white font-bold rounded-lg text-sm flex items-center gap-3 transition" onclick="switchTab('tab-dashboard', this)">
                         <i class="fa-solid fa-chart-line w-5"></i> Kontrol Paneli Özet
                     </button>
-                    <button class="w-full text-left px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg text-sm flex items-center gap-3 transition" onclick="switchTab('tab-shift', this)">
-                        <i class="fa-solid fa-sun w-5"></i> Öğretim Düzeni
-                    </button>
                     <button class="w-full text-left px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg text-sm flex items-center gap-3 transition" onclick="switchTab('tab-general', this)">
                         <i class="fa-solid fa-school w-5"></i> Kimlik & Güvenlik
+                    </button>
+                    <button class="w-full text-left px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg text-sm flex items-center gap-3 transition" onclick="switchTab('tab-teaching', this)">
+                        <i class="fa-solid fa-sun w-5"></i> Öğretim Düzeni (Tekli / İkili)
                     </button>
                     <button class="w-full text-left px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg text-sm flex items-center gap-3 transition" onclick="switchTab('tab-excel', this)">
                         <i class="fa-solid fa-file-excel w-5"></i> Excel Entegrasyonu
@@ -468,12 +457,6 @@
                 </div>
 
                 <!-- TAB 1: GENEL VE GÜVENLİK -->
-                <!-- Öğretim Düzeni (Normal / İkili) -->
-                <div class="tab-content hidden space-y-5" id="tab-shift">
-                    <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2 border-b border-slate-800 pb-2"><i class="fa-solid fa-sun"></i> Öğretim Düzeni</h2>
-                    <div id="shift-tab-body" class="space-y-5"></div>
-                </div>
-
                 <div class="tab-content hidden space-y-6" id="tab-general">
                     <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2 border-b border-slate-800 pb-2"><i class="fa-solid fa-school"></i> Okul Tanıtım & Kimlik Verileri</h2>
                     <div class="grid grid-cols-2 gap-6">
@@ -674,6 +657,57 @@
                 </div>
 
                 <!-- TAB 2: EXCEL ENTEGRASYONU -->
+                <!-- TAB: ÖĞRETİM DÜZENİ (Normal / İkili Öğretim) -->
+                <div class="tab-content hidden space-y-6" id="tab-teaching">
+                    <h2 class="text-lg font-bold text-amber-400 flex items-center gap-2 border-b border-slate-800 pb-2"><i class="fa-solid fa-sun"></i> Öğretim Düzeni</h2>
+                    <p class="text-xs text-slate-400">Okulunuzda tek öğretim (normal) mi yoksa sabah/öğle ikili öğretim mi uygulandığını seçin. İkili öğretimde <b class="text-yellow-400">zil saatleri</b>, <b class="text-yellow-400">ders programı</b> ve <b class="text-yellow-400">nöbetçi öğretmenler</b> sabah ve öğle için ayrı tutulur; pano saate göre doğru öğretimi otomatik gösterir. Duyuru, doğum günü, söz, medya gibi diğer alanlar ortaktır.</p>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <button type="button" id="teach-mode-single" onclick="teachingModeSet('single')" class="text-left p-4 rounded-xl border-2 border-slate-800 bg-slate-950 hover:border-cyan-600 transition">
+                            <div class="font-bold text-white text-sm flex items-center gap-2"><i class="fa-solid fa-school text-cyan-400"></i> Normal (Tekli) Öğretim</div>
+                            <p class="text-[11px] text-slate-400 mt-1">Tüm sınıflar aynı zil saatleri, ders programı ve nöbet çizelgesini kullanır.</p>
+                        </button>
+                        <button type="button" id="teach-mode-double" onclick="teachingModeSet('double')" class="text-left p-4 rounded-xl border-2 border-slate-800 bg-slate-950 hover:border-cyan-600 transition">
+                            <div class="font-bold text-white text-sm flex items-center gap-2"><i class="fa-solid fa-circle-half-stroke text-amber-400"></i> İkili Öğretim (Sabah / Öğle)</div>
+                            <p class="text-[11px] text-slate-400 mt-1">Sabah ve öğle gruplarının zil saatleri, ders programı ve nöbetçileri ayrı olur.</p>
+                        </button>
+                    </div>
+
+                    <div id="teach-double-panel" class="space-y-5 hidden">
+                        <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-3">
+                            <h3 class="text-white font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-tv text-cyan-400"></i> Panoda Hangi Öğretim Gösterilsin?</h3>
+                            <select id="teach-active-mode" onchange="shiftSetActiveMode(this.value)" class="bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white">
+                                <option value="auto">Otomatik (saate göre sabah / öğle)</option>
+                                <option value="morning">Hep Sabah öğretimi</option>
+                                <option value="afternoon">Hep Öğle öğretimi</option>
+                            </select>
+                            <p class="text-[11px] text-slate-400" id="teach-switch-info"></p>
+                        </div>
+
+                        <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-3">
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <h3 class="text-white font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-people-group text-yellow-400"></i> Sınıfların Öğretimi</h3>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-[11px] text-slate-400 font-mono" id="teach-class-count"></span>
+                                    <button type="button" onclick="shiftSwapAllClasses()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-yellow-400 border border-yellow-500/30 font-bold rounded-lg text-[11px] flex items-center gap-1.5"><i class="fa-solid fa-right-left"></i> Sabah ↔ Öğle Yer Değiştir</button>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-500">Bir sınıfa tıklayarak sabah/öğle arasında geçirebilirsiniz. Haftalık/aylık dönüşümlü uygulamalarda "Yer Değiştir" ile tüm grupları tek seferde değiştirebilirsiniz.</p>
+                            <div class="grid grid-cols-4 gap-2" id="teach-class-grid"></div>
+                        </div>
+
+                        <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-2">
+                            <h3 class="text-white font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-list-check text-green-400"></i> Sabah / Öğle Verilerini Düzenleme</h3>
+                            <p class="text-[11px] text-slate-400">Zil Saatleri, Ders Programı ve Aylık Nöbet sekmelerinin en üstünde <b class="text-amber-400">Sabah | Öğle</b> seçici bulunur. Seçtiğiniz öğretimin verisini düzenlersiniz; ders sayısı da her öğretimde ayrı olabilir. Değişiklikler "Kaydet" ile uygulanır.</p>
+                            <div class="flex items-center gap-2 flex-wrap pt-1">
+                                <button type="button" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-xs" onclick="switchTab('tab-hours', document.querySelector('[onclick*=\'tab-hours\']'))"><i class="fa-solid fa-clock text-yellow-400"></i> Zil Saatleri</button>
+                                <button type="button" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-xs" onclick="switchTab('tab-schedule', document.querySelector('[onclick*=\'tab-schedule\']'))"><i class="fa-solid fa-table text-yellow-400"></i> Ders Programı</button>
+                                <button type="button" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-xs" onclick="switchTab('tab-duties', document.querySelector('[onclick*=\'tab-duties\']'))"><i class="fa-solid fa-clipboard-user text-cyan-400"></i> Aylık Nöbet</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="tab-content hidden space-y-6" id="tab-excel">
                     <h2 class="text-lg font-bold text-emerald-400 flex items-center gap-2 border-b border-slate-800 pb-2"><i class="fa-solid fa-file-excel"></i> Excel Entegrasyon ve Yedekleme Arabirimi</h2>
                     <p class="text-xs text-slate-300 leading-relaxed">Haftalık ders programlarını, gün bazlı nöbetçileri ve öğrenci doğum tarihlerini Excel dosyası ile topluca yükleyebilir veya yedeğini alabilirsiniz.</p>
@@ -713,6 +747,7 @@
 
                 <!-- TAB 3: DERS PROGRAMI MATRİSİ (HAFTALIK TOPLU GİRİŞ) -->
                 <div class="tab-content hidden space-y-4" id="tab-schedule">
+                    <div class="shift-edit-bar hidden"></div>
                     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                         <h2 class="text-lg font-bold text-yellow-400 flex items-center gap-2"><i class="fa-solid fa-table"></i> Haftalık Ders Programı Matrisi</h2>
                         <span class="text-xs text-slate-400">Sınıf seçip haftalık ders programını manuel düzenleyin veya Excel'den yükleyin.</span>
@@ -1783,6 +1818,7 @@
 
                 <!-- TAB 6: HAFTALIK/AYLIK NÖBET PLANLAYICI -->
                 <div class="tab-content hidden space-y-4" id="tab-duties">
+                    <div class="shift-edit-bar hidden"></div>
                     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                         <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-clipboard-user"></i> Aylık Nöbet Çizelgesi Planlayıcı</h2>
                         <div class="flex items-center gap-3">
@@ -1927,6 +1963,7 @@
 
                 <!-- TAB 7: ZİL SAATLERİ -->
                 <div class="tab-content hidden space-y-6" id="tab-hours">
+                    <div class="shift-edit-bar hidden"></div>
                     <div class="flex items-center justify-between border-b border-slate-800 pb-2 flex-wrap gap-2">
                         <h2 class="text-lg font-bold text-yellow-400 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left"></i> Okul Giriş - Çıkış Zil Saatleri Planlayıcı</h2>
                         <button onclick="addLessonPeriod()" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-lg text-xs flex items-center gap-2"><i class="fa-solid fa-plus"></i> Yeni Ders Saati Ekle</button>

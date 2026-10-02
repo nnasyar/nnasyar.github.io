@@ -36,19 +36,6 @@
             weatherLat: "38.73",
             weatherLng: "41.49",
             adminPin: "",
-            // ÖĞRETİM DÜZENİ: 'single' = Normal (tekli) öğretim, 'dual' = İkili (sabah/öğle) öğretim.
-            // İkili öğretimde zil saatleri, ders programı, nöbet ve sınıf listesi shiftData içinde
-            // sabah/öğle için ayrı tutulur (bkz. shift.js).
-            schoolMode: "single",
-            shiftSettings: {
-                autoSwitch: true,
-                switchTime: "13:00",
-                manualShift: "morning",
-                labels: { morning: "SABAH ÖĞRETİMİ", afternoon: "ÖĞLE ÖĞRETİMİ" },
-                filterBirthdays: true,
-                showBadge: true
-            },
-            shiftData: null,
             // Başka bir cihazda/tarayıcıda yapılan güncelleme bu ekrana ulaştığında
             // gösterilecek mesaj. Yönetim Paneli > Bulut Bağlantısı bölümünden
             // değiştirilebilir; hem Pano49 hem Pano99 (Duyuru Panosu) için ayrı
@@ -1644,7 +1631,6 @@
         // Tüm "kaydet" işlemleri bu tek fonksiyon üzerinden geçer. Her çağrıda __syncVersion
         // bir artırılır; bulut karşılaştırmaları ham JSON metni yerine bu sayaca bakar.
         function panoPersist() {
-            shiftStashLive(); // İkili öğretimde canlı alanları aktif öğretimin kaydına geri yaz
             appConfig.__syncVersion = (appConfig.__syncVersion || 0) + 1;
             localStorage.setItem('okulPanoDataV8', JSON.stringify(appConfig));
             cloudPushDebounced();
@@ -2016,7 +2002,7 @@
             });
         }
 
-        let appConfig = JSON.parse(localStorage.getItem('okulPanoDataV8')) || defaultAppConfig;
+        let appConfig = JSON.parse(localStorage.getItem('okulPanoDataV8')) || JSON.parse(JSON.stringify(defaultAppConfig));
 
         // ESKİ SÜRÜM UYUMLULUĞU: Duyurular önceden düz metin (string) dizisiydi.
         // Her duyuru için ayrı biçimlendirme desteği eklendiğinde, eski kayıtları
@@ -2026,7 +2012,6 @@
                 return { text: a, color: '', bgColor: '', font: '', fontSize: 11, bold: false };
             }
             return {
-                shift: (a && a.shift) || 'all',
                 text: (a && a.text) || '',
                 color: (a && a.color) || '',
                 bgColor: (a && a.bgColor) || '',
@@ -2046,7 +2031,6 @@
                 return { text: m, color: '', bold: false, italic: false, icon: '' };
             }
             return {
-                shift: (m && m.shift) || 'all',
                 text: (m && m.text) || '',
                 color: (m && m.color) || '',
                 bold: !!(m && m.bold),
@@ -2095,12 +2079,440 @@
 
         applyBrandPositions();
         
+        /* =========================================================================
+           İKİLİ ÖĞRETİM (SABAH / ÖĞLE) DESTEĞİ
+           -------------------------------------------------------------------------
+           İki mod vardır:
+             - "single" (Normal / Tekli): Eski çalışma şekli. Hiçbir veri değişmez.
+             - "double" (İkili Öğretim): Aşağıdaki alanlar SABAH ve ÖĞLE için ayrı tutulur:
+                   bellHours (zil saatleri), weeklyClassSchedules (ders programı),
+                   aylikNobet + weeklyDuties (nöbetçi öğretmenler)
+               Her sınıf bir öğretime (sabah/öğle) atanır; pano, saate göre otomatik
+               (veya elle seçilen) öğretimin verisini gösterir.
+
+           Çalışma prensibi: ikili modda appConfig.bellHours, appConfig.weeklyClassSchedules,
+           appConfig.aylikNobet ve appConfig.weeklyDuties "yönlendirici" (getter/setter)
+           özelliklere dönüşür ve o an bağlı olan öğretimin verisini okur/yazar. Böylece
+           mevcut tüm fonksiyonlar (Excel yükleme, zil ekleme/silme, nöbet tablosu vb.)
+           değişmeden doğru öğretimin verisi üzerinde çalışır. Bu özellikler "enumerable
+           değildir", yani kayıt (JSON) sırasında tekrar yazılmazlar; gerçek veri
+           appConfig.doubleShift içinde saklanır. Normal moda dönüldüğünde eski tekli
+           verileriniz (appConfig.singleModeData) aynen geri yüklenir.
+        ========================================================================= */
+        const SHIFT_KEYS = ['morning', 'afternoon'];
+        const SHIFT_LABELS = { morning: 'Sabah', afternoon: 'Öğle' };
+        const SHIFT_FIELDS = ['bellHours', 'weeklyClassSchedules', 'aylikNobet', 'weeklyDuties'];
+        const SHIFT_DEFAULT_BELLS = {
+            morning:   [['08:00', '08:40'], ['08:50', '09:30'], ['09:40', '10:20'], ['10:30', '11:10'], ['11:20', '12:00']],
+            afternoon: [['12:30', '13:10'], ['13:20', '14:00'], ['14:10', '14:50'], ['15:00', '15:40'], ['15:50', '16:30']]
+        };
+        const SHIFT_SINGLE_DEFAULT_BELLS = [
+            { id: 1, start: '08:40', end: '09:20' }, { id: 2, start: '09:35', end: '10:15' },
+            { id: 3, start: '10:30', end: '11:10' }, { id: 4, start: '11:20', end: '12:00' },
+            { id: 5, start: '13:20', end: '14:00' }, { id: 6, start: '14:10', end: '14:50' },
+            { id: 7, start: '15:00', end: '15:40' }
+        ];
+        let __boundShift = null;            // şu an hangi öğretimin verisine bağlıyız (tekli modda null)
+        let shiftAdminEditShift = 'morning'; // yönetim panelinde düzenlenen öğretim
+
+        function isDoubleMode() {
+            return !!(appConfig && appConfig.teachingMode === 'double' && appConfig.doubleShift);
+        }
+
+        function shiftDeepCopy(o) { return JSON.parse(JSON.stringify(o === undefined ? null : o)); }
+
+        function shiftTimeToMin(str) {
+            const p = String(str || '').split(':');
+            const h = parseInt(p[0], 10), m = parseInt(p[1], 10);
+            if (isNaN(h) || isNaN(m)) return NaN;
+            return h * 60 + m;
+        }
+
+        // Bir ders programı satırını (gün -> ders listesi) hedef ders sayısına göre kırpar/tamamlar
+        function shiftNormalizeClassWeek(week, len) {
+            const out = {};
+            daysOfWeek.forEach(d => {
+                const arr = ((week && week[d]) || []).slice(0, len);
+                while (arr.length < len) arr.push('');
+                out[d] = arr;
+            });
+            return out;
+        }
+
+        // Tekli moddaki mevcut veriden ilk ikili öğretim verisini üretir
+        function shiftSeedFromSingle(single) {
+            const ds = { activeMode: 'auto', classShifts: {}, morning: {}, afternoon: {} };
+            // Varsayılan: 3-4. sınıflar sabah, 1-2. sınıflar öğle (yönetim panelinden değiştirilebilir)
+            classList.forEach(c => { ds.classShifts[c] = (c.startsWith('3/') || c.startsWith('4/')) ? 'morning' : 'afternoon'; });
+            SHIFT_KEYS.forEach(k => {
+                const bells = SHIFT_DEFAULT_BELLS[k].map((b, i) => ({ id: i + 1, start: b[0], end: b[1] }));
+                const sched = {};
+                classList.filter(c => ds.classShifts[c] === k).forEach(c => {
+                    const src = (single.weeklyClassSchedules || {})[c];
+                    if (src) sched[c] = shiftNormalizeClassWeek(src, bells.length);
+                });
+                ds[k] = {
+                    bellHours: bells,
+                    weeklyClassSchedules: sched,
+                    // Mevcut nöbet çizelgesi sabaha aktarılır; öğle boş başlar
+                    aylikNobet: k === 'morning' ? shiftDeepCopy(single.aylikNobet || {}) : {},
+                    weeklyDuties: k === 'morning' ? shiftDeepCopy(single.weeklyDuties || {}) : {}
+                };
+            });
+            return ds;
+        }
+
+        // Eksik alanları tamamlar (eski/bozuk kayıtlara karşı)
+        function shiftEnsureDoubleData() {
+            if (!appConfig.doubleShift) appConfig.doubleShift = shiftSeedFromSingle(appConfig.singleModeData || {});
+            const ds = appConfig.doubleShift;
+            if (!ds.activeMode) ds.activeMode = 'auto';
+            if (!ds.classShifts) ds.classShifts = {};
+            classList.forEach(c => { if (ds.classShifts[c] !== 'morning' && ds.classShifts[c] !== 'afternoon') ds.classShifts[c] = 'morning'; });
+            SHIFT_KEYS.forEach(k => {
+                if (!ds[k]) ds[k] = {};
+                if (!Array.isArray(ds[k].bellHours) || ds[k].bellHours.length === 0) {
+                    ds[k].bellHours = SHIFT_DEFAULT_BELLS[k].map((b, i) => ({ id: i + 1, start: b[0], end: b[1] }));
+                }
+                if (!ds[k].weeklyClassSchedules) ds[k].weeklyClassSchedules = {};
+                if (!ds[k].aylikNobet) ds[k].aylikNobet = {};
+                if (!ds[k].weeklyDuties) ds[k].weeklyDuties = {};
+            });
+        }
+
+        function shiftInstallAccessors() {
+            const cfg = appConfig;
+            SHIFT_FIELDS.forEach(f => {
+                Object.defineProperty(cfg, f, {
+                    configurable: true,
+                    enumerable: false, // JSON'a yazılmasın; gerçek veri doubleShift içinde
+                    get() { return cfg.doubleShift[__boundShift || 'morning'][f]; },
+                    set(v) { cfg.doubleShift[__boundShift || 'morning'][f] = v; }
+                });
+            });
+        }
+
+        function shiftRemoveAccessors() {
+            SHIFT_FIELDS.forEach(f => {
+                const d = Object.getOwnPropertyDescriptor(appConfig, f);
+                if (d && (d.get || d.set)) delete appConfig[f];
+            });
+        }
+
+        function shiftBind(key) {
+            __boundShift = key;
+            bellHours = appConfig.bellHours;
+        }
+
+        // Sayfa açılışında / appConfig değiştirildiğinde (sıfırlama, yedekten yükleme) çağrılır
+        function shiftInstall() {
+            shiftRemoveAccessors();
+            if (appConfig.teachingMode !== 'double') {
+                appConfig.teachingMode = 'single';
+                __boundShift = null;
+                if (!Array.isArray(appConfig.bellHours) || appConfig.bellHours.length === 0) {
+                    appConfig.bellHours = shiftDeepCopy(SHIFT_SINGLE_DEFAULT_BELLS);
+                }
+                bellHours = appConfig.bellHours;
+                return;
+            }
+            // Çift modda düz alanlar (varsa) kaldırılır, yönlendirici özellikler kurulur
+            SHIFT_FIELDS.forEach(f => { try { delete appConfig[f]; } catch (e) {} });
+            shiftEnsureDoubleData();
+            shiftInstallAccessors();
+            shiftBind(shiftGetActive(new Date()));
+        }
+
+        // Şu an panoda hangi öğretimin gösterileceği
+        function shiftGetActive(now) {
+            const ds = appConfig.doubleShift;
+            if (!ds) return 'morning';
+            if (ds.activeMode === 'morning' || ds.activeMode === 'afternoon') return ds.activeMode;
+            const n = now || new Date();
+            return (n.getHours() * 60 + n.getMinutes()) < shiftSwitchMinutes() ? 'morning' : 'afternoon';
+        }
+
+        // Otomatik geçiş saati: sabahın son ders çıkışı ile öğlenin ilk ders girişinin tam ortası
+        function shiftSwitchMinutes() {
+            const ds = appConfig.doubleShift;
+            try {
+                const m = ds.morning.bellHours, a = ds.afternoon.bellHours;
+                const mEnd = shiftTimeToMin(m[m.length - 1].end);
+                const aStart = shiftTimeToMin(a[0].start);
+                if (!isNaN(mEnd) && !isNaN(aStart)) return Math.round((mEnd + aStart) / 2);
+            } catch (e) {}
+            return 12 * 60 + 30;
+        }
+
+        function shiftMinToTime(min) {
+            return String(Math.floor(min / 60)).padStart(2, '0') + ':' + String(min % 60).padStart(2, '0');
+        }
+
+        function shiftClassesOf(key) {
+            const ds = appConfig.doubleShift;
+            return classList.filter(c => (ds.classShifts[c] || 'morning') === key);
+        }
+
+        // Yönetim panelindeki ders programı için seçilebilir sınıflar
+        function adminClassList() {
+            return (isDoubleMode() && __boundShift) ? shiftClassesOf(__boundShift) : classList;
+        }
+
+        // Admin panelindeki giriş alanlarındaki bekleyen değişiklikleri bağlı öğretimin verisine yazar
+        function shiftCommitInputs() {
+            try { saveBellHoursFromInputs(); } catch (e) {}
+            try { saveWeeklyScheduleMatrix(); } catch (e) {}
+            try { nobetAyiKaydet(); } catch (e) {}
+        }
+
+        // Pano ekranını bağlı öğretime göre yeniden çizer
+        function shiftRefreshDisplay() {
+            renderBellHoursTable();
+            renderActiveScheduleGroup();
+            renderActiveDuties();
+            shiftDecorate();
+            calculateCountdownAndTableHighlight(new Date());
+        }
+
+        // Her saniye çağrılır: yönetim paneli kapalıyken saat ilerleyip öğretim değişirse
+        // (sabah -> öğle) veriyi otomatik değiştirir; panel açıkken düzenlenen öğretimi korur.
+        function shiftSyncBinding(forceActive) {
+            if (!isDoubleMode()) return false;
+            const panel = document.getElementById('admin-panel');
+            const adminOpen = !forceActive && panel && !panel.classList.contains('hidden');
+            const want = adminOpen ? shiftAdminEditShift : shiftGetActive(new Date());
+            if (want === __boundShift) return false;
+            shiftBind(want);
+            shiftRefreshDisplay();
+            return true;
+        }
+
+        // Pano kartı başlıklarına "SABAH ÖĞRETİMİ / ÖĞLE ÖĞRETİMİ" rozeti ekler
+        function shiftDecorate() {
+            document.querySelectorAll('.shift-badge').forEach(e => e.remove());
+            if (!isDoubleMode() || !__boundShift) return;
+            const text = SHIFT_LABELS[__boundShift].toUpperCase() + ' ÖĞRETİMİ';
+            const cls = 'shift-badge shift-badge-' + __boundShift;
+            const targets = [
+                document.getElementById('display-bellhours-title'),
+                (document.getElementById('display-duty-title-text') || {}).parentElement
+            ];
+            targets.forEach(t => {
+                if (!t) return;
+                const s = document.createElement('span');
+                s.className = cls;
+                s.textContent = text;
+                t.appendChild(s);
+            });
+        }
+
+        (function shiftInjectStyle() {
+            const st = document.createElement('style');
+            st.textContent = `
+                .shift-badge{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;font-size:.62em;font-weight:700;letter-spacing:.04em;vertical-align:middle;white-space:nowrap}
+                .shift-badge-morning{background:rgba(255,183,3,.18);color:#ffb703;border:1px solid rgba(255,183,3,.5)}
+                .shift-badge-afternoon{background:rgba(129,140,248,.18);color:#a5b4fc;border:1px solid rgba(129,140,248,.5)}
+            `;
+            document.head.appendChild(st);
+        })();
+
+        /* ---------------------- YÖNETİM PANELİ ---------------------- */
+
+        // Panel açılırken: düzenlenecek öğretimi seçer ve veriyi ona bağlar
+        function shiftAdminOpenInit() {
+            if (!isDoubleMode()) return;
+            shiftAdminEditShift = shiftGetActive(new Date());
+            shiftBind(shiftAdminEditShift);
+            const cls = adminClassList();
+            if (cls.length && !cls.includes(activeAdminEditClass)) activeAdminEditClass = cls[0];
+        }
+
+        // Yönetim panelindeki ilgili tüm bölümleri bağlı öğretime göre yeniden kurar
+        function shiftRefreshAdmin() {
+            const cls = adminClassList();
+            if (cls.length && !cls.includes(activeAdminEditClass)) activeAdminEditClass = cls[0];
+            buildAdminClassSelector();
+            buildAdminBellHoursInputs();
+            buildWeeklyScheduleMatrix();
+            buildAylikNobetTablosu();
+            renderShiftEditBars();
+            renderTeachingTab();
+            shiftRefreshDisplay();
+        }
+
+        // Ders programı / zil saatleri / nöbet sekmelerinin üstündeki "Sabah | Öğle" seçici
+        function renderShiftEditBars() {
+            const dbl = isDoubleMode();
+            document.querySelectorAll('.shift-edit-bar').forEach(bar => {
+                if (!dbl) { bar.innerHTML = ''; bar.classList.add('hidden'); return; }
+                bar.classList.remove('hidden');
+                const mk = (key, icon, color) => {
+                    const on = (__boundShift === key);
+                    return `<button type="button" onclick="adminSwitchEditShift('${key}')" class="px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 border transition ${on ? color + ' text-black border-transparent shadow-lg' : 'bg-slate-900 text-slate-400 border-slate-700 hover:text-white'}"><i class="fa-solid ${icon}"></i> ${SHIFT_LABELS[key]} Öğretimi</button>`;
+                };
+                bar.innerHTML = `
+                    <div class="flex items-center gap-3 flex-wrap bg-slate-950 border border-amber-500/30 rounded-xl p-3">
+                        <span class="text-[11px] text-slate-400 font-bold"><i class="fa-solid fa-pen-to-square text-amber-400"></i> Düzenlenen öğretim:</span>
+                        ${mk('morning', 'fa-sun', 'bg-amber-400')}
+                        ${mk('afternoon', 'fa-cloud-sun', 'bg-indigo-300')}
+                        <span class="text-[10px] text-slate-500">Bu sekmedeki zil saatleri, ders programı ve nöbet çizelgesi seçili öğretime aittir.</span>
+                    </div>`;
+            });
+        }
+
+        function adminSwitchEditShift(key) {
+            if (!isDoubleMode() || key === __boundShift) return;
+            shiftCommitInputs();
+            shiftAdminEditShift = key;
+            shiftBind(key);
+            const cls = adminClassList();
+            if (cls.length) activeAdminEditClass = cls[0];
+            shiftRefreshAdmin();
+            writeCMSLog(`Düzenlenen öğretim: ${SHIFT_LABELS[key]}`);
+        }
+
+        function shiftEnableDouble() {
+            if (isDoubleMode()) return;
+            shiftCommitInputs();
+            const single = {};
+            SHIFT_FIELDS.forEach(f => { single[f] = appConfig[f]; });
+            appConfig.singleModeData = single;               // yedek: normal moda dönüşte geri gelir
+            if (!appConfig.doubleShift) appConfig.doubleShift = shiftSeedFromSingle(single);
+            SHIFT_FIELDS.forEach(f => { delete appConfig[f]; });
+            appConfig.teachingMode = 'double';
+            shiftEnsureDoubleData();
+            shiftInstallAccessors();
+            shiftAdminEditShift = shiftGetActive(new Date());
+            shiftBind(shiftAdminEditShift);
+            const cls = adminClassList();
+            if (cls.length) activeAdminEditClass = cls[0];
+        }
+
+        function shiftDisableDouble() {
+            if (!isDoubleMode()) return;
+            shiftCommitInputs();
+            const back = appConfig.singleModeData || {};
+            shiftRemoveAccessors();
+            SHIFT_FIELDS.forEach(f => {
+                if (back[f] !== undefined && back[f] !== null) appConfig[f] = back[f];
+                else appConfig[f] = (f === 'bellHours') ? shiftDeepCopy(SHIFT_SINGLE_DEFAULT_BELLS) : {};
+            });
+            delete appConfig.singleModeData;
+            appConfig.teachingMode = 'single';
+            __boundShift = null;
+            bellHours = appConfig.bellHours;
+            if (!classList.includes(activeAdminEditClass)) activeAdminEditClass = classList[0];
+        }
+
+        function teachingModeSet(mode) {
+            const current = isDoubleMode() ? 'double' : 'single';
+            if (mode === current) return;
+            if (mode === 'double') {
+                askCustomConfirmation(
+                    'İkili Öğretime Geç',
+                    'Zil saatleri, ders programı ve nöbet çizelgesi SABAH ve ÖĞLE için ayrı tutulacak. İlk geçişte mevcut ders programınız sınıflara göre iki öğretime dağıtılır ve örnek zil saatleri yüklenir (sonra düzenleyebilirsiniz). Normal moda dönerseniz eski verileriniz aynen geri gelir. Devam edilsin mi?',
+                    function () { shiftEnableDouble(); shiftRefreshAdmin(); writeCMSLog('İkili öğretim moduna geçildi. Kaydetmeyi unutmayın.'); }
+                );
+            } else {
+                askCustomConfirmation(
+                    'Normal (Tekli) Öğretime Dön',
+                    'Pano tekrar tek öğretim düzenine dönecek ve ikili öğretime geçmeden önceki zil saatleri, ders programı ve nöbet verileriniz geri yüklenecek. Sabah/öğle verileriniz silinmez; ikili moda tekrar geçerseniz karşınıza çıkar. Devam edilsin mi?',
+                    function () { shiftDisableDouble(); shiftRefreshAdmin(); writeCMSLog('Normal (tekli) öğretim moduna dönüldü. Kaydetmeyi unutmayın.'); }
+                );
+            }
+        }
+
+        function shiftSetActiveMode(val) {
+            if (!isDoubleMode()) return;
+            appConfig.doubleShift.activeMode = (val === 'morning' || val === 'afternoon') ? val : 'auto';
+            renderTeachingTab();
+        }
+
+        function shiftMoveClass(cls, to) {
+            const ds = appConfig.doubleShift;
+            const from = ds.classShifts[cls] || 'morning';
+            if (from === to) return;
+            ds.classShifts[cls] = to;
+            // Sınıfın hedef öğretimde programı yoksa, mevcut programı kopyalanır (varsa dokunulmaz)
+            const src = ds[from].weeklyClassSchedules[cls];
+            if (src && !ds[to].weeklyClassSchedules[cls]) {
+                ds[to].weeklyClassSchedules[cls] = shiftNormalizeClassWeek(src, ds[to].bellHours.length);
+            }
+        }
+
+        function shiftToggleClass(cls) {
+            if (!isDoubleMode()) return;
+            shiftCommitInputs();
+            const cur = appConfig.doubleShift.classShifts[cls] || 'morning';
+            shiftMoveClass(cls, cur === 'morning' ? 'afternoon' : 'morning');
+            shiftRefreshAdmin();
+        }
+
+        function shiftSwapAllClasses() {
+            if (!isDoubleMode()) return;
+            askCustomConfirmation(
+                'Sabah ↔ Öğle Yer Değiştir',
+                'Tüm sınıfların öğretimi değiştirilecek (sabahtakiler öğleye, öğledekiler sabaha). Zil saatleri ve nöbet çizelgeleri öğretime bağlı olduğu için yerinde kalır. Her sınıfın o öğretimdeki ders programı varsa o kullanılır, yoksa mevcut programı kopyalanır. Devam edilsin mi?',
+                function () {
+                    shiftCommitInputs();
+                    const ds = appConfig.doubleShift;
+                    const moves = classList.map(c => [c, ds.classShifts[c] === 'afternoon' ? 'morning' : 'afternoon']);
+                    moves.forEach(([c, to]) => shiftMoveClass(c, to));
+                    shiftRefreshAdmin();
+                    writeCMSLog('Sabah/öğle sınıf grupları yer değiştirdi. Kaydetmeyi unutmayın.');
+                }
+            );
+        }
+
+        // "Öğretim Düzeni" sekmesini çizer
+        function renderTeachingTab() {
+            const dbl = isDoubleMode();
+            const setCard = (id, on) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.classList.toggle('border-cyan-500', on);
+                el.classList.toggle('bg-cyan-900/20', on);
+                el.classList.toggle('border-slate-800', !on);
+            };
+            setCard('teach-mode-single', !dbl);
+            setCard('teach-mode-double', dbl);
+            const panel = document.getElementById('teach-double-panel');
+            if (panel) panel.classList.toggle('hidden', !dbl);
+            if (!dbl) return;
+
+            const ds = appConfig.doubleShift;
+            const sel = document.getElementById('teach-active-mode');
+            if (sel) sel.value = ds.activeMode || 'auto';
+
+            const info = document.getElementById('teach-switch-info');
+            if (info) {
+                const now = shiftGetActive(new Date());
+                info.innerHTML = (ds.activeMode === 'auto' || !ds.activeMode)
+                    ? `Otomatik: <b class="text-yellow-400">${shiftMinToTime(shiftSwitchMinutes())}</b> öncesinde <b>Sabah</b>, sonrasında <b>Öğle</b> öğretimi gösterilir (sabahın son ders çıkışı ile öğlenin ilk ders girişinin ortası). Şu an panoda: <b class="text-cyan-400">${SHIFT_LABELS[now]} Öğretimi</b>.`
+                    : `Pano sabit olarak <b class="text-cyan-400">${SHIFT_LABELS[ds.activeMode]} Öğretimi</b> verisini gösteriyor (otomatik geçiş kapalı).`;
+            }
+
+            const grid = document.getElementById('teach-class-grid');
+            if (grid) {
+                grid.innerHTML = classList.map(c => {
+                    const k = ds.classShifts[c] || 'morning';
+                    const styl = k === 'morning'
+                        ? 'bg-amber-400/15 border-amber-400/50 text-amber-300'
+                        : 'bg-indigo-400/15 border-indigo-400/50 text-indigo-300';
+                    return `<button type="button" onclick="shiftToggleClass('${c}')" class="flex items-center justify-between gap-2 px-3 py-2 rounded-lg border text-xs font-bold transition hover:brightness-125 ${styl}" title="Tıklayınca öğretimi değişir"><span>${c}</span><span class="text-[10px] opacity-90"><i class="fa-solid ${k === 'morning' ? 'fa-sun' : 'fa-cloud-sun'}"></i> ${SHIFT_LABELS[k]}</span></button>`;
+                }).join('');
+            }
+            const cnt = document.getElementById('teach-class-count');
+            if (cnt) cnt.textContent = `Sabah: ${shiftClassesOf('morning').length} sınıf · Öğle: ${shiftClassesOf('afternoon').length} sınıf`;
+        }
+        /* ========================= İKİLİ ÖĞRETİM SONU ========================= */
+
+        shiftInstall(); // normal/ikili öğretim moduna göre veri bağlantısını kur
         if (!appConfig.bellHours) appConfig.bellHours = bellHours; else bellHours = appConfig.bellHours;
         appConfig.bellHoursSettings = { ...defaultAppConfig.bellHoursSettings, ...(appConfig.bellHoursSettings || {}) };
         if (!appConfig.weeklyDuties) appConfig.weeklyDuties = defaultAppConfig.weeklyDuties;
         if (!appConfig.weeklyClassSchedules) appConfig.weeklyClassSchedules = defaultAppConfig.weeklyClassSchedules;
         if (!appConfig.aylikNobet) appConfig.aylikNobet = {};
-        shiftInit(); // Normal / İkili öğretim: aktif öğretimin verisini canlı alanlara yükler (shift.js)
         if (!appConfig.teacherRoster) appConfig.teacherRoster = {};
         if (!appConfig.dutyPositions || !Array.isArray(appConfig.dutyPositions) || appConfig.dutyPositions.length === 0) {
             appConfig.dutyPositions = JSON.parse(JSON.stringify(defaultAppConfig.dutyPositions));
@@ -2635,9 +3047,7 @@
             const viewport = document.getElementById('marquee-viewport');
             if (!track) return;
             const mw = appConfig.marqueeWidget || defaultAppConfig.marqueeWidget;
-            let items = (appConfig.marqueeItems && appConfig.marqueeItems.length > 0) ? appConfig.marqueeItems : defaultAppConfig.marqueeItems;
-            const __mqShift = shiftFilterItems(items);
-            items = __mqShift.length > 0 ? __mqShift : items;
+            const items = (appConfig.marqueeItems && appConfig.marqueeItems.length > 0) ? appConfig.marqueeItems : defaultAppConfig.marqueeItems;
             buildMarqueeTrack(track, viewport, items, mw);
         }
 
@@ -2649,7 +3059,6 @@
             document.getElementById('display-school-name').style.fontFamily = appConfig.schoolNameFont || defaultAppConfig.schoolNameFont;
             document.getElementById('display-brand-sub').innerText = appConfig.brandSubText || defaultAppConfig.brandSubText;
             document.getElementById('display-brand-sub').style.display = (appConfig.brandSubVisible === false) ? 'none' : '';
-            shiftRenderBadge();
 
             const logoBox = document.getElementById('brand-logo-box');
             const logoImg = document.getElementById('brand-logo-img');
@@ -2680,8 +3089,7 @@
 
             const annListContainer = document.getElementById('display-announcements-list');
             annListContainer.innerHTML = '';
-            const __annShift = shiftFilterItems(appConfig.announcements);
-            const anns = __annShift.length > 0 ? __annShift : [{ text: 'Duyuru bulunmamaktadır.', color: '', bgColor: '', font: '', fontSize: 11, bold: false }];
+            const anns = appConfig.announcements && appConfig.announcements.length > 0 ? appConfig.announcements : [{ text: 'Duyuru bulunmamaktadır.', color: '', bgColor: '', font: '', fontSize: 11, bold: false }];
             anns.slice(0, 4).forEach(ann => {
                 const item = document.createElement('div');
                 item.className = 'ann-item';
@@ -2706,6 +3114,7 @@
             applyClockStyle();
             renderActiveScheduleGroup();
             renderMarqueeWidget();
+            shiftDecorate();
         }
 
         function applyBrandPositions() {
@@ -3194,20 +3603,23 @@
             if (!appConfig.teacherRoster) appConfig.teacherRoster = {};
             const found = new Set();
 
-            Object.values(appConfig.weeklyDuties || {}).forEach(d => {
+            const _dutySources = isDoubleMode()
+                ? SHIFT_KEYS.map(k => ({ w: appConfig.doubleShift[k].weeklyDuties || {}, a: appConfig.doubleShift[k].aylikNobet || {} }))
+                : [{ w: appConfig.weeklyDuties || {}, a: appConfig.aylikNobet || {} }];
+            _dutySources.forEach(src => Object.values(src.w).forEach(d => {
                 ['admin', 'canteen', 'garden', 'floor1', 'floor2'].forEach(k => {
                     if (d[k] && d[k].trim()) found.add(d[k].trim());
                 });
-            });
+            }));
 
             const dutyIds = (appConfig.dutyPositions || []).map(p => p.id);
-            Object.values(appConfig.aylikNobet || {}).forEach(ay => {
+            _dutySources.forEach(src => Object.values(src.a).forEach(ay => {
                 Object.values(ay || {}).forEach(gun => {
                     dutyIds.forEach(k => {
                         if (gun[k] && gun[k].trim()) found.add(gun[k].trim());
                     });
                 });
-            });
+            }));
 
             let added = 0;
             found.forEach(name => {
@@ -4146,16 +4558,20 @@
             const titleEl = document.getElementById('display-schedule-group-title');
             container.innerHTML = '';
 
-            // Normal öğretimde tüm sınıflar; İkili öğretimde yalnızca aktif öğretimin sınıfları (shift.js)
-            const __grp = shiftScheduleGroups();
-            let __g = activeScheduleGroup;
-            if (__g === 1 && __grp.g1.length === 0 && __grp.g2.length > 0) __g = 2;
-            else if (__g === 2 && __grp.g2.length === 0 && __grp.g1.length > 0) __g = 1;
-            const filteredClasses = (__g === 1) ? __grp.g1 : __grp.g2;
-            titleEl.innerText = shiftGradeTitle(filteredClasses) + (shiftIsDual() ? ' • ' + shiftShortLabel(currentShift) : '');
-            if (filteredClasses.length === 0) {
-                container.innerHTML = '<div style="grid-column:1/-1;padding:14px;text-align:center;color:var(--text-muted);font-size:12px;">Bu öğretime henüz sınıf atanmadı.<br>Yönetim Paneli > Öğretim Düzeni</div>';
-                return;
+            let filteredClasses = [];
+            if (isDoubleMode()) {
+                const allCls = shiftClassesOf(__boundShift || 'morning');
+                const chunks = [];
+                for (let i = 0; i < allCls.length; i += 8) chunks.push(allCls.slice(i, i + 8));
+                const gi = chunks.length ? (((activeScheduleGroup - 1) % chunks.length) + chunks.length) % chunks.length : 0;
+                filteredClasses = chunks[gi] || [];
+                titleEl.innerText = 'DERS PROGRAMI · ' + SHIFT_LABELS[__boundShift || 'morning'].toUpperCase() + ' ÖĞRETİMİ' + (chunks.length > 1 ? ` (${gi + 1}/${chunks.length})` : '');
+            } else if (activeScheduleGroup === 1) {
+                titleEl.innerText = "DERS PROGRAMI (3. VE 4. SINIFLAR)";
+                filteredClasses = classList.filter(c => c.startsWith('3/') || c.startsWith('4/'));
+            } else {
+                titleEl.innerText = "DERS PROGRAMI (1. VE 2. SINIFLAR)";
+                filteredClasses = classList.filter(c => c.startsWith('1/') || c.startsWith('2/'));
             }
 
             const now = new Date();
@@ -4534,8 +4950,8 @@
                 document.getElementById('display-clock-date').innerText = dateString;
                 document.getElementById('display-clock-time').innerText = timeString;
 
+                if (typeof shiftSyncBinding === 'function') shiftSyncBinding();
                 calculateCountdownAndTableHighlight(now);
-                shiftTick(now); // saat geçiş saatini aştıysa sabah <-> öğle öğretimini değiştirir
             }, 1000);
 
             startCyclingModuleIntervals();
@@ -4723,7 +5139,7 @@
             const settings = appConfig.birthdayWidget || defaultAppConfig.birthdayWidget;
             applyBirthdayWidgetChrome();
 
-            const birthdays = shiftFilterBirthdays(appConfig.birthdays || []);
+            const birthdays = appConfig.birthdays || [];
             const now = new Date();
             const todayStr = `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth() + 1).toString().padStart(2, '0')}`;
             const todaysBirthdays = birthdays.filter(b => b.date === todayStr);
@@ -6016,6 +6432,7 @@
             renderAdminMediaPlaylist();
             renderAdminAchievementCategories();
             renderAdminModuleSettings();
+            shiftAdminOpenInit(); // ikili öğretimde düzenlenecek öğretimi bağla
             buildAdminBellHoursInputs();
             loadBellHoursDisplaySettingsIntoForm();
             buildWeeklyScheduleMatrix();
@@ -6024,7 +6441,6 @@
             buildWeeklyDutiesTable();
             buildAylikNobetTablosu(); // Aylık nöbet takvimini inşa et
             renderRosterList(); // Nöbetçi kadrosu (fotoğraf/ikon) listesini inşa et
-            shiftAdminOpen(); // Öğretim Düzeni sekmesi + Sabah/Öğle düzenleme düğmeleri
 
             // Nöbet yerleri (dinamik ekle/sil/sırala) ve görsel özelleştirme
             tempDutyPositions = (appConfig.dutyPositions || []).map(p => ({ ...p }));
@@ -6036,6 +6452,9 @@
             // Nöbet Modülü Kapsamlı Ayarlar sekmesini başlat
             setTimeout(() => loadDutyAdvancedSettingsIntoForm(), 80);
 
+            buildAdminClassSelector();
+            renderShiftEditBars();
+            renderTeachingTab();
             document.getElementById('stat-birthday-count').innerText = appConfig.birthdays.length;
             document.getElementById('stat-ann-count').innerText = appConfig.announcements.length;
 
@@ -6046,6 +6465,7 @@
             document.getElementById('admin-panel').classList.add('hidden');
             if (supabaseClient) supabaseClient.auth.signOut();
             writeCMSLog("Yönetim Paneli kaydetmeden kapatıldı.");
+            if (typeof shiftSyncBinding === 'function') shiftSyncBinding();
         }
 
         // Ayarlar panelindeki "Yönetici Şifresi" alanı artık düz metin bir PIN
@@ -6077,7 +6497,6 @@
             saveWeeklyScheduleMatrix();
             saveWeeklyDutiesTable();
             nobetAyiKaydet(); // Aylık nöbet verilerini kaydet
-            shiftAdminCollect(); // Öğretim Düzeni sekmesindeki ayarları uygula
 
             const refreshMsgInput = document.getElementById('input-refresh-message');
             if (refreshMsgInput) {
@@ -6212,6 +6631,7 @@
             appConfig.dutyStyle = tempDutyStyle || appConfig.dutyStyle;
 
             panoPersist();
+            if (typeof shiftSyncBinding === 'function') shiftSyncBinding(true); // panel kapanıyor: panoyu aktif öğretime döndür
             renderPanoData();
             applyModuleSettingsToDashboard();
             startCyclingModuleIntervals();
@@ -6228,6 +6648,7 @@
         function resetPanoToDefaults() {
             askCustomConfirmation("Fabrika Ayarları", "Tüm pano verileri sıfırlanıp varsayılan ayarlara dönülecek. Onaylıyor musunuz?", function() {
                 appConfig = JSON.parse(JSON.stringify(defaultAppConfig));
+                shiftInstall(); // normal (tekli) moda döner, zil saatlerini varsayılana kurar
                 panoPersist(); // yerel + bulut kaydını da varsayılana sıfırlar (diğer cihazlara da yansır)
                 bellHours = appConfig.bellHours;
                 cancelEditBirthday();
@@ -6313,8 +6734,7 @@
                 ].filter(Boolean).join(';');
                 row.innerHTML = `
                     <span class="text-slate-300 truncate max-w-xs" style="${previewStyle}">${index + 1}. ${escapeHtml(ann.text)}</span>
-                    <div class="flex gap-1 shrink-0 items-center">
-                        ${shiftTargetSelectHtml('ann', index, ann.shift)}
+                    <div class="flex gap-1 shrink-0">
                         <button class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" onclick="moveAnnouncement(${index}, -1)"><i class="fa-solid fa-arrow-up"></i></button>
                         <button class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" onclick="moveAnnouncement(${index}, 1)"><i class="fa-solid fa-arrow-down"></i></button>
                         <button class="p-1 hover:bg-cyan-500/20 rounded text-cyan-400" onclick="editAnnouncement(${index})"><i class="fa-solid fa-pen"></i></button>
@@ -6331,10 +6751,9 @@
             if (!val) return;
 
             const fmt = readAnnouncementFormatFromForm();
-            const annObj = { text: val, ...fmt, shift: 'all' };
+            const annObj = { text: val, ...fmt };
 
             if (editingAnnouncementIndex !== -1) {
-                annObj.shift = (tempAnnouncements[editingAnnouncementIndex] && tempAnnouncements[editingAnnouncementIndex].shift) || 'all';
                 tempAnnouncements[editingAnnouncementIndex] = annObj;
                 writeCMSLog(`Duyuru güncellendi: ${val}`);
                 cancelEditAnnouncement();
@@ -6461,8 +6880,7 @@
                 const iconHtml = item.icon ? `<i class="fa-solid ${item.icon}"></i> ` : '';
                 row.innerHTML = `
                     <span class="text-slate-300 truncate max-w-xs" style="${previewStyle}">${index + 1}. ${iconHtml}${escapeHtml(item.text)}</span>
-                    <div class="flex gap-1 shrink-0 items-center">
-                        ${shiftTargetSelectHtml('marquee', index, item.shift)}
+                    <div class="flex gap-1 shrink-0">
                         <button class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" onclick="moveMarqueeItem(${index}, -1)"><i class="fa-solid fa-arrow-up"></i></button>
                         <button class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" onclick="moveMarqueeItem(${index}, 1)"><i class="fa-solid fa-arrow-down"></i></button>
                         <button class="p-1 hover:bg-cyan-500/20 rounded text-cyan-400" onclick="editMarqueeItem(${index})"><i class="fa-solid fa-pen"></i></button>
@@ -6480,10 +6898,9 @@
             if (!val) return;
 
             const fmt = readMarqueeItemFormatFromForm();
-            const itemObj = { text: val, ...fmt, shift: 'all' };
+            const itemObj = { text: val, ...fmt };
 
             if (editingMarqueeIndex !== -1) {
-                itemObj.shift = (tempMarqueeItems[editingMarqueeIndex] && tempMarqueeItems[editingMarqueeIndex].shift) || 'all';
                 tempMarqueeItems[editingMarqueeIndex] = itemObj;
                 writeCMSLog(`Kayan yazı mesajı güncellendi: ${val}`);
                 cancelEditMarqueeItem();
@@ -7643,7 +8060,11 @@
         function buildAdminClassSelector() {
             const container = document.getElementById('schedule-class-badge-container');
             container.innerHTML = "";
-            shiftAdminClassList().forEach(className => {
+            const _selClasses = adminClassList();
+            if (_selClasses.length === 0) {
+                container.innerHTML = '<span class="text-xs text-slate-500 italic">Bu öğretimde sınıf yok. "Öğretim Düzeni" sekmesinden sınıf atayın.</span>';
+            }
+            _selClasses.forEach(className => {
                 const btn = document.createElement('button');
                 btn.className = `px-3 py-1.5 rounded-lg text-xs font-bold transition border border-slate-800 ${className === activeAdminEditClass ? 'bg-yellow-500 text-black' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'}`;
                 btn.innerText = className;
@@ -7663,7 +8084,13 @@
             const tbody = document.getElementById('weekly-schedule-matrix-body');
             const title = document.getElementById('schedule-matrix-title');
             
-            title.innerText = `${activeAdminEditClass} Sınıfı Haftalık Ders Programı Matrisi`;
+            title.innerText = `${activeAdminEditClass} Sınıfı Haftalık Ders Programı Matrisi` + (isDoubleMode() ? ` — ${SHIFT_LABELS[__boundShift]} Öğretimi` : '');
+            if (isDoubleMode() && !adminClassList().includes(activeAdminEditClass)) {
+                title.innerText = 'Bu öğretimde sınıf yok';
+                if (thead) thead.innerHTML = '';
+                tbody.innerHTML = '';
+                return;
+            }
 
             // Başlık satırını (Gün + N. Ders sütunları) mevcut ders saati (bellHours) sayısına göre dinamik üret
             if (thead) {
@@ -7703,6 +8130,7 @@
         }
 
         function saveWeeklyScheduleMatrix() {
+            if (isDoubleMode() && !adminClassList().includes(activeAdminEditClass)) return;
             if (!appConfig.weeklyClassSchedules[activeAdminEditClass]) {
                 appConfig.weeklyClassSchedules[activeAdminEditClass] = {};
             }
@@ -8688,7 +9116,7 @@
 
                         // Her sınıf için ders saatlerini oluştur (mevcut ders saati sayısı kadar)
                         siniflarExcel.forEach((sinif, idx) => {
-                            if (!classList.includes(sinif)) return;
+                            if (!adminClassList().includes(sinif)) return;
                             if (!tempSchedule[sinif][sonGun]) {
                                 tempSchedule[sinif][sonGun] = [];
                             }
@@ -8701,7 +9129,7 @@
 
                     // appConfig'e yaz
                     siniflarExcel.forEach(sinif => {
-                        if (!classList.includes(sinif)) return;
+                        if (!adminClassList().includes(sinif)) return;
                         if (!appConfig.weeklyClassSchedules[sinif]) appConfig.weeklyClassSchedules[sinif] = {};
                         daysOfWeek.forEach(gun => {
                             if (tempSchedule[sinif][gun]) {
@@ -8729,10 +9157,10 @@
 
         function dersExcelSablonIndir() {
             const wb = XLSX.utils.book_new();
-            const rows = [["Gün", "Ders Sırası", ...classList]];
+            const rows = [["Gün", "Ders Sırası", ...adminClassList()]];
             daysOfWeek.forEach(gun => {
                 for (let i = 1; i <= bellHours.length; i++) {
-                    rows.push([i === 1 ? gun : "", `${i}. Ders`, ...classList.map(() => "")]);
+                    rows.push([i === 1 ? gun : "", `${i}. Ders`, ...adminClassList().map(() => "")]);
                 }
             });
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), "Ders_Programi");
@@ -8965,6 +9393,7 @@
                     return;
                 }
                 appConfig = restored;
+                shiftInstall(); // yedek ikili öğretimdeyse veri bağlantısını kur
                 // Geri yüklenen veriyi buluttaki mevcut sürümden daha yeni işaretle,
                 // böylece cloudPushNow() bunu buluta da yazar (diğer cihazlar da alır).
                 appConfig.__syncVersion = (appConfig.__syncVersion || 0) + 1;
