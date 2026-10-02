@@ -36,6 +36,19 @@
             weatherLat: "38.73",
             weatherLng: "41.49",
             adminPin: "",
+            // ÖĞRETİM DÜZENİ: 'single' = Normal (tekli) öğretim, 'dual' = İkili (sabah/öğle) öğretim.
+            // İkili öğretimde zil saatleri, ders programı, nöbet ve sınıf listesi shiftData içinde
+            // sabah/öğle için ayrı tutulur (bkz. shift.js).
+            schoolMode: "single",
+            shiftSettings: {
+                autoSwitch: true,
+                switchTime: "13:00",
+                manualShift: "morning",
+                labels: { morning: "SABAH ÖĞRETİMİ", afternoon: "ÖĞLE ÖĞRETİMİ" },
+                filterBirthdays: true,
+                showBadge: true
+            },
+            shiftData: null,
             // Başka bir cihazda/tarayıcıda yapılan güncelleme bu ekrana ulaştığında
             // gösterilecek mesaj. Yönetim Paneli > Bulut Bağlantısı bölümünden
             // değiştirilebilir; hem Pano49 hem Pano99 (Duyuru Panosu) için ayrı
@@ -1631,7 +1644,7 @@
         // Tüm "kaydet" işlemleri bu tek fonksiyon üzerinden geçer. Her çağrıda __syncVersion
         // bir artırılır; bulut karşılaştırmaları ham JSON metni yerine bu sayaca bakar.
         function panoPersist() {
-            stashShift();
+            shiftStashLive(); // İkili öğretimde canlı alanları aktif öğretimin kaydına geri yaz
             appConfig.__syncVersion = (appConfig.__syncVersion || 0) + 1;
             localStorage.setItem('okulPanoDataV8', JSON.stringify(appConfig));
             cloudPushDebounced();
@@ -2005,62 +2018,6 @@
 
         let appConfig = JSON.parse(localStorage.getItem('okulPanoDataV8')) || defaultAppConfig;
 
-        // ============================================================================
-        // İKİLİ ÖĞRETİM (SABAH / ÖĞLE) DESTEĞİ
-        // ----------------------------------------------------------------------------
-        // appConfig.dual.enabled=false ise (varsayılan) hiçbir şey değişmez: normal öğretim.
-        // Açıkken, SHIFT_KEYS içindeki alanların (ders programı, zil saatleri, nöbetçiler,
-        // doğum günleri...) AYRI birer kopyası sabah ve öğle için appConfig.shiftStore'da
-        // tutulur. Kodun geri kalanı her zaman appConfig.<alan> okuduğu için, aktif vardiyanın
-        // verisi sayfa açılırken bu alanlara yüklenir (applyShift). Kaydederken (panoPersist)
-        // aktif vardiyanın verisi geri shiftStore'a yazılır (stashShift).
-        // Yeni bir alanı vardiyaya özel yapmak için adını SHIFT_KEYS'e eklemeniz yeterlidir.
-        // ============================================================================
-        const SHIFT_KEYS = ['bellHours', 'weeklyClassSchedules', 'weeklyDuties', 'aylikNobet',
-                            'teacherRoster', 'rosterOrder', 'birthdays', 'achievementCategories'];
-        const SHIFT_LABEL = { morning: 'SABAH ÖĞRETİMİ', afternoon: 'ÖĞLE ÖĞRETİMİ' };
-        const clone = (o) => JSON.parse(JSON.stringify(o === undefined ? null : o));
-
-        function getDual() {
-            return Object.assign({ enabled: false, switchTime: '12:30', mode: 'auto',
-                                   shiftClasses: { morning: [], afternoon: [] } }, appConfig.dual || {});
-        }
-        function computeShift() {
-            const d = getDual();
-            if (!IS_DISPLAY_MODE) {
-                const e = localStorage.getItem('panoEditShift');
-                if (e === 'morning' || e === 'afternoon') return e;
-            }
-            if (d.mode === 'morning' || d.mode === 'afternoon') return d.mode;
-            const [h, m] = String(d.switchTime || '12:30').split(':').map(Number);
-            const n = new Date();
-            return (n.getHours() * 60 + n.getMinutes() >= h * 60 + m) ? 'afternoon' : 'morning';
-        }
-        function stashShift() {
-            if (!getDual().enabled) return;
-            const cur = appConfig.__shiftLoaded || 'morning';
-            appConfig.shiftStore = appConfig.shiftStore || {};
-            const snap = {};
-            SHIFT_KEYS.forEach(k => { snap[k] = clone(appConfig[k]); });
-            appConfig.shiftStore[cur] = snap;
-        }
-        function applyShift(target) {
-            if (!getDual().enabled || (target !== 'morning' && target !== 'afternoon')) return;
-            const cur = appConfig.__shiftLoaded || 'morning';
-            if (cur === target && appConfig.__shiftLoaded) return;
-            stashShift();
-            const src = appConfig.shiftStore[target] || appConfig.shiftStore[cur]; // ilk kez: diğer vardiyanın kopyası
-            SHIFT_KEYS.forEach(k => { if (src && src[k] !== undefined) appConfig[k] = clone(src[k]); });
-            appConfig.__shiftLoaded = target;
-        }
-        function shiftFilterClasses(list) {
-            const d = getDual();
-            if (!d.enabled) return list;
-            const sel = (d.shiftClasses || {})[appConfig.__shiftLoaded || 'morning'] || [];
-            return sel.length ? list.filter(c => sel.includes(c)) : list;
-        }
-        applyShift(computeShift());
-
         // ESKİ SÜRÜM UYUMLULUĞU: Duyurular önceden düz metin (string) dizisiydi.
         // Her duyuru için ayrı biçimlendirme desteği eklendiğinde, eski kayıtları
         // varsayılan biçimlendirme değerleriyle nesne (object) formatına dönüştürüyoruz.
@@ -2069,6 +2026,7 @@
                 return { text: a, color: '', bgColor: '', font: '', fontSize: 11, bold: false };
             }
             return {
+                shift: (a && a.shift) || 'all',
                 text: (a && a.text) || '',
                 color: (a && a.color) || '',
                 bgColor: (a && a.bgColor) || '',
@@ -2088,6 +2046,7 @@
                 return { text: m, color: '', bold: false, italic: false, icon: '' };
             }
             return {
+                shift: (m && m.shift) || 'all',
                 text: (m && m.text) || '',
                 color: (m && m.color) || '',
                 bold: !!(m && m.bold),
@@ -2141,6 +2100,7 @@
         if (!appConfig.weeklyDuties) appConfig.weeklyDuties = defaultAppConfig.weeklyDuties;
         if (!appConfig.weeklyClassSchedules) appConfig.weeklyClassSchedules = defaultAppConfig.weeklyClassSchedules;
         if (!appConfig.aylikNobet) appConfig.aylikNobet = {};
+        shiftInit(); // Normal / İkili öğretim: aktif öğretimin verisini canlı alanlara yükler (shift.js)
         if (!appConfig.teacherRoster) appConfig.teacherRoster = {};
         if (!appConfig.dutyPositions || !Array.isArray(appConfig.dutyPositions) || appConfig.dutyPositions.length === 0) {
             appConfig.dutyPositions = JSON.parse(JSON.stringify(defaultAppConfig.dutyPositions));
@@ -2675,7 +2635,9 @@
             const viewport = document.getElementById('marquee-viewport');
             if (!track) return;
             const mw = appConfig.marqueeWidget || defaultAppConfig.marqueeWidget;
-            const items = (appConfig.marqueeItems && appConfig.marqueeItems.length > 0) ? appConfig.marqueeItems : defaultAppConfig.marqueeItems;
+            let items = (appConfig.marqueeItems && appConfig.marqueeItems.length > 0) ? appConfig.marqueeItems : defaultAppConfig.marqueeItems;
+            const __mqShift = shiftFilterItems(items);
+            items = __mqShift.length > 0 ? __mqShift : items;
             buildMarqueeTrack(track, viewport, items, mw);
         }
 
@@ -2687,6 +2649,7 @@
             document.getElementById('display-school-name').style.fontFamily = appConfig.schoolNameFont || defaultAppConfig.schoolNameFont;
             document.getElementById('display-brand-sub').innerText = appConfig.brandSubText || defaultAppConfig.brandSubText;
             document.getElementById('display-brand-sub').style.display = (appConfig.brandSubVisible === false) ? 'none' : '';
+            shiftRenderBadge();
 
             const logoBox = document.getElementById('brand-logo-box');
             const logoImg = document.getElementById('brand-logo-img');
@@ -2717,7 +2680,8 @@
 
             const annListContainer = document.getElementById('display-announcements-list');
             annListContainer.innerHTML = '';
-            const anns = appConfig.announcements && appConfig.announcements.length > 0 ? appConfig.announcements : [{ text: 'Duyuru bulunmamaktadır.', color: '', bgColor: '', font: '', fontSize: 11, bold: false }];
+            const __annShift = shiftFilterItems(appConfig.announcements);
+            const anns = __annShift.length > 0 ? __annShift : [{ text: 'Duyuru bulunmamaktadır.', color: '', bgColor: '', font: '', fontSize: 11, bold: false }];
             anns.slice(0, 4).forEach(ann => {
                 const item = document.createElement('div');
                 item.className = 'ann-item';
@@ -4182,16 +4146,17 @@
             const titleEl = document.getElementById('display-schedule-group-title');
             container.innerHTML = '';
 
-            let filteredClasses = [];
-            if (activeScheduleGroup === 1) {
-                titleEl.innerText = "DERS PROGRAMI (3. VE 4. SINIFLAR)";
-                filteredClasses = classList.filter(c => c.startsWith('3/') || c.startsWith('4/'));
-            } else {
-                titleEl.innerText = "DERS PROGRAMI (1. VE 2. SINIFLAR)";
-                filteredClasses = classList.filter(c => c.startsWith('1/') || c.startsWith('2/'));
+            // Normal öğretimde tüm sınıflar; İkili öğretimde yalnızca aktif öğretimin sınıfları (shift.js)
+            const __grp = shiftScheduleGroups();
+            let __g = activeScheduleGroup;
+            if (__g === 1 && __grp.g1.length === 0 && __grp.g2.length > 0) __g = 2;
+            else if (__g === 2 && __grp.g2.length === 0 && __grp.g1.length > 0) __g = 1;
+            const filteredClasses = (__g === 1) ? __grp.g1 : __grp.g2;
+            titleEl.innerText = shiftGradeTitle(filteredClasses) + (shiftIsDual() ? ' • ' + shiftShortLabel(currentShift) : '');
+            if (filteredClasses.length === 0) {
+                container.innerHTML = '<div style="grid-column:1/-1;padding:14px;text-align:center;color:var(--text-muted);font-size:12px;">Bu öğretime henüz sınıf atanmadı.<br>Yönetim Paneli > Öğretim Düzeni</div>';
+                return;
             }
-
-            filteredClasses = shiftFilterClasses(filteredClasses);
 
             const now = new Date();
             let dayName = getTurkishDayName(now.getDay());
@@ -4570,6 +4535,7 @@
                 document.getElementById('display-clock-time').innerText = timeString;
 
                 calculateCountdownAndTableHighlight(now);
+                shiftTick(now); // saat geçiş saatini aştıysa sabah <-> öğle öğretimini değiştirir
             }, 1000);
 
             startCyclingModuleIntervals();
@@ -4757,7 +4723,7 @@
             const settings = appConfig.birthdayWidget || defaultAppConfig.birthdayWidget;
             applyBirthdayWidgetChrome();
 
-            const birthdays = appConfig.birthdays || [];
+            const birthdays = shiftFilterBirthdays(appConfig.birthdays || []);
             const now = new Date();
             const todayStr = `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth() + 1).toString().padStart(2, '0')}`;
             const todaysBirthdays = birthdays.filter(b => b.date === todayStr);
@@ -5890,7 +5856,6 @@
 
         function openAdminPanel() {
             writeCMSLog("Yönetim Paneli açıldı.");
-            if (typeof dualRenderForm === 'function') dualRenderForm();
             if (typeof supabaseStatusRefresh === 'function') supabaseStatusRefresh();
             const panel = document.getElementById('admin-panel');
             
@@ -6059,6 +6024,7 @@
             buildWeeklyDutiesTable();
             buildAylikNobetTablosu(); // Aylık nöbet takvimini inşa et
             renderRosterList(); // Nöbetçi kadrosu (fotoğraf/ikon) listesini inşa et
+            shiftAdminOpen(); // Öğretim Düzeni sekmesi + Sabah/Öğle düzenleme düğmeleri
 
             // Nöbet yerleri (dinamik ekle/sil/sırala) ve görsel özelleştirme
             tempDutyPositions = (appConfig.dutyPositions || []).map(p => ({ ...p }));
@@ -6111,6 +6077,7 @@
             saveWeeklyScheduleMatrix();
             saveWeeklyDutiesTable();
             nobetAyiKaydet(); // Aylık nöbet verilerini kaydet
+            shiftAdminCollect(); // Öğretim Düzeni sekmesindeki ayarları uygula
 
             const refreshMsgInput = document.getElementById('input-refresh-message');
             if (refreshMsgInput) {
@@ -6346,7 +6313,8 @@
                 ].filter(Boolean).join(';');
                 row.innerHTML = `
                     <span class="text-slate-300 truncate max-w-xs" style="${previewStyle}">${index + 1}. ${escapeHtml(ann.text)}</span>
-                    <div class="flex gap-1 shrink-0">
+                    <div class="flex gap-1 shrink-0 items-center">
+                        ${shiftTargetSelectHtml('ann', index, ann.shift)}
                         <button class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" onclick="moveAnnouncement(${index}, -1)"><i class="fa-solid fa-arrow-up"></i></button>
                         <button class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" onclick="moveAnnouncement(${index}, 1)"><i class="fa-solid fa-arrow-down"></i></button>
                         <button class="p-1 hover:bg-cyan-500/20 rounded text-cyan-400" onclick="editAnnouncement(${index})"><i class="fa-solid fa-pen"></i></button>
@@ -6363,9 +6331,10 @@
             if (!val) return;
 
             const fmt = readAnnouncementFormatFromForm();
-            const annObj = { text: val, ...fmt };
+            const annObj = { text: val, ...fmt, shift: 'all' };
 
             if (editingAnnouncementIndex !== -1) {
+                annObj.shift = (tempAnnouncements[editingAnnouncementIndex] && tempAnnouncements[editingAnnouncementIndex].shift) || 'all';
                 tempAnnouncements[editingAnnouncementIndex] = annObj;
                 writeCMSLog(`Duyuru güncellendi: ${val}`);
                 cancelEditAnnouncement();
@@ -6492,7 +6461,8 @@
                 const iconHtml = item.icon ? `<i class="fa-solid ${item.icon}"></i> ` : '';
                 row.innerHTML = `
                     <span class="text-slate-300 truncate max-w-xs" style="${previewStyle}">${index + 1}. ${iconHtml}${escapeHtml(item.text)}</span>
-                    <div class="flex gap-1 shrink-0">
+                    <div class="flex gap-1 shrink-0 items-center">
+                        ${shiftTargetSelectHtml('marquee', index, item.shift)}
                         <button class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" onclick="moveMarqueeItem(${index}, -1)"><i class="fa-solid fa-arrow-up"></i></button>
                         <button class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" onclick="moveMarqueeItem(${index}, 1)"><i class="fa-solid fa-arrow-down"></i></button>
                         <button class="p-1 hover:bg-cyan-500/20 rounded text-cyan-400" onclick="editMarqueeItem(${index})"><i class="fa-solid fa-pen"></i></button>
@@ -6510,9 +6480,10 @@
             if (!val) return;
 
             const fmt = readMarqueeItemFormatFromForm();
-            const itemObj = { text: val, ...fmt };
+            const itemObj = { text: val, ...fmt, shift: 'all' };
 
             if (editingMarqueeIndex !== -1) {
+                itemObj.shift = (tempMarqueeItems[editingMarqueeIndex] && tempMarqueeItems[editingMarqueeIndex].shift) || 'all';
                 tempMarqueeItems[editingMarqueeIndex] = itemObj;
                 writeCMSLog(`Kayan yazı mesajı güncellendi: ${val}`);
                 cancelEditMarqueeItem();
@@ -7672,7 +7643,7 @@
         function buildAdminClassSelector() {
             const container = document.getElementById('schedule-class-badge-container');
             container.innerHTML = "";
-            classList.forEach(className => {
+            shiftAdminClassList().forEach(className => {
                 const btn = document.createElement('button');
                 btn.className = `px-3 py-1.5 rounded-lg text-xs font-bold transition border border-slate-800 ${className === activeAdminEditClass ? 'bg-yellow-500 text-black' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'}`;
                 btn.innerText = className;
@@ -9048,68 +9019,3 @@
     }
   }, 5000); // her 5 saniyede bir kontrol et
 })();
-
-        // ===================== İKİLİ ÖĞRETİM — YÖNETİM ARAYÜZÜ =====================
-        function dualRenderForm() {
-            const d = getDual();
-            const $ = (id) => document.getElementById(id);
-            if (!$('dual-enabled')) return;
-            $('dual-enabled').value = d.enabled ? 'dual' : 'normal';
-            $('dual-switch-time').value = d.switchTime;
-            $('dual-mode').value = d.mode;
-            $('dual-options').classList.toggle('hidden', !d.enabled);
-            ['morning', 'afternoon'].forEach(s => {
-                const box = $('dual-classes-' + s);
-                box.innerHTML = classList.map(c =>
-                    `<label class="flex items-center gap-1 text-[11px] text-slate-300"><input type="checkbox" class="accent-cyan-500" data-shift="${s}" value="${c}" ${((d.shiftClasses || {})[s] || []).includes(c) ? 'checked' : ''}>${c}</label>`).join('');
-            });
-            const es = appConfig.__shiftLoaded || 'morning';
-            $('dual-edit-now').innerText = d.enabled ? `Şu an düzenlenen: ${SHIFT_LABEL[es]}` : '';
-            $('dual-edit-morning').className = 'px-3 py-2 rounded-lg text-xs font-bold ' + (es === 'morning' ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-slate-300');
-            $('dual-edit-afternoon').className = 'px-3 py-2 rounded-lg text-xs font-bold ' + (es === 'afternoon' ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-300');
-        }
-        function dualToggle() {
-            document.getElementById('dual-options').classList.toggle('hidden', document.getElementById('dual-enabled').value !== 'dual');
-        }
-        function dualSaveSettings() {
-            const $ = (id) => document.getElementById(id);
-            const enabled = $('dual-enabled').value === 'dual';
-            const was = getDual().enabled;
-            const sc = { morning: [], afternoon: [] };
-            document.querySelectorAll('#dual-options input[data-shift]:checked').forEach(i => sc[i.dataset.shift].push(i.value));
-            appConfig.dual = { enabled, switchTime: $('dual-switch-time').value || '12:30', mode: $('dual-mode').value, shiftClasses: sc };
-            if (enabled && !was) { appConfig.shiftStore = {}; appConfig.__shiftLoaded = 'morning'; localStorage.setItem('panoEditShift', 'morning'); }
-            if (!enabled) localStorage.removeItem('panoEditShift');
-            panoPersist();
-            showCustomNotification('Öğretim Düzeni', enabled ? 'İkili öğretim kaydedildi.' : 'Normal öğretime dönüldü.');
-            dualRenderForm(); dualUpdateBadge();
-            if (enabled !== was) setTimeout(() => location.reload(), 1500);
-        }
-        function dualSetEditShift(s) {
-            if (!getDual().enabled || (appConfig.__shiftLoaded || 'morning') === s) return;
-            if (!confirm('Kaydedilmemiş değişiklikler kaybolabilir. ' + SHIFT_LABEL[s] + ' düzenlemeye geçilsin mi?')) return;
-            stashShift();
-            appConfig.__syncVersion = (appConfig.__syncVersion || 0) + 1;
-            localStorage.setItem('okulPanoDataV8', JSON.stringify(appConfig));
-            localStorage.setItem('panoEditShift', s);
-            if (typeof cloudPushNow === 'function' && supabaseClient) cloudPushNow(() => location.reload()); else location.reload();
-        }
-        function dualUpdateBadge() {
-            let b = document.getElementById('shift-badge');
-            if (!getDual().enabled) { if (b) b.remove(); return; }
-            if (!b) {
-                b = document.createElement('div'); b.id = 'shift-badge';
-                b.style.cssText = 'position:fixed;top:4px;right:8px;z-index:9999;padding:2px 10px;border-radius:999px;font:700 11px Rajdhani,sans-serif;letter-spacing:.08em;pointer-events:none;';
-                document.body.appendChild(b);
-            }
-            const s = appConfig.__shiftLoaded || 'morning';
-            b.innerText = SHIFT_LABEL[s] + (IS_DISPLAY_MODE ? '' : ' (DÜZENLEME)');
-            b.style.background = s === 'morning' ? 'rgba(0,180,216,.85)' : 'rgba(251,146,60,.9)';
-            b.style.color = '#02040a';
-        }
-        // Ekranda (TV) saat, öğle geçiş saatini aşınca otomatik olarak diğer vardiyaya geçer.
-        setInterval(() => {
-            if (getDual().enabled && computeShift() !== (appConfig.__shiftLoaded || 'morning')) location.reload();
-        }, 30000);
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', dualUpdateBadge); else dualUpdateBadge();
-
