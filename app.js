@@ -1631,6 +1631,7 @@
         // Tüm "kaydet" işlemleri bu tek fonksiyon üzerinden geçer. Her çağrıda __syncVersion
         // bir artırılır; bulut karşılaştırmaları ham JSON metni yerine bu sayaca bakar.
         function panoPersist() {
+            stashShift();
             appConfig.__syncVersion = (appConfig.__syncVersion || 0) + 1;
             localStorage.setItem('okulPanoDataV8', JSON.stringify(appConfig));
             cloudPushDebounced();
@@ -2003,6 +2004,62 @@
         }
 
         let appConfig = JSON.parse(localStorage.getItem('okulPanoDataV8')) || defaultAppConfig;
+
+        // ============================================================================
+        // İKİLİ ÖĞRETİM (SABAH / ÖĞLE) DESTEĞİ
+        // ----------------------------------------------------------------------------
+        // appConfig.dual.enabled=false ise (varsayılan) hiçbir şey değişmez: normal öğretim.
+        // Açıkken, SHIFT_KEYS içindeki alanların (ders programı, zil saatleri, nöbetçiler,
+        // doğum günleri...) AYRI birer kopyası sabah ve öğle için appConfig.shiftStore'da
+        // tutulur. Kodun geri kalanı her zaman appConfig.<alan> okuduğu için, aktif vardiyanın
+        // verisi sayfa açılırken bu alanlara yüklenir (applyShift). Kaydederken (panoPersist)
+        // aktif vardiyanın verisi geri shiftStore'a yazılır (stashShift).
+        // Yeni bir alanı vardiyaya özel yapmak için adını SHIFT_KEYS'e eklemeniz yeterlidir.
+        // ============================================================================
+        const SHIFT_KEYS = ['bellHours', 'weeklyClassSchedules', 'weeklyDuties', 'aylikNobet',
+                            'teacherRoster', 'rosterOrder', 'birthdays', 'achievementCategories'];
+        const SHIFT_LABEL = { morning: 'SABAH ÖĞRETİMİ', afternoon: 'ÖĞLE ÖĞRETİMİ' };
+        const clone = (o) => JSON.parse(JSON.stringify(o === undefined ? null : o));
+
+        function getDual() {
+            return Object.assign({ enabled: false, switchTime: '12:30', mode: 'auto',
+                                   shiftClasses: { morning: [], afternoon: [] } }, appConfig.dual || {});
+        }
+        function computeShift() {
+            const d = getDual();
+            if (!IS_DISPLAY_MODE) {
+                const e = localStorage.getItem('panoEditShift');
+                if (e === 'morning' || e === 'afternoon') return e;
+            }
+            if (d.mode === 'morning' || d.mode === 'afternoon') return d.mode;
+            const [h, m] = String(d.switchTime || '12:30').split(':').map(Number);
+            const n = new Date();
+            return (n.getHours() * 60 + n.getMinutes() >= h * 60 + m) ? 'afternoon' : 'morning';
+        }
+        function stashShift() {
+            if (!getDual().enabled) return;
+            const cur = appConfig.__shiftLoaded || 'morning';
+            appConfig.shiftStore = appConfig.shiftStore || {};
+            const snap = {};
+            SHIFT_KEYS.forEach(k => { snap[k] = clone(appConfig[k]); });
+            appConfig.shiftStore[cur] = snap;
+        }
+        function applyShift(target) {
+            if (!getDual().enabled || (target !== 'morning' && target !== 'afternoon')) return;
+            const cur = appConfig.__shiftLoaded || 'morning';
+            if (cur === target && appConfig.__shiftLoaded) return;
+            stashShift();
+            const src = appConfig.shiftStore[target] || appConfig.shiftStore[cur]; // ilk kez: diğer vardiyanın kopyası
+            SHIFT_KEYS.forEach(k => { if (src && src[k] !== undefined) appConfig[k] = clone(src[k]); });
+            appConfig.__shiftLoaded = target;
+        }
+        function shiftFilterClasses(list) {
+            const d = getDual();
+            if (!d.enabled) return list;
+            const sel = (d.shiftClasses || {})[appConfig.__shiftLoaded || 'morning'] || [];
+            return sel.length ? list.filter(c => sel.includes(c)) : list;
+        }
+        applyShift(computeShift());
 
         // ESKİ SÜRÜM UYUMLULUĞU: Duyurular önceden düz metin (string) dizisiydi.
         // Her duyuru için ayrı biçimlendirme desteği eklendiğinde, eski kayıtları
@@ -4134,6 +4191,8 @@
                 filteredClasses = classList.filter(c => c.startsWith('1/') || c.startsWith('2/'));
             }
 
+            filteredClasses = shiftFilterClasses(filteredClasses);
+
             const now = new Date();
             let dayName = getTurkishDayName(now.getDay());
             if (dayName === "Cumartesi" || dayName === "Pazar") {
@@ -5831,6 +5890,7 @@
 
         function openAdminPanel() {
             writeCMSLog("Yönetim Paneli açıldı.");
+            if (typeof dualRenderForm === 'function') dualRenderForm();
             if (typeof supabaseStatusRefresh === 'function') supabaseStatusRefresh();
             const panel = document.getElementById('admin-panel');
             
@@ -8988,3 +9048,68 @@
     }
   }, 5000); // her 5 saniyede bir kontrol et
 })();
+
+        // ===================== İKİLİ ÖĞRETİM — YÖNETİM ARAYÜZÜ =====================
+        function dualRenderForm() {
+            const d = getDual();
+            const $ = (id) => document.getElementById(id);
+            if (!$('dual-enabled')) return;
+            $('dual-enabled').value = d.enabled ? 'dual' : 'normal';
+            $('dual-switch-time').value = d.switchTime;
+            $('dual-mode').value = d.mode;
+            $('dual-options').classList.toggle('hidden', !d.enabled);
+            ['morning', 'afternoon'].forEach(s => {
+                const box = $('dual-classes-' + s);
+                box.innerHTML = classList.map(c =>
+                    `<label class="flex items-center gap-1 text-[11px] text-slate-300"><input type="checkbox" class="accent-cyan-500" data-shift="${s}" value="${c}" ${((d.shiftClasses || {})[s] || []).includes(c) ? 'checked' : ''}>${c}</label>`).join('');
+            });
+            const es = appConfig.__shiftLoaded || 'morning';
+            $('dual-edit-now').innerText = d.enabled ? `Şu an düzenlenen: ${SHIFT_LABEL[es]}` : '';
+            $('dual-edit-morning').className = 'px-3 py-2 rounded-lg text-xs font-bold ' + (es === 'morning' ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-slate-300');
+            $('dual-edit-afternoon').className = 'px-3 py-2 rounded-lg text-xs font-bold ' + (es === 'afternoon' ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-300');
+        }
+        function dualToggle() {
+            document.getElementById('dual-options').classList.toggle('hidden', document.getElementById('dual-enabled').value !== 'dual');
+        }
+        function dualSaveSettings() {
+            const $ = (id) => document.getElementById(id);
+            const enabled = $('dual-enabled').value === 'dual';
+            const was = getDual().enabled;
+            const sc = { morning: [], afternoon: [] };
+            document.querySelectorAll('#dual-options input[data-shift]:checked').forEach(i => sc[i.dataset.shift].push(i.value));
+            appConfig.dual = { enabled, switchTime: $('dual-switch-time').value || '12:30', mode: $('dual-mode').value, shiftClasses: sc };
+            if (enabled && !was) { appConfig.shiftStore = {}; appConfig.__shiftLoaded = 'morning'; localStorage.setItem('panoEditShift', 'morning'); }
+            if (!enabled) localStorage.removeItem('panoEditShift');
+            panoPersist();
+            showCustomNotification('Öğretim Düzeni', enabled ? 'İkili öğretim kaydedildi.' : 'Normal öğretime dönüldü.');
+            dualRenderForm(); dualUpdateBadge();
+            if (enabled !== was) setTimeout(() => location.reload(), 1500);
+        }
+        function dualSetEditShift(s) {
+            if (!getDual().enabled || (appConfig.__shiftLoaded || 'morning') === s) return;
+            if (!confirm('Kaydedilmemiş değişiklikler kaybolabilir. ' + SHIFT_LABEL[s] + ' düzenlemeye geçilsin mi?')) return;
+            stashShift();
+            appConfig.__syncVersion = (appConfig.__syncVersion || 0) + 1;
+            localStorage.setItem('okulPanoDataV8', JSON.stringify(appConfig));
+            localStorage.setItem('panoEditShift', s);
+            if (typeof cloudPushNow === 'function' && supabaseClient) cloudPushNow(() => location.reload()); else location.reload();
+        }
+        function dualUpdateBadge() {
+            let b = document.getElementById('shift-badge');
+            if (!getDual().enabled) { if (b) b.remove(); return; }
+            if (!b) {
+                b = document.createElement('div'); b.id = 'shift-badge';
+                b.style.cssText = 'position:fixed;top:4px;right:8px;z-index:9999;padding:2px 10px;border-radius:999px;font:700 11px Rajdhani,sans-serif;letter-spacing:.08em;pointer-events:none;';
+                document.body.appendChild(b);
+            }
+            const s = appConfig.__shiftLoaded || 'morning';
+            b.innerText = SHIFT_LABEL[s] + (IS_DISPLAY_MODE ? '' : ' (DÜZENLEME)');
+            b.style.background = s === 'morning' ? 'rgba(0,180,216,.85)' : 'rgba(251,146,60,.9)';
+            b.style.color = '#02040a';
+        }
+        // Ekranda (TV) saat, öğle geçiş saatini aşınca otomatik olarak diğer vardiyaya geçer.
+        setInterval(() => {
+            if (getDual().enabled && computeShift() !== (appConfig.__shiftLoaded || 'morning')) location.reload();
+        }, 30000);
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', dualUpdateBadge); else dualUpdateBadge();
+

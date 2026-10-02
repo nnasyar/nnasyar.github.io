@@ -494,6 +494,50 @@
                         </div>
                     </div>
 
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-4" id="dual-card">
+                        <h3 class="text-white font-bold flex items-center gap-2"><i class="fa-solid fa-sun-plant-wilt text-amber-400"></i> Öğretim Düzeni (Normal / İkili Öğretim)</h3>
+                        <div class="flex flex-wrap items-end gap-3">
+                            <div>
+                                <label class="text-xs text-slate-400 block mb-1">Okul düzeni</label>
+                                <select id="dual-enabled" onchange="dualToggle()" class="bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white text-sm">
+                                    <option value="normal">Normal (tekli) öğretim</option>
+                                    <option value="dual">İkili öğretim (sabah / öğle)</option>
+                                </select>
+                            </div>
+                            <button class="px-4 py-2.5 bg-cyan-700 hover:bg-cyan-600 text-white font-bold rounded-lg text-xs" onclick="dualSaveSettings()"><i class="fa-solid fa-floppy-disk"></i> Düzeni Kaydet</button>
+                        </div>
+                        <div id="dual-options" class="hidden space-y-4">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">Öğle öğretimine geçiş saati</label>
+                                    <input type="time" id="dual-switch-time" value="12:30" class="bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white text-sm">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">Panoda gösterilecek vardiya</label>
+                                    <select id="dual-mode" class="bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-white text-sm">
+                                        <option value="auto">Otomatik (saate göre)</option>
+                                        <option value="morning">Hep Sabah</option>
+                                        <option value="afternoon">Hep Öğle</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 block mb-1">Hangi vardiyayı düzenliyorsunuz?</label>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <button id="dual-edit-morning" onclick="dualSetEditShift('morning')">Sabah Öğretimi</button>
+                                    <button id="dual-edit-afternoon" onclick="dualSetEditShift('afternoon')">Öğle Öğretimi</button>
+                                    <span id="dual-edit-now" class="text-xs text-amber-400 font-bold"></span>
+                                </div>
+                                <p class="text-[10px] text-slate-500 mt-2">Vardiyaya özel alanlar: ders programı, zil saatleri, nöbetçi öğretmenler (haftalık/aylık), öğretmen listesi, doğum günleri ve Ayın Enleri. Diğer her şey (logo, duyurular, özlü söz, tema...) ortaktır. İlk geçişte diğer vardiya mevcut verinin kopyasıyla başlar.</p>
+                            </div>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div><div class="text-xs text-cyan-400 font-bold mb-1">Sabah sınıfları</div><div id="dual-classes-morning" class="grid grid-cols-4 gap-1"></div></div>
+                                <div><div class="text-xs text-amber-400 font-bold mb-1">Öğle sınıfları</div><div id="dual-classes-afternoon" class="grid grid-cols-4 gap-1"></div></div>
+                            </div>
+                            <p class="text-[10px] text-slate-500">Sınıf seçmezseniz o vardiyada tüm sınıflar gösterilir. Seçim, ders programı kartında yalnızca seçili sınıfları listeler.</p>
+                        </div>
+                    </div>
+
                     <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-4">
                         <h3 class="text-white font-bold flex items-center gap-2"><i class="fa-solid fa-image text-cyan-400"></i> Okul Logosu & Boyutlandırma</h3>
                         <div class="grid grid-cols-3 gap-6 items-start">
