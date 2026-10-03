@@ -7008,6 +7008,7 @@
             panel.classList.add('adm-skin-' + name);
             panel.querySelectorAll('.adm-skin-dot').forEach(d => d.classList.toggle('is-active', d.getAttribute('data-skin') === name));
             try { localStorage.setItem(ADMIN_SKIN_KEY, name); } catch (e) {}
+            try { if (admUi.accent) { admUi.accent = ''; admUiApply(); } } catch (e) {}
         }
         (function admInitSkin() {
             let skin = 'ocean';
@@ -7018,7 +7019,7 @@
 
         // ===== Yönetim paneli arayüz düzeni & stil (yalnızca bu cihazda hatırlanır) =====
         const ADMIN_UI_KEY = 'panoAdminUi';
-        const ADM_UI_DEFAULT = { layout: 'classic', mode: 'dark', radius: 'round', surface: 'solid', scale: '100', sidew: 'normal', motion: 'on' };
+        const ADM_UI_DEFAULT = { layout: 'classic', palette: 'night', accent: '', radius: 'round', surface: 'solid', scale: '100', sidew: 'normal', motion: 'on' };
         // [id, ad, açıklama, dikdörtgenler: topbar | menü | içerik]
         const ADM_LAYOUTS = [
             ['classic', 'Klasik', 'Üst başlık + sol menü', [2,2,76,7, 2,12,18,38, 23,12,55,38]],
@@ -7033,35 +7034,64 @@
             ['accordion', 'Akordeon Menü', 'Gruplar açılır/kapanır', [2,2,76,7, 2,12,18,38, 23,12,55,38]],
             ['drawer', 'Çekmece Menü', 'Menü ☰ ile açılır, içerik tam genişlik', [2,2,76,7, 2,12,76,38, 2,12,76,38]],
             ['focus', 'Odak Modu', 'Ortalanmış dar içerik + çekmece', [2,2,76,7, 2,12,12,38, 16,12,48,38]],
-            ['compact', 'Kompakt', 'Küçük boşluk, çok içerik', [2,2,76,5, 2,9,14,41, 18,9,60,41]]
+            ['compact', 'Kompakt', 'Küçük boşluk, çok içerik', [2,2,76,5, 2,9,14,41, 18,9,60,41]],
+            ['floattop', 'Yüzen Üst Menü', 'Yukarıda yüzen kart menü', [5,4,70,7, 5,13,70,6, 5,22,70,26]],
+            ['dock', 'Yüzen Alt Dock', 'Ortada yüzen çubuk', [5,4,70,7, 18,42,44,6, 5,13,70,26]]
         ];
         const ADM_PRESETS = [
             ['Okul Klasiği', { layout: 'classic' }],
             ['Kurumsal', { layout: 'left', surface: 'flat', radius: 'sharp' }],
-            ['Modern Cam', { layout: 'floating', surface: 'glass', radius: 'pill', mode: 'black' }],
+            ['Modern Cam', { layout: 'floating', surface: 'glass', radius: 'pill', palette: 'black' }],
             ['Dokunmatik Ekran', { layout: 'bottom', scale: '115', radius: 'pill' }],
             ['Verimli', { layout: 'compact', scale: '85', radius: 'sharp' }],
-            ['Gece Odak', { layout: 'focus', mode: 'black' }],
-            ['Açık Tema', { layout: 'top', mode: 'light' }]
+            ['Gece Odak', { layout: 'focus', palette: 'navy' }],
+            ['Açık Tema', { layout: 'top', palette: 'light' }],
+            ['Orman Sakin', { layout: 'floattop', palette: 'forest', accent: '#10b981', radius: 'pill' }],
+            ['Kâğıt', { layout: 'left', palette: 'lightwarm', accent: '#f97316', surface: 'flat' }],
+            ['Mor Dock', { layout: 'dock', palette: 'violet', accent: '#a855f7', surface: 'glass', radius: 'pill' }]
         ];
         const ADM_ROWS = [
-            ['mode', 'Tema', [['dark', 'Koyu'], ['black', 'Siyah'], ['light', 'Açık']]],
             ['radius', 'Köşeler', [['sharp', 'Keskin'], ['round', 'Yuvarlak'], ['pill', 'Çok yuvarlak']]],
             ['surface', 'Yüzey', [['solid', 'Düz'], ['glass', 'Cam'], ['flat', 'Çerçevesiz'], ['outline', 'Hat']]],
             ['scale', 'Boyut', [['85', '%85'], ['100', '%100'], ['115', '%115'], ['130', '%130']]],
             ['sidew', 'Menü genişliği', [['narrow', 'Dar'], ['normal', 'Normal'], ['wide', 'Geniş']]],
             ['motion', 'Animasyon', [['on', 'Açık'], ['off', 'Kapalı']]]
         ];
+        // [id, ad, önizleme, arka plan değişkenleri (bg1,bg2,yüzey,yüzey2,kenar) | null, açık mı]
+        const _PV = { navy: ['#020b1f','#06143a','#0b1f4d','#071538','#173269'], violet: ['#0a0615','#140c2b','#1a1236','#110a26','#2b1f55'], forest: ['#02100b','#061f16','#0b2a1e','#071c14','#14442f'], wine: ['#14040a','#260a14','#32101d','#1f0811','#4d1a2c'], coffee: ['#120d08','#201710','#2a1f15','#1a130c','#40301f'], gray: ['#0a0a0a','#121212','#1a1a1a','#0e0e0e','#2e2e2e'] };
+        const ADM_PALETTES = [
+            ['night', 'Gece', '#0f172a', null, false], ['black', 'Siyah', '#000', ['#000','#000','#070707','#000','#1c1c1c'], false],
+            ['graphite', 'Antrasit', '#1c2027', ['#0f1115','#171a20','#1c2027','#14171c','#2a2f38'], false], ['navy', 'Lacivert', '#0b1f4d', _PV.navy, false],
+            ['violet', 'Mor Gece', '#1a1236', _PV.violet, false], ['forest', 'Orman', '#0b2a1e', _PV.forest, false],
+            ['wine', 'Bordo', '#32101d', _PV.wine, false], ['coffee', 'Kahve', '#2a1f15', _PV.coffee, false],
+            ['light', 'Açık Mavi', '#eef3fa', ['#020617','#0b1426','#0f172a','#0b1222','#1e293b'], true], ['lightgray', 'Açık Gri', '#f2f2f2', _PV.gray, true],
+            ['lightgreen', 'Açık Yeşil', '#eaf7f0', _PV.forest, true], ['lightviolet', 'Açık Mor', '#f1ecfa', _PV.violet, true],
+            ['lightwarm', 'Krem', '#f8f1e6', _PV.coffee, true], ['lightrose', 'Açık Gül', '#fbecef', _PV.wine, true]
+        ];
+        const ADM_ACCENTS = ['#06b6d4','#0ea5e9','#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899','#f43f5e','#f97316','#f59e0b','#84cc16','#10b981','#14b8a6','#94a3b8'];
+        function admRgb(h) { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
         let admUi = Object.assign({}, ADM_UI_DEFAULT);
         try { Object.assign(admUi, JSON.parse(localStorage.getItem(ADMIN_UI_KEY) || '{}')); } catch (e) {}
 
+        if (admUi.mode) { admUi.palette = admUi.mode === 'black' ? 'black' : admUi.mode === 'light' ? 'light' : (admUi.palette || 'night'); delete admUi.mode; }
         function admUiApply() {
             const p = document.getElementById('admin-panel');
             if (!p) return;
             [...p.classList].filter(c => /^adm-(lay|mode|rad|surf|scale|sw)-/.test(c) || c === 'adm-nomotion' || c === 'adm-drawer-open').forEach(c => p.classList.remove(c));
             const u = admUi;
-            p.classList.add('adm-lay-' + u.layout, 'adm-mode-' + u.mode, 'adm-rad-' + u.radius, 'adm-surf-' + u.surface, 'adm-scale-' + u.scale, 'adm-sw-' + u.sidew);
+            p.classList.add('adm-lay-' + u.layout, 'adm-rad-' + u.radius, 'adm-surf-' + u.surface, 'adm-scale-' + u.scale, 'adm-sw-' + u.sidew);
             if (u.motion === 'off') p.classList.add('adm-nomotion');
+            const P = ADM_PALETTES.find(x => x[0] === u.palette) || ADM_PALETTES[0];
+            ['--adm-bg1', '--adm-bg2', '--adm-surface', '--adm-surface-2', '--adm-border'].forEach((n, i) => { if (P[3]) p.style.setProperty(n, P[3][i]); else p.style.removeProperty(n); });
+            p.classList.toggle('adm-mode-light', !!P[4]);
+            if (u.accent) {
+                const [r, g, b] = admRgb(u.accent);
+                p.style.setProperty('--adm-accent', u.accent);
+                p.style.setProperty('--adm-accent-2', `rgb(${Math.round(r * .8)},${Math.round(g * .8)},${Math.round(b * .8)})`);
+                p.style.setProperty('--adm-accent-soft', `rgba(${r},${g},${b},.16)`);
+            } else ['--adm-accent', '--adm-accent-2', '--adm-accent-soft'].forEach(n => p.style.removeProperty(n));
+            document.querySelectorAll('#adm-ui-rows .adm-pal').forEach(b => b.classList.toggle('is-active', b.dataset.pal === u.palette));
+            document.querySelectorAll('#adm-ui-rows .adm-sw').forEach(b => b.classList.toggle('is-active', b.dataset.acc === u.accent));
             document.querySelectorAll('#adm-ui-layouts .adm-lay-card').forEach(b => b.classList.toggle('is-active', b.dataset.id === u.layout));
             document.querySelectorAll('#adm-ui-rows .adm-segment button').forEach(b => b.classList.toggle('is-active', admUi[b.dataset.k] === b.dataset.v));
             try { localStorage.setItem(ADMIN_UI_KEY, JSON.stringify(u)); } catch (e) {}
@@ -7082,14 +7112,15 @@
             }).join('');
             document.getElementById('adm-ui-presets').innerHTML = ADM_PRESETS.map((p, i) => `<button type="button" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg text-xs" onclick="admUiPreset(${i})">${p[0]}</button>`).join('');
             document.getElementById('adm-ui-rows').innerHTML = ADM_ROWS.map(([k, label, opts]) =>
-                `<div class="adm-ui-row"><label>${label}</label><div class="adm-segment" style="--n:${opts.length}">${opts.map(([v, t]) => `<button type="button" data-k="${k}" data-v="${v}" onclick="admUiSet('${k}','${v}')">${t}</button>`).join('')}</div></div>`).join('') +
-                `<div class="adm-ui-row"><label>Renk</label><div class="adm-skin-picker">${[['ocean','#06b6d4'],['violet','#8b5cf6'],['forest','#10b981'],['amber','#f59e0b'],['rose','#f43f5e']].map(([s, c]) => `<button type="button" class="adm-skin-dot" data-skin="${s}" style="--c:${c}" onclick="admSetSkin('${s}')"></button>`).join('')}</div></div>`;
+                `<div class="adm-ui-row"><label>${label}</label><div class="adm-segment" style="--n:${opts.length}">${opts.map(([v, t]) => `<button type="button" data-k="${k}" data-v="${v}" onclick="admUiSet('${k}','${v}')">${t}</button>`).join('')}</div></div>`).join('');
             // Simge çubuğu için ipuçları + akordeon grup başlıkları
             document.querySelectorAll('#cms-sidebar-links .cms-nav-btn').forEach(b => { b.title = b.textContent.trim(); });
             document.querySelectorAll('#cms-sidebar-links .adm-nav-title').forEach(t => t.addEventListener('click', () => {
                 if (document.getElementById('admin-panel').classList.contains('adm-lay-accordion')) t.parentElement.classList.toggle('is-collapsed');
             }));
-            admSetSkin(localStorage.getItem(ADMIN_SKIN_KEY) || 'ocean');
+            document.getElementById('adm-ui-rows').insertAdjacentHTML('afterbegin',
+                `<div class="adm-ui-row"><label>Renk paleti<br><small style="font-weight:400;color:#64748b">Koyu ve açık</small></label><div class="adm-pal-grid">${ADM_PALETTES.map(p => `<button type="button" class="adm-pal" data-pal="${p[0]}" onclick="admUiSet('palette','${p[0]}')"><i style="background:${p[2]}"></i><span>${p[1]}</span></button>`).join('')}</div></div>` +
+                `<div class="adm-ui-row"><label>Vurgu rengi</label><div class="adm-acc-grid"><button type="button" class="adm-sw" data-acc="" style="--c:linear-gradient(135deg,#06b6d4,#f43f5e)" title="Üst çubuktaki renk" onclick="admUiSet('accent','')"></button>${ADM_ACCENTS.map(h => `<button type="button" class="adm-sw" data-acc="${h}" style="--c:${h}" onclick="admUiSet('accent','${h}')"></button>`).join('')}</div></div>`);
             admUiApply();
         })();
 
