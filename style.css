@@ -11,43 +11,24 @@
             --text-muted: #94a3b8;
             --title-gradient-start: #6b1111;
             --title-gradient-end: #300a0a;
+            --dash-grad-start: #091122;
+            --dash-grad-end: #02040a;
         }
 
-        .theme-cyberpunk {
-            --neon-blue: #ff007f;
-            --neon-red: #39ff14;
-            --neon-yellow: #f5ed12;
-            --title-gradient-start: #11001c;
-            --title-gradient-end: #2d004d;
-        }
+        /* NOT: Renk temaları (.theme-cyberpunk, .theme-ocean ...) app.js içindeki
+           PANO_THEME_PRESETS tablosundan üretilip <style id="pano-theme-css"> olarak
+           eklenir (tek kaynak). Böylece admin paneldeki önizlemeler ile pano birebir aynı olur. */
 
-        .theme-emerald {
-            --neon-blue: #06d6a0;
-            --neon-red: #118ab2;
-            --neon-yellow: #ffd166;
-            --title-gradient-start: #064e3b;
-            --title-gradient-end: #022c22;
-        }
-
-        .theme-purple {
-            --neon-blue: #a855f7;
-            --neon-red: #ec4899;
-            --neon-yellow: #eab308;
-            --title-gradient-start: #3b0764;
-            --title-gradient-end: #1e1b4b;
-        }
-
-        /* ===== AÇIK / KOYU MOD (dark & light mode, orthogonal to renk temaları) ===== */
-        .mode-light {
+        /* ===== AÇIK / KOYU MOD (renk temalarından bağımsız) =====
+           "body." öneki, sonradan eklenen tema sınıflarından daha yüksek öncelik sağlar. */
+        body.mode-light {
             --bg-dark: #eef1f6;
             --card-bg: #ffffff;
             --card-border: #d7dee8;
             --text-main: #182430;
             --text-muted: #5b6b80;
-        }
-
-        .mode-light .dashboard-container {
-            background: radial-gradient(circle at top, #ffffff 0%, #eef1f6 100%);
+            --dash-grad-start: #ffffff;
+            --dash-grad-end: #eef1f6;
         }
 
         .mode-light .school-brand {
@@ -92,7 +73,7 @@
             height: 100%;
             max-width: 1920px;
             max-height: 1080px;
-            background: radial-gradient(circle at top, #091122 0%, #02040a 100%);
+            background: radial-gradient(circle at top, var(--dash-grad-start) 0%, var(--dash-grad-end) 100%);
             border: 2px solid var(--card-border);
             border-radius: 12px;
             display: grid;
@@ -114,12 +95,12 @@
         /* ===== YERLEŞİM DÜZENLEYİCİ (SÜRÜKLE / BOYUTLANDIR) ===== */
         .pano-edit-mode .dashboard-container {
             background-image:
-                repeating-linear-gradient(to right, rgba(0, 180, 216, 0.10) 0, rgba(0, 180, 216, 0.10) 1px, transparent 1px, transparent calc(100% / 96)),
-                repeating-linear-gradient(to bottom, rgba(0, 180, 216, 0.10) 0, rgba(0, 180, 216, 0.10) 1px, transparent 1px, transparent calc(100% / 64));
+                repeating-linear-gradient(to right, color-mix(in srgb, var(--neon-blue) 10%, transparent) 0, color-mix(in srgb, var(--neon-blue) 10%, transparent) 1px, transparent 1px, transparent calc(100% / 96)),
+                repeating-linear-gradient(to bottom, color-mix(in srgb, var(--neon-blue) 10%, transparent) 0, color-mix(in srgb, var(--neon-blue) 10%, transparent) 1px, transparent 1px, transparent calc(100% / 64));
         }
 
         .pano-edit-mode .pano-module {
-            outline: 2px dashed rgba(0, 180, 216, 0.55);
+            outline: 2px dashed color-mix(in srgb, var(--neon-blue) 55%, transparent);
             outline-offset: -2px;
             cursor: grab;
             user-select: none;
@@ -151,7 +132,7 @@
             position: absolute;
             top: 2px;
             left: 2px;
-            background: rgba(0, 180, 216, 0.9);
+            background: color-mix(in srgb, var(--neon-blue) 90%, transparent);
             color: #02040a;
             font-size: 10px;
             font-weight: 700;
@@ -312,9 +293,9 @@
 
         .school-brand {
             width: 100%;
-            background: var(--brand-bg, linear-gradient(135deg, #09101f 0%, #0d1b35 100%));
+            background: var(--brand-bg, linear-gradient(135deg, var(--card-bg) 0%, var(--dash-grad-start) 100%));
             border: var(--brand-border-width, 2px) var(--brand-border-style, solid) var(--brand-border-color, var(--neon-blue));
-            box-shadow: var(--brand-shadow, 0 0 15px rgba(0, 180, 216, 0.2));
+            box-shadow: var(--brand-shadow, 0 0 15px color-mix(in srgb, var(--neon-blue) 20%, transparent));
             border-radius: 10px;
             display: flex;
             align-items: stretch;
@@ -325,7 +306,7 @@
         }
 
         .school-brand:hover {
-            box-shadow: var(--brand-shadow-hover, 0 0 25px rgba(0, 180, 216, 0.4));
+            box-shadow: var(--brand-shadow-hover, 0 0 25px color-mix(in srgb, var(--neon-blue) 40%, transparent));
         }
 
         /* Efekt ön ayarları: JS tarafından ilgili sınıf ekleniyor/çıkarılıyor */
@@ -519,8 +500,8 @@
 
         .class-schedule-box.active {
             border-color: var(--sch-active-border, var(--neon-blue));
-            background: var(--sch-active-bg, rgba(0, 180, 216, 0.05));
-            box-shadow: 0 0 10px var(--sch-active-border, rgba(0, 180, 216, 0.1));
+            background: var(--sch-active-bg, color-mix(in srgb, var(--neon-blue) 5%, transparent));
+            box-shadow: 0 0 10px var(--sch-active-border, color-mix(in srgb, var(--neon-blue) 10%, transparent));
         }
 
         /* Sınıf adı ve ders adı, üst üste iki ayrı hücrede (grid row) yer alır;
@@ -546,14 +527,14 @@
         }
 
         .class-name-badge {
-            background: var(--sch-name-bg, #09101f);
+            background: var(--sch-name-bg, color-mix(in srgb, var(--card-bg) 88%, var(--neon-blue) 12%));
             color: var(--sch-name-color, #7dd3fc);
             padding: 2px 8px;
             border-radius: 4px;
             font-weight: var(--sch-name-weight, 700);
             font-size: var(--sch-name-size, 12px);
             text-align: var(--sch-name-align, center);
-            border: 1px solid rgba(0, 180, 216, 0.3);
+            border: 1px solid color-mix(in srgb, var(--neon-blue) 30%, transparent);
             width: 100%;
         }
 
@@ -794,7 +775,7 @@
             border: 1px solid var(--neon-blue);
             text-align: center;
             padding: 8px;
-            box-shadow: 0 0 12px rgba(0, 180, 216, 0.2);
+            box-shadow: 0 0 12px color-mix(in srgb, var(--neon-blue) 20%, transparent);
             display: grid;
             grid-template-rows: 1fr 1fr 1fr;
             grid-template-columns: 100%;
@@ -821,7 +802,7 @@
             font-size: var(--clk-time-size, 32px);
             color: var(--clk-time-color, var(--neon-blue));
             font-weight: var(--clk-time-weight, 700);
-            text-shadow: 0 0 8px rgba(0, 180, 216, 0.4);
+            text-shadow: 0 0 8px color-mix(in srgb, var(--neon-blue) 40%, transparent);
             line-height: 1.1;
             text-align: var(--clk-time-align, center);
         }
@@ -1412,7 +1393,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: rgba(0, 180, 216, 0.75);
+            color: color-mix(in srgb, var(--neon-blue) 75%, transparent);
             font-size: 13px;
         }
 
@@ -1431,21 +1412,21 @@
         }
 
         .ach-layout-row .achievement-separator.ach-sep-line {
-            background: linear-gradient(to bottom, transparent, rgba(0, 180, 216, 0.6), transparent);
+            background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--neon-blue) 60%, transparent), transparent);
         }
 
         .ach-layout-column .achievement-separator.ach-sep-line {
-            background: linear-gradient(to right, transparent, rgba(0, 180, 216, 0.6), transparent);
+            background: linear-gradient(to right, transparent, color-mix(in srgb, var(--neon-blue) 60%, transparent), transparent);
         }
 
         .ach-layout-row .achievement-separator.ach-sep-dots {
             width: 2px;
-            background-image: repeating-linear-gradient(to bottom, rgba(0, 180, 216, 0.7) 0 3px, transparent 3px 8px);
+            background-image: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--neon-blue) 70%, transparent) 0 3px, transparent 3px 8px);
         }
 
         .ach-layout-column .achievement-separator.ach-sep-dots {
             height: 2px;
-            background-image: repeating-linear-gradient(to right, rgba(0, 180, 216, 0.7) 0 3px, transparent 3px 8px);
+            background-image: repeating-linear-gradient(to right, color-mix(in srgb, var(--neon-blue) 70%, transparent) 0 3px, transparent 3px 8px);
         }
 
         .achievement-separator.ach-sep-icon {
@@ -1492,7 +1473,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: rgba(0, 180, 216, 0.75);
+            color: color-mix(in srgb, var(--neon-blue) 75%, transparent);
             font-size: 12px;
         }
 
@@ -1511,21 +1492,21 @@
         }
 
         .sdw-layout-row .sdw-separator.sdw-sep-line {
-            background: linear-gradient(to bottom, transparent, rgba(0, 180, 216, 0.6), transparent);
+            background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--neon-blue) 60%, transparent), transparent);
         }
 
         .sdw-layout-column .sdw-separator.sdw-sep-line {
-            background: linear-gradient(to right, transparent, rgba(0, 180, 216, 0.6), transparent);
+            background: linear-gradient(to right, transparent, color-mix(in srgb, var(--neon-blue) 60%, transparent), transparent);
         }
 
         .sdw-layout-row .sdw-separator.sdw-sep-dots {
             width: 2px;
-            background-image: repeating-linear-gradient(to bottom, rgba(0, 180, 216, 0.7) 0 3px, transparent 3px 8px);
+            background-image: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--neon-blue) 70%, transparent) 0 3px, transparent 3px 8px);
         }
 
         .sdw-layout-column .sdw-separator.sdw-sep-dots {
             height: 2px;
-            background-image: repeating-linear-gradient(to right, rgba(0, 180, 216, 0.7) 0 3px, transparent 3px 8px);
+            background-image: repeating-linear-gradient(to right, color-mix(in srgb, var(--neon-blue) 70%, transparent) 0 3px, transparent 3px 8px);
         }
 
         .sdw-separator.sdw-sep-icon {
@@ -1543,3 +1524,221 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+
+/* =====================================================================
+   YÖNETİM PANELİ — YENİ ARAYÜZ (v8.1 STUDIO)
+   Yalnızca #admin-panel içini etkiler; pano ekranına dokunmaz.
+   5 arayüz rengi: ocean (varsayılan), violet, forest, amber, rose
+   ===================================================================== */
+.adm-shell {
+    --adm-accent: #06b6d4;
+    --adm-accent-2: #0891b2;
+    --adm-accent-soft: rgba(6, 182, 212, 0.14);
+    --adm-bg1: #020617;
+    --adm-bg2: #0b1426;
+    --adm-surface: #0f172a;
+    --adm-surface-2: #0b1222;
+    --adm-border: #1e293b;
+}
+.adm-shell.adm-skin-violet { --adm-accent:#8b5cf6; --adm-accent-2:#7c3aed; --adm-accent-soft:rgba(139,92,246,.16); --adm-bg1:#0a0615; --adm-bg2:#150d2e; --adm-surface:#171033; --adm-surface-2:#100a26; --adm-border:#2a1d57; }
+.adm-shell.adm-skin-forest { --adm-accent:#10b981; --adm-accent-2:#059669; --adm-accent-soft:rgba(16,185,129,.15); --adm-bg1:#02100b; --adm-bg2:#07201a; --adm-surface:#0b2a21; --adm-surface-2:#071d16; --adm-border:#134e3a; }
+.adm-shell.adm-skin-amber  { --adm-accent:#f59e0b; --adm-accent-2:#d97706; --adm-accent-soft:rgba(245,158,11,.15); --adm-bg1:#120a02; --adm-bg2:#201405; --adm-surface:#2a1b08; --adm-surface-2:#1d1205; --adm-border:#4a3210; }
+.adm-shell.adm-skin-rose   { --adm-accent:#f43f5e; --adm-accent-2:#e11d48; --adm-accent-soft:rgba(244,63,94,.15); --adm-bg1:#14040a; --adm-bg2:#240812; --adm-surface:#2f0c1a; --adm-surface-2:#200913; --adm-border:#4c1a2b; }
+
+#admin-panel.adm-shell {
+    background:
+        radial-gradient(1200px 600px at 85% -10%, var(--adm-accent-soft), transparent 60%),
+        linear-gradient(160deg, var(--adm-bg1) 0%, var(--adm-bg2) 100%);
+}
+
+/* Tailwind yardımcı sınıflarını arayüz renk paletine bağla (ID özgüllüğü sayesinde Tailwind'i ezer) */
+#admin-panel .bg-slate-900 { background-color: var(--adm-surface); }
+#admin-panel .bg-slate-950 { background-color: var(--adm-surface-2); }
+#admin-panel .border-slate-800 { border-color: var(--adm-border); }
+#admin-panel .bg-cyan-500, #admin-panel .bg-cyan-600 { background-color: var(--adm-accent); }
+#admin-panel .hover\:bg-cyan-600:hover { background-color: var(--adm-accent-2); }
+#admin-panel .text-cyan-400, #admin-panel .text-cyan-500 { color: var(--adm-accent); }
+#admin-panel .border-cyan-500 { border-color: var(--adm-accent); }
+#admin-panel .hover\:border-cyan-500:hover { border-color: var(--adm-accent); }
+#admin-panel .bg-cyan-500\/10, #admin-panel .bg-cyan-500\/20 { background-color: var(--adm-accent-soft); }
+#admin-panel .shadow-cyan-500\/20, #admin-panel .shadow-cyan-600\/10 { --tw-shadow-color: var(--adm-accent-soft); }
+#admin-panel .accent-cyan-500 { accent-color: var(--adm-accent); }
+
+/* Üst çubuk */
+.adm-topbar { border-bottom: 1px solid var(--adm-border); }
+.adm-logo {
+    background: var(--adm-accent-soft);
+    border: 1px solid var(--adm-accent);
+    color: var(--adm-accent);
+    box-shadow: 0 8px 24px -8px var(--adm-accent);
+}
+.adm-badge { background: var(--adm-accent-soft); color: var(--adm-accent); border: 1px solid var(--adm-accent); }
+
+.adm-skin-picker {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 10px; border-radius: 999px;
+    background: var(--adm-surface); border: 1px solid var(--adm-border);
+}
+.adm-skin-dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--c); border: 2px solid transparent;
+    cursor: pointer; transition: transform .15s ease, box-shadow .15s ease;
+}
+.adm-skin-dot:hover { transform: scale(1.2); }
+.adm-skin-dot.is-active { border-color: #fff; box-shadow: 0 0 0 2px var(--c); }
+
+/* Kenar çubuğu */
+.adm-sidebar { background: var(--adm-surface); border: 1px solid var(--adm-border); }
+.adm-nav-search {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; margin-bottom: 12px; border-radius: 10px;
+    background: var(--adm-surface-2); border: 1px solid var(--adm-border);
+    color: #64748b; font-size: 12px; flex-shrink: 0;
+}
+.adm-nav-search:focus-within { border-color: var(--adm-accent); color: var(--adm-accent); }
+.adm-nav-search input { flex: 1; min-width: 0; background: transparent; outline: none; color: #e2e8f0; font-size: 12px; }
+.adm-nav-search input::placeholder { color: #64748b; }
+.adm-nav-group { margin-bottom: 14px; }
+.adm-nav-title {
+    padding: 0 10px 6px; font-size: 10px; font-weight: 700;
+    letter-spacing: .14em; text-transform: uppercase; color: #64748b;
+}
+.cms-nav-btn {
+    width: 100%; display: flex; align-items: center; gap: 12px;
+    padding: 9px 12px; margin-bottom: 2px; border-radius: 10px;
+    font-size: 13px; text-align: left; color: #94a3b8;
+    border: 1px solid transparent; cursor: pointer;
+    transition: background .15s ease, color .15s ease, transform .15s ease;
+}
+.cms-nav-btn i { width: 20px; text-align: center; font-size: 14px; opacity: .85; }
+.cms-nav-btn:hover { background: rgba(148, 163, 184, 0.09); color: #fff; transform: translateX(2px); }
+.cms-nav-btn.active {
+    color: #fff; font-weight: 700;
+    background: linear-gradient(90deg, var(--adm-accent-soft), transparent);
+    border-color: var(--adm-border);
+    box-shadow: inset 3px 0 0 var(--adm-accent);
+}
+.cms-nav-btn.active i { color: var(--adm-accent); opacity: 1; }
+.adm-nav-empty { padding: 16px 8px; text-align: center; color: #64748b; font-size: 12px; }
+#admin-panel .hidden { display: none; }
+
+/* İçerik alanı ve ortak bileşenler */
+.adm-viewport { background: var(--adm-surface); border: 1px solid var(--adm-border); }
+.tab-content:not(.hidden) { animation: admFadeIn .25s ease; }
+@keyframes admFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.adm-card {
+    background: var(--adm-surface-2);
+    border: 1px solid var(--adm-border);
+    border-radius: 16px;
+    padding: 20px;
+}
+.adm-page-head {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+    padding-bottom: 14px; border-bottom: 1px solid var(--adm-border);
+}
+.adm-page-head h2 { color: var(--adm-accent); }
+.adm-chip {
+    display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+    padding: 6px 12px; border-radius: 999px; font-size: 11px; color: #cbd5e1;
+    background: var(--adm-accent-soft); border: 1px solid var(--adm-border);
+}
+.adm-chip i { color: var(--adm-accent); }
+.adm-chip b { color: #fff; }
+
+.adm-segment {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px;
+    border-radius: 12px; background: var(--adm-surface); border: 1px solid var(--adm-border);
+}
+.adm-segment button {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 12px; border-radius: 9px; font-size: 13px; font-weight: 700;
+    color: #94a3b8; cursor: pointer; transition: all .15s ease;
+}
+.adm-segment button:hover { color: #fff; }
+.adm-segment button.is-active { background: var(--adm-accent); color: #fff; box-shadow: 0 6px 18px -6px var(--adm-accent); }
+
+/* Özel kaydırma çubuğu */
+#admin-panel ::-webkit-scrollbar { width: 8px; height: 8px; }
+#admin-panel ::-webkit-scrollbar-track { background: transparent; }
+#admin-panel ::-webkit-scrollbar-thumb { background: var(--adm-border); border-radius: 8px; }
+#admin-panel ::-webkit-scrollbar-thumb:hover { background: var(--adm-accent); }
+
+/* ---------- Tema Stüdyosu: pano minyatürü (tema değişkenlerini kullanır) ---------- */
+.tp-screen {
+    display: flex; flex-direction: column; gap: 6px;
+    aspect-ratio: 16 / 9; padding: 10px;
+    background: radial-gradient(circle at top, var(--dash-grad-start) 0%, var(--dash-grad-end) 100%);
+    border: 2px solid var(--card-border);
+    border-radius: 12px;
+}
+.tp-brand {
+    height: 15%; flex-shrink: 0; border-radius: 7px;
+    background: linear-gradient(135deg, var(--card-bg), var(--dash-grad-start));
+    border: 2px solid var(--neon-blue);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--neon-blue) 35%, transparent);
+    display: flex; align-items: center; padding: 0 10px;
+}
+.tp-brand span { display: block; width: 38%; height: 28%; border-radius: 3px; background: var(--text-main); opacity: .85; }
+.tp-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 6px; }
+.tp-mini .tp-grid { grid-template-rows: 1fr; }
+.tp-card {
+    display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+    background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 6px;
+}
+.tp-head {
+    height: 24%; flex-shrink: 0;
+    background: linear-gradient(to right, var(--title-gradient-start), var(--title-gradient-end));
+    border-bottom: 2px solid var(--neon-red);
+}
+.tp-lines i { display: block; height: 4px; border-radius: 2px; margin: 5px 6px 0; background: var(--text-muted); opacity: .45; }
+.tp-lines i.c1 { background: var(--neon-blue); opacity: 1; }
+.tp-lines i.c2 { background: var(--neon-yellow); opacity: 1; }
+.tp-lines i.c3 { background: var(--neon-green); opacity: 1; }
+.tp-lines i.c4 { background: var(--neon-red); opacity: 1; }
+.tp-marquee { height: 7%; flex-shrink: 0; border-radius: 4px; background: linear-gradient(90deg, var(--neon-yellow), transparent 85%); opacity: .8; }
+.tp-mini { padding: 7px; gap: 4px; border-width: 1px; border-radius: 9px; }
+.tp-mini .tp-grid { gap: 4px; }
+
+/* Tema galerisi kartları */
+.tg-card {
+    text-align: left; padding: 10px; border-radius: 16px; cursor: pointer;
+    background: var(--adm-surface); border: 2px solid var(--adm-border);
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.tg-card:hover { transform: translateY(-3px); border-color: var(--adm-accent); box-shadow: 0 14px 30px -14px #000; }
+.tg-card.is-active { border-color: var(--adm-accent); box-shadow: 0 0 0 3px var(--adm-accent-soft); }
+.tg-meta { padding: 10px 4px 2px; }
+.tg-title { color: #fff; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+.tg-title i { color: var(--adm-accent); }
+.tg-desc { color: #94a3b8; font-size: 10px; margin-top: 2px; min-height: 26px; }
+.tg-sw { display: flex; gap: 5px; margin-top: 6px; }
+.tg-sw span { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .25); }
+
+/* ---------- Yerleşim şablonu kartları (mini yerleşim önizlemeli) ---------- */
+.lt-card {
+    text-align: left; padding: 10px; border-radius: 16px; cursor: pointer;
+    background: var(--adm-surface); border: 2px solid var(--adm-border);
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.lt-card:hover { transform: translateY(-3px); border-color: var(--adm-accent); box-shadow: 0 14px 30px -14px #000; }
+.lt-card.is-active { border-color: var(--adm-accent); box-shadow: 0 0 0 3px var(--adm-accent-soft); }
+.lt-preview {
+    position: relative; aspect-ratio: 16 / 9; overflow: hidden;
+    background: #020617; border: 1px solid var(--adm-border); border-radius: 8px;
+}
+.lt-block {
+    position: absolute; box-sizing: border-box; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    background: hsl(var(--h) 55% 34%); border: 1px solid #020617; border-radius: 3px;
+    color: rgba(255, 255, 255, .8); font-size: 8px; font-weight: 700;
+}
+.lt-meta { padding: 10px 4px 2px; }
+.lt-title { color: #fff; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+.lt-title i { color: var(--adm-accent); }
+.lt-title em {
+    margin-left: auto; font-style: normal; font-size: 9px; letter-spacing: .05em;
+    padding: 2px 7px; border-radius: 999px; background: var(--adm-accent); color: #fff;
+}
+.lt-desc { color: #94a3b8; font-size: 10px; margin-top: 2px; }

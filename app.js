@@ -502,6 +502,90 @@
                 bellhours:     { c: 37, cs: 12, r: 13, rs: 6,  fs: 100 },
                 announcements: { c: 37, cs: 12, r: 19, rs: 6,  fs: 100 },
                 achievements:  { c: 37, cs: 12, r: 25, rs: 8,  fs: 100 }
+            },
+            nobet_odakli: {
+                brand:         { c: 1,  cs: 48, r: 1,  rs: 3,  fs: 100 },
+                duty:          { c: 1,  cs: 14, r: 4,  rs: 26, fs: 115 },
+                media:         { c: 15, cs: 20, r: 4,  rs: 10, fs: 100 },
+                announcements: { c: 15, cs: 20, r: 14, rs: 7,  fs: 100 },
+                achievements:  { c: 15, cs: 20, r: 21, rs: 5,  fs: 90 },
+                clock:         { c: 15, cs: 20, r: 26, rs: 4,  fs: 90 },
+                schedule:      { c: 35, cs: 14, r: 4,  rs: 9,  fs: 90 },
+                bellhours:     { c: 35, cs: 14, r: 13, rs: 6,  fs: 90 },
+                birthday:      { c: 35, cs: 14, r: 19, rs: 4,  fs: 85 },
+                quote:         { c: 35, cs: 14, r: 23, rs: 3,  fs: 80 },
+                specialday:    { c: 35, cs: 14, r: 26, rs: 4,  fs: 85 },
+                marquee:       { c: 1,  cs: 48, r: 30, rs: 3,  fs: 100 }
+            },
+            kutlama_odakli: {
+                brand:         { c: 1,  cs: 48, r: 1,  rs: 3,  fs: 100 },
+                birthday:      { c: 1,  cs: 16, r: 4,  rs: 14, fs: 115 },
+                specialday:    { c: 1,  cs: 16, r: 18, rs: 6,  fs: 100 },
+                quote:         { c: 1,  cs: 16, r: 24, rs: 6,  fs: 95 },
+                media:         { c: 17, cs: 20, r: 4,  rs: 14, fs: 100 },
+                announcements: { c: 17, cs: 20, r: 18, rs: 7,  fs: 100 },
+                achievements:  { c: 17, cs: 20, r: 25, rs: 5,  fs: 90 },
+                clock:         { c: 37, cs: 12, r: 4,  rs: 6,  fs: 95 },
+                schedule:      { c: 37, cs: 12, r: 10, rs: 10, fs: 90 },
+                bellhours:     { c: 37, cs: 12, r: 20, rs: 5,  fs: 85 },
+                duty:          { c: 37, cs: 12, r: 25, rs: 5,  fs: 85 },
+                marquee:       { c: 1,  cs: 48, r: 30, rs: 3,  fs: 100 }
+            },
+            genis_vitrin: {
+                brand:         { c: 1,  cs: 48, r: 1,  rs: 3,  fs: 100 },
+                media:         { c: 1,  cs: 32, r: 4,  rs: 20, fs: 100 },
+                birthday:      { c: 1,  cs: 8,  r: 24, rs: 6,  fs: 85 },
+                quote:         { c: 9,  cs: 8,  r: 24, rs: 6,  fs: 85 },
+                specialday:    { c: 17, cs: 8,  r: 24, rs: 6,  fs: 85 },
+                achievements:  { c: 25, cs: 8,  r: 24, rs: 6,  fs: 85 },
+                clock:         { c: 33, cs: 16, r: 4,  rs: 5,  fs: 100 },
+                schedule:      { c: 33, cs: 16, r: 9,  rs: 8,  fs: 95 },
+                duty:          { c: 33, cs: 16, r: 17, rs: 5,  fs: 90 },
+                bellhours:     { c: 33, cs: 16, r: 22, rs: 4,  fs: 90 },
+                announcements: { c: 33, cs: 16, r: 26, rs: 4,  fs: 90 },
+                marquee:       { c: 1,  cs: 48, r: 30, rs: 3,  fs: 100 }
+            },
+            uc_sutun: {
+                brand:         { c: 1,  cs: 48, r: 1,  rs: 3,  fs: 100 },
+                birthday:      { c: 1,  cs: 16, r: 4,  rs: 7,  fs: 95 },
+                schedule:      { c: 1,  cs: 16, r: 11, rs: 12, fs: 100 },
+                clock:         { c: 1,  cs: 16, r: 23, rs: 7,  fs: 100 },
+                media:         { c: 17, cs: 16, r: 4,  rs: 14, fs: 100 },
+                duty:          { c: 17, cs: 16, r: 18, rs: 6,  fs: 95 },
+                announcements: { c: 17, cs: 16, r: 24, rs: 6,  fs: 100 },
+                quote:         { c: 33, cs: 16, r: 4,  rs: 6,  fs: 95 },
+                specialday:    { c: 33, cs: 16, r: 10, rs: 6,  fs: 95 },
+                bellhours:     { c: 33, cs: 16, r: 16, rs: 7,  fs: 100 },
+                achievements:  { c: 33, cs: 16, r: 23, rs: 7,  fs: 95 },
+                marquee:       { c: 1,  cs: 48, r: 30, rs: 3,  fs: 100 }
+            },
+            sinav_gunu: {
+                brand:         { c: 1,  cs: 48, r: 1,  rs: 3,  fs: 100 },
+                clock:         { c: 1,  cs: 12, r: 4,  rs: 9,  fs: 130 },
+                bellhours:     { c: 13, cs: 12, r: 4,  rs: 9,  fs: 120 },
+                duty:          { c: 25, cs: 12, r: 4,  rs: 9,  fs: 100 },
+                achievements:  { c: 37, cs: 12, r: 4,  rs: 9,  fs: 85 },
+                schedule:      { c: 1,  cs: 24, r: 13, rs: 17, fs: 115 },
+                announcements: { c: 25, cs: 24, r: 13, rs: 8,  fs: 110 },
+                media:         { c: 25, cs: 12, r: 21, rs: 9,  fs: 100 },
+                birthday:      { c: 37, cs: 12, r: 21, rs: 3,  fs: 80 },
+                quote:         { c: 37, cs: 12, r: 24, rs: 3,  fs: 80 },
+                specialday:    { c: 37, cs: 12, r: 27, rs: 3,  fs: 80 },
+                marquee:       { c: 1,  cs: 48, r: 30, rs: 3,  fs: 100 }
+            },
+            ust_serit: {
+                brand:         { c: 1,  cs: 48, r: 1,  rs: 3,  fs: 100 },
+                clock:         { c: 1,  cs: 8,  r: 4,  rs: 7,  fs: 90 },
+                birthday:      { c: 9,  cs: 8,  r: 4,  rs: 7,  fs: 85 },
+                quote:         { c: 17, cs: 8,  r: 4,  rs: 7,  fs: 85 },
+                specialday:    { c: 25, cs: 8,  r: 4,  rs: 7,  fs: 85 },
+                bellhours:     { c: 33, cs: 8,  r: 4,  rs: 7,  fs: 85 },
+                achievements:  { c: 41, cs: 8,  r: 4,  rs: 7,  fs: 85 },
+                media:         { c: 1,  cs: 26, r: 11, rs: 19, fs: 100 },
+                schedule:      { c: 27, cs: 22, r: 11, rs: 9,  fs: 95 },
+                duty:          { c: 27, cs: 22, r: 20, rs: 5,  fs: 90 },
+                announcements: { c: 27, cs: 22, r: 25, rs: 5,  fs: 95 },
+                marquee:       { c: 1,  cs: 48, r: 30, rs: 3,  fs: 100 }
             }
         };
 
@@ -521,7 +605,13 @@
             klasik: { title: 'Klasik', desc: 'Varsayılan dengeli düzen', icon: 'fa-table-columns' },
             duyuru_odakli: { title: 'Duyuru Odaklı', desc: 'Duyurular ve nöbet bilgisi öne çıkar', icon: 'fa-bullhorn' },
             ders_programi_odakli: { title: 'Ders Programı Odaklı', desc: 'Ders programı büyük gösterilir', icon: 'fa-calendar-days' },
-            medya_odakli: { title: 'Medya Odaklı', desc: 'Görsel/slayt alanı büyütülür', icon: 'fa-photo-film' }
+            medya_odakli: { title: 'Medya Odaklı', desc: 'Görsel/slayt alanı büyütülür', icon: 'fa-photo-film' },
+            nobet_odakli: { title: 'Nöbet Odaklı', desc: 'Nöbetçi öğretmenler sol sütunda büyük', icon: 'fa-shield-halved' },
+            kutlama_odakli: { title: 'Kutlama Odaklı', desc: 'Doğum günleri ve özel günler öne çıkar', icon: 'fa-cake-candles' },
+            genis_vitrin: { title: 'Geniş Vitrin', desc: 'Medya 2/3 ekran, bilgiler yan sütunda', icon: 'fa-panorama' },
+            uc_sutun: { title: 'Üç Sütun Dengeli', desc: 'Eşit genişlikte üç sütun', icon: 'fa-table-columns' },
+            sinav_gunu: { title: 'Sınav Günü', desc: 'Saat, zil ve ders programı vurgulu', icon: 'fa-stopwatch' },
+            ust_serit: { title: 'Üst Şerit', desc: 'Üstte bilgi şeridi, altta büyük medya', icon: 'fa-grip' }
         };
 
         // Yerleşik modüller için PANO_MODULE_LABELS'tan, özel modüller için moduleDefs/customModuleDefs
@@ -1735,7 +1825,19 @@
             panoPersist();
             applyPanoLayout(appConfig.panoLayout);
             panoRenderModuleSizeList();
+            panoRenderTemplateList();
             writeCMSLog(`"${(PANO_TEMPLATE_LABELS[templateKey] || {}).title || templateKey}" yerleşim şablonu uygulandı.`);
+        }
+
+        // Mevcut yerleşim, verilen şablonla (modül konumları/ebatları) birebir aynı mı?
+        function panoLayoutMatchesTemplate(key) {
+            const tpl = PANO_LAYOUT_TEMPLATES[key];
+            const cur = appConfig.panoLayout;
+            if (!tpl || !cur) return false;
+            return Object.keys(tpl).every(id => {
+                const a = tpl[id], b = cur[id];
+                return b && a.c === b.c && a.cs === b.cs && a.r === b.r && a.rs === b.rs;
+            });
         }
 
         function panoRenderTemplateList() {
@@ -1744,15 +1846,25 @@
             wrap.innerHTML = '';
             Object.keys(PANO_LAYOUT_TEMPLATES).forEach(key => {
                 const meta = PANO_TEMPLATE_LABELS[key] || { title: key, desc: '', icon: 'fa-table-cells' };
+                const tpl = PANO_LAYOUT_TEMPLATES[key];
+                const active = panoLayoutMatchesTemplate(key);
+                const ids = Object.keys(tpl);
+                if (!tpl.marquee) ids.push('marquee');
+                const blocks = ids.map((id, i) => {
+                    const m = tpl[id] || MARQUEE_DEFAULT_POS;
+                    const label = panoModuleLabel(id);
+                    return `<div class="lt-block" title="${label}" style="--h:${(i * 47) % 360};left:${((m.c - 1) / 96 * 100).toFixed(2)}%;top:${((m.r - 1) / 64 * 100).toFixed(2)}%;width:${(m.cs / 96 * 100).toFixed(2)}%;height:${(m.rs / 64 * 100).toFixed(2)}%"><span>${label.charAt(0)}</span></div>`;
+                }).join('');
                 const card = document.createElement('button');
-                card.className = 'text-left bg-slate-900 border border-slate-700 hover:border-cyan-500 rounded-xl p-3 transition group';
+                card.type = 'button';
+                card.className = 'lt-card' + (active ? ' is-active' : '');
                 card.onclick = () => panoApplyTemplate(key);
                 card.innerHTML = `
-                    <div class="w-9 h-9 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center mb-2 group-hover:bg-cyan-500/20">
-                        <i class="fa-solid ${meta.icon}"></i>
+                    <div class="lt-preview">${blocks}</div>
+                    <div class="lt-meta">
+                        <div class="lt-title"><i class="fa-solid ${meta.icon}"></i> ${meta.title}${active ? '<em>Aktif</em>' : ''}</div>
+                        <div class="lt-desc">${meta.desc}</div>
                     </div>
-                    <div class="text-white font-bold text-sm">${meta.title}</div>
-                    <div class="text-[11px] text-slate-500 mt-0.5">${meta.desc}</div>
                 `;
                 wrap.appendChild(card);
             });
@@ -5970,66 +6082,149 @@
             return result;
         }
 
+        /* ================== TEMA MOTORU (v8.1) ==================
+           Düzeltilen sorunlar:
+           1) Özel renkler <html> üzerine yazılıyordu ama tema sınıfları <body> üzerinde olduğundan
+              tema değişkenleri onları eziyordu; artık özel renkler <body> üzerine uygulanır.
+           2) body.className = ... ataması body'deki diğer sınıfları (ör. pano-edit-mode) siliyordu.
+           3) Hazır temalar yalnızca vurgu renklerini değiştiriyor, arka plan/kart rengi sabit kalıyordu.
+           4) Tema seçimi kalıcı olarak kaydedilmiyordu (yalnızca "Kaydet"e basılırsa saklanıyordu).
+           5) Özel renk tanımlıyken hazır tema seçmek görsel olarak hiçbir şey değiştirmiyordu. */
+        const PANO_THEME_PRESETS = {
+            standard: { title: 'Muş Melikşah Klasik', desc: 'Orijinal mavi ve koyu kırmızı neon kombinasyonu', vars: {
+                '--bg-dark': '#02040a', '--card-bg': '#070b13', '--card-border': '#111b2d',
+                '--neon-blue': '#00b4d8', '--neon-red': '#d90429', '--neon-yellow': '#ffb703', '--neon-green': '#38b000',
+                '--title-gradient-start': '#6b1111', '--title-gradient-end': '#300a0a',
+                '--dash-grad-start': '#091122', '--dash-grad-end': '#02040a' } },
+            cyberpunk: { title: 'Neon Cyberpunk', desc: 'Çarpıcı yeşil ve pembe siber ışıklar', vars: {
+                '--bg-dark': '#05000d', '--card-bg': '#0d0221', '--card-border': '#3b0f6b',
+                '--neon-blue': '#ff007f', '--neon-red': '#39ff14', '--neon-yellow': '#f5ed12', '--neon-green': '#00f5d4',
+                '--title-gradient-start': '#11001c', '--title-gradient-end': '#2d004d',
+                '--dash-grad-start': '#1a0536', '--dash-grad-end': '#05000d' } },
+            emerald: { title: 'Doğa Zümrüt', desc: 'Sakin yeşil ve gold detaylar', vars: {
+                '--bg-dark': '#01100b', '--card-bg': '#04201a', '--card-border': '#0f4a39',
+                '--neon-blue': '#06d6a0', '--neon-red': '#118ab2', '--neon-yellow': '#ffd166', '--neon-green': '#52b788',
+                '--title-gradient-start': '#064e3b', '--title-gradient-end': '#022c22',
+                '--dash-grad-start': '#06281f', '--dash-grad-end': '#01100b' } },
+            purple: { title: 'Galaksi Moru', desc: 'Uzay moru ve pembe geçişleri', vars: {
+                '--bg-dark': '#0a0618', '--card-bg': '#120a2b', '--card-border': '#2e1f66',
+                '--neon-blue': '#a855f7', '--neon-red': '#ec4899', '--neon-yellow': '#eab308', '--neon-green': '#34d399',
+                '--title-gradient-start': '#3b0764', '--title-gradient-end': '#1e1b4b',
+                '--dash-grad-start': '#1e1b4b', '--dash-grad-end': '#0a0618' } },
+            ocean: { title: 'Derin Okyanus', desc: 'Turkuaz ve mavi, serin ve ferah', vars: {
+                '--bg-dark': '#00101f', '--card-bg': '#021b33', '--card-border': '#0b4a7a',
+                '--neon-blue': '#22d3ee', '--neon-red': '#3b82f6', '--neon-yellow': '#fde047', '--neon-green': '#34d399',
+                '--title-gradient-start': '#0c4a6e', '--title-gradient-end': '#082f49',
+                '--dash-grad-start': '#0a2a4a', '--dash-grad-end': '#00101f' } },
+            sunset: { title: 'Gün Batımı', desc: 'Turuncu, kırmızı ve amber sıcaklığı', vars: {
+                '--bg-dark': '#140805', '--card-bg': '#22100a', '--card-border': '#5a2a16',
+                '--neon-blue': '#fb923c', '--neon-red': '#ef4444', '--neon-yellow': '#fbbf24', '--neon-green': '#a3e635',
+                '--title-gradient-start': '#7c2d12', '--title-gradient-end': '#431407',
+                '--dash-grad-start': '#2a1209', '--dash-grad-end': '#140805' } },
+            graphite: { title: 'Grafit', desc: 'Sade, nötr gri tonlar; gözü yormaz', vars: {
+                '--bg-dark': '#0b0d10', '--card-bg': '#14181d', '--card-border': '#2d353f',
+                '--neon-blue': '#94a3b8', '--neon-red': '#64748b', '--neon-yellow': '#e2e8f0', '--neon-green': '#86efac',
+                '--title-gradient-start': '#1f2937', '--title-gradient-end': '#111827',
+                '--dash-grad-start': '#181c22', '--dash-grad-end': '#0b0d10' } },
+            royal: { title: 'Lacivert & Altın', desc: 'Kurumsal lacivert zemin, altın vurgular', vars: {
+                '--bg-dark': '#030712', '--card-bg': '#0a1226', '--card-border': '#1e3a8a',
+                '--neon-blue': '#fbbf24', '--neon-red': '#1d4ed8', '--neon-yellow': '#fde68a', '--neon-green': '#4ade80',
+                '--title-gradient-start': '#1e3a8a', '--title-gradient-end': '#0b1437',
+                '--dash-grad-start': '#0f1b3d', '--dash-grad-end': '#030712' } }
+        };
+
+        const PANO_LIGHT_MODE_VARS = {
+            '--bg-dark': '#eef1f6', '--card-bg': '#ffffff', '--card-border': '#d7dee8',
+            '--text-main': '#182430', '--text-muted': '#5b6b80',
+            '--dash-grad-start': '#ffffff', '--dash-grad-end': '#eef1f6'
+        };
+
+        // Özel renklerle <body> üzerine yazılan tüm değişkenler (temizlerken hepsi kaldırılır)
+        const CUSTOM_MANAGED_VARS = ['--neon-blue', '--neon-red', '--neon-yellow', '--neon-green',
+            '--card-bg', '--bg-dark', '--card-border', '--dash-grad-start', '--dash-grad-end',
+            '--title-gradient-start', '--title-gradient-end'];
+
+        // Tema sınıflarını tek kaynaktan (PANO_THEME_PRESETS) üretip sayfaya ekler.
+        // ".theme-x" (özgüllük 0,1,0) kasıtlı olarak "body.mode-light"tan (0,1,1) düşüktür,
+        // böylece açık mod her temanın üstünde çalışır.
+        (function panoInjectThemeCss() {
+            let css = '';
+            Object.keys(PANO_THEME_PRESETS).forEach(key => {
+                const decl = Object.keys(PANO_THEME_PRESETS[key].vars).map(k => `${k}:${PANO_THEME_PRESETS[key].vars[k]}`).join(';');
+                css += `.theme-${key}{${decl}}\n`;
+            });
+            let el = document.getElementById('pano-theme-css');
+            if (!el) { el = document.createElement('style'); el.id = 'pano-theme-css'; document.head.appendChild(el); }
+            el.textContent = css;
+        })();
+
         function applyThemePreset(presetName, skipLog) {
-            appConfig.theme = presetName || 'standard';
+            appConfig.theme = PANO_THEME_PRESETS[presetName] ? presetName : 'standard';
+            // Hazır tema seçildiyse önceki özel renkler temizlenir; aksi halde seçim görünmez kalırdı.
+            appConfig.customColors = null;
             renderThemeClasses();
-            if (!skipLog) writeCMSLog(`Pano renk teması güncellendi: ${appConfig.theme}`);
+            loadCustomThemeInputsFromConfig();
+            panoPersist();
+            if (!skipLog) writeCMSLog(`Pano renk teması güncellendi: ${PANO_THEME_PRESETS[appConfig.theme].title}`);
         }
 
         function applyThemeMode(mode, skipLog) {
             appConfig.themeMode = (mode === 'light') ? 'light' : 'dark';
             renderThemeClasses();
+            loadCustomThemeInputsFromConfig();
+            panoPersist();
             if (!skipLog) writeCMSLog(`Pano görünüm modu güncellendi: ${appConfig.themeMode === 'light' ? 'Açık Tema' : 'Koyu Tema'}`);
         }
 
         function renderThemeClasses() {
             const body = document.body;
-            const preset = appConfig.theme || 'standard';
-            const mode = appConfig.themeMode || 'dark';
-            body.className = `theme-${preset} mode-${mode}`;
+            let preset = appConfig.theme || 'standard';
+            if (!PANO_THEME_PRESETS[preset]) preset = 'standard';
+            const mode = (appConfig.themeMode === 'light') ? 'light' : 'dark';
 
-            // Aktif buton/kart görsel durumunu güncelle
-            const darkBtn = document.getElementById('mode-btn-dark');
-            const lightBtn = document.getElementById('mode-btn-light');
-            if (darkBtn && lightBtn) {
-                darkBtn.classList.toggle('border-cyan-500', mode === 'dark');
-                darkBtn.classList.toggle('border-slate-800', mode !== 'dark');
-                lightBtn.classList.toggle('border-cyan-500', mode === 'light');
-                lightBtn.classList.toggle('border-slate-800', mode !== 'light');
-            }
-            document.querySelectorAll('.theme-preset-card').forEach(card => {
-                const isActive = card.getAttribute('data-preset') === preset;
-                card.classList.toggle('border-cyan-500', isActive);
-                card.classList.toggle('border-slate-800', !isActive);
-            });
+            // Yalnızca theme-* / mode-* sınıflarını değiştir; diğer sınıfları (pano-edit-mode vb.) koru.
+            Array.from(body.classList).forEach(c => { if (/^(theme|mode)-/.test(c)) body.classList.remove(c); });
+            body.classList.add('theme-' + preset, 'mode-' + mode);
 
-            // Özel renkler tanımlıysa uygula (tema/mod değişse bile korunur)
-            if (appConfig.customColors) {
-                applyCustomColorVars(appConfig.customColors);
-            } else {
-                clearCustomColorVars();
-            }
+            // Özel renkler tanımlıysa uygula (tema/mod değişse bile korunur), değilse temizle
+            if (appConfig.customColors) applyCustomColorVars(appConfig.customColors, mode);
+            else clearCustomColorVars();
+
+            panoUpdateThemeUi(preset, mode);
         }
 
-        const CUSTOM_COLOR_VAR_MAP = {
-            blue: '--neon-blue',
-            red: '--neon-red',
-            yellow: '--neon-yellow',
-            green: '--neon-green',
-            cardbg: '--card-bg',
-            bgdark: '--bg-dark'
-        };
-
-        function applyCustomColorVars(colors) {
-            const root = document.documentElement;
-            Object.keys(CUSTOM_COLOR_VAR_MAP).forEach(key => {
-                if (colors[key]) root.style.setProperty(CUSTOM_COLOR_VAR_MAP[key], colors[key]);
-            });
+        function applyCustomColorVars(colors, mode) {
+            mode = mode || ((appConfig.themeMode === 'light') ? 'light' : 'dark');
+            clearCustomColorVars();
+            const st = document.body.style; // <body> üzerinde: tema sınıflarının değişkenlerini ezer
+            if (colors.blue) st.setProperty('--neon-blue', colors.blue);
+            if (colors.yellow) st.setProperty('--neon-yellow', colors.yellow);
+            if (colors.green) st.setProperty('--neon-green', colors.green);
+            if (colors.red) {
+                st.setProperty('--neon-red', colors.red);
+                st.setProperty('--title-gradient-start', `color-mix(in srgb, ${colors.red} 45%, #000)`);
+                st.setProperty('--title-gradient-end', `color-mix(in srgb, ${colors.red} 20%, #000)`);
+            }
+            // Açık modda zemin renkleri modun kendi paletinden gelir; yalnızca vurgu renkleri özelleşir.
+            if (mode !== 'light') {
+                const accent = colors.blue || '#00b4d8';
+                if (colors.cardbg) {
+                    st.setProperty('--card-bg', colors.cardbg);
+                    st.setProperty('--card-border', `color-mix(in srgb, ${colors.cardbg} 70%, ${accent} 30%)`);
+                }
+                if (colors.bgdark) {
+                    st.setProperty('--bg-dark', colors.bgdark);
+                    st.setProperty('--dash-grad-end', colors.bgdark);
+                    st.setProperty('--dash-grad-start', `color-mix(in srgb, ${colors.bgdark} 85%, ${accent} 15%)`);
+                }
+            }
         }
 
         function clearCustomColorVars() {
-            const root = document.documentElement;
-            Object.values(CUSTOM_COLOR_VAR_MAP).forEach(v => root.style.removeProperty(v));
+            CUSTOM_MANAGED_VARS.forEach(v => {
+                document.body.style.removeProperty(v);
+                document.documentElement.style.removeProperty(v); // eski sürümden kalan değerler
+            });
         }
 
         function applyCustomThemeColors(fromUserClick) {
@@ -6043,6 +6238,7 @@
             };
             appConfig.customColors = colors;
             applyCustomColorVars(colors);
+            panoUpdateThemeUi(appConfig.theme || 'standard', appConfig.themeMode === 'light' ? 'light' : 'dark');
             if (fromUserClick) {
                 panoPersist();
                 writeCMSLog("Özel tema renkleri uygulandı ve kaydedildi.");
@@ -6053,6 +6249,7 @@
         function resetCustomThemeColors() {
             appConfig.customColors = null;
             clearCustomColorVars();
+            renderThemeClasses();
             loadCustomThemeInputsFromConfig();
             panoPersist();
             writeCMSLog("Özel tema renkleri sıfırlandı.");
@@ -6061,13 +6258,54 @@
 
         function loadCustomThemeInputsFromConfig() {
             const defaults = { blue: '#00b4d8', red: '#d90429', yellow: '#ffb703', green: '#38b000', cardbg: '#070b13', bgdark: '#02040a' };
-            const colors = appConfig.customColors || defaults;
-            document.getElementById('custom-color-blue').value = colors.blue || defaults.blue;
-            document.getElementById('custom-color-red').value = colors.red || defaults.red;
-            document.getElementById('custom-color-yellow').value = colors.yellow || defaults.yellow;
-            document.getElementById('custom-color-green').value = colors.green || defaults.green;
-            document.getElementById('custom-color-cardbg').value = colors.cardbg || defaults.cardbg;
-            document.getElementById('custom-color-bgdark').value = colors.bgdark || defaults.bgdark;
+            let colors = appConfig.customColors;
+            if (!colors) {
+                // Özel renk yoksa, seçili temanın gerçek renklerini kutulara yansıt
+                const cs = getComputedStyle(document.body);
+                const g = (v, d) => { const x = (cs.getPropertyValue(v) || '').trim(); return /^#[0-9a-f]{6}$/i.test(x) ? x : d; };
+                colors = { blue: g('--neon-blue', defaults.blue), red: g('--neon-red', defaults.red), yellow: g('--neon-yellow', defaults.yellow),
+                           green: g('--neon-green', defaults.green), cardbg: g('--card-bg', defaults.cardbg), bgdark: g('--bg-dark', defaults.bgdark) };
+            }
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+            set('custom-color-blue', colors.blue || defaults.blue);
+            set('custom-color-red', colors.red || defaults.red);
+            set('custom-color-yellow', colors.yellow || defaults.yellow);
+            set('custom-color-green', colors.green || defaults.green);
+            set('custom-color-cardbg', colors.cardbg || defaults.cardbg);
+            set('custom-color-bgdark', colors.bgdark || defaults.bgdark);
+        }
+
+        // Admin: mod düğmeleri, aktif tema adı ve tema şablon galerisini günceller
+        function panoUpdateThemeUi(preset, mode) {
+            const darkBtn = document.getElementById('mode-btn-dark');
+            const lightBtn = document.getElementById('mode-btn-light');
+            if (darkBtn) darkBtn.classList.toggle('is-active', mode === 'dark');
+            if (lightBtn) lightBtn.classList.toggle('is-active', mode === 'light');
+            const nameEl = document.getElementById('theme-current-name');
+            if (nameEl) nameEl.textContent = (appConfig.customColors ? 'Özel Tema · ' : '') + PANO_THEME_PRESETS[preset].title + (mode === 'light' ? ' (Açık)' : ' (Koyu)');
+
+            const gal = document.getElementById('theme-gallery');
+            if (!gal) return;
+            gal.innerHTML = Object.keys(PANO_THEME_PRESETS).map(key => {
+                const t = PANO_THEME_PRESETS[key];
+                const v = mode === 'light' ? Object.assign({}, t.vars, PANO_LIGHT_MODE_VARS) : t.vars;
+                const style = Object.keys(v).map(k => `${k}:${v[k]}`).join(';');
+                const active = !appConfig.customColors && key === preset;
+                const cell = '<div class="tp-card"><div class="tp-head"></div><div class="tp-lines"><i class="c1"></i><i></i></div></div>';
+                const sw = ['--neon-blue', '--neon-red', '--neon-yellow', '--neon-green'].map(k => `<span style="background:${t.vars[k]}"></span>`).join('');
+                return `<button type="button" class="tg-card${active ? ' is-active' : ''}" onclick="applyThemePreset('${key}')">
+                    <div class="tp-screen tp-mini" style="${style}">
+                        <div class="tp-brand"><span></span></div>
+                        <div class="tp-grid">${cell.repeat(4)}</div>
+                        <div class="tp-marquee"></div>
+                    </div>
+                    <div class="tg-meta">
+                        <div class="tg-title">${t.title}${active ? ' <i class="fa-solid fa-circle-check"></i>' : ''}</div>
+                        <div class="tg-desc">${t.desc}</div>
+                        <div class="tg-sw">${sw}</div>
+                    </div>
+                </button>`;
+            }).join('');
         }
 
         // SAAT MODÜLÜNE TIKLAYINCA TAM EKRAN AÇ/KAPAT — panonun TV'de tam ekran (kiosk)
@@ -6645,19 +6883,52 @@
 
         function switchTab(tabId, el) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            document.getElementById(tabId).classList.remove('hidden');
+            const target = document.getElementById(tabId);
+            if (target) target.classList.remove('hidden');
 
-            const links = document.getElementById('cms-sidebar-links').getElementsByTagName('button');
-            for (let link of links) {
-                link.className = "w-full text-left px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg text-sm flex items-center gap-3 transition";
-            }
-            el.className = "w-full text-left px-4 py-3 bg-cyan-600 text-white font-bold rounded-lg text-sm flex items-center gap-3 transition shadow-lg shadow-cyan-600/10";
+            document.querySelectorAll('#cms-sidebar-links .cms-nav-btn').forEach(b => b.classList.toggle('active', b === el));
             try { sessionStorage.setItem(ADMIN_TAB_KEY, tabId); } catch (e) {}
             // Sekme değişince içerik alanını en üste kaydır
             const vp = document.getElementById('cms-content-viewport');
             if (vp) vp.scrollTop = 0;
             writeCMSLog(`Sekme değiştirildi: ${tabId}`);
         }
+
+        // Yönetim paneli kenar çubuğunda arama (Türkçe harf duyarlı)
+        function admFilterNav(q) {
+            const needle = (q || '').trim().toLocaleLowerCase('tr');
+            let total = 0;
+            document.querySelectorAll('#cms-sidebar-links .adm-nav-group').forEach(g => {
+                let visible = 0;
+                g.querySelectorAll('.cms-nav-btn').forEach(b => {
+                    const show = !needle || b.textContent.toLocaleLowerCase('tr').includes(needle);
+                    b.classList.toggle('hidden', !show);
+                    if (show) visible++;
+                });
+                g.classList.toggle('hidden', visible === 0);
+                total += visible;
+            });
+            const empty = document.querySelector('#cms-sidebar-links .adm-nav-empty');
+            if (empty) empty.classList.toggle('hidden', total !== 0);
+        }
+
+        // Yönetim paneli arayüz rengi (yalnızca yönetim ekranını etkiler, panoyu değil)
+        const ADMIN_SKIN_KEY = 'panoAdminSkin';
+        const ADMIN_SKINS = ['ocean', 'violet', 'forest', 'amber', 'rose'];
+        function admSetSkin(name) {
+            if (!ADMIN_SKINS.includes(name)) name = 'ocean';
+            const panel = document.getElementById('admin-panel');
+            if (!panel) return;
+            ADMIN_SKINS.forEach(s => panel.classList.remove('adm-skin-' + s));
+            panel.classList.add('adm-skin-' + name);
+            panel.querySelectorAll('.adm-skin-dot').forEach(d => d.classList.toggle('is-active', d.getAttribute('data-skin') === name));
+            try { localStorage.setItem(ADMIN_SKIN_KEY, name); } catch (e) {}
+        }
+        (function admInitSkin() {
+            let skin = 'ocean';
+            try { skin = localStorage.getItem(ADMIN_SKIN_KEY) || 'ocean'; } catch (e) {}
+            admSetSkin(skin);
+        })();
 
         // Duyuru biçimlendirme form kontrollerinden mevcut ayarları okur
         function readAnnouncementFormatFromForm() {
