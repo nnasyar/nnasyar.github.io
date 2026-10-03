@@ -2101,7 +2101,7 @@
         ========================================================================= */
         const SHIFT_KEYS = ['morning', 'afternoon'];
         const SHIFT_LABELS = { morning: 'Sabah', afternoon: 'Öğle' };
-        const SHIFT_FIELDS = ['bellHours', 'weeklyClassSchedules', 'aylikNobet', 'weeklyDuties'];
+        const SHIFT_FIELDS = ['bellHours', 'weeklyClassSchedules', 'aylikNobet', 'weeklyDuties', 'achievementCategories'];
         const SHIFT_DEFAULT_BELLS = {
             morning:   [['08:00', '08:40'], ['08:50', '09:30'], ['09:40', '10:20'], ['10:30', '11:10'], ['11:20', '12:00']],
             afternoon: [['12:30', '13:10'], ['13:20', '14:00'], ['14:10', '14:50'], ['15:00', '15:40'], ['15:50', '16:30']]
@@ -2120,6 +2120,12 @@
         }
 
         function shiftDeepCopy(o) { return JSON.parse(JSON.stringify(o === undefined ? null : o)); }
+
+        // Ayın Enleri alan yapısını (başlık/ikon/stil) korur, kayıt listelerini boşaltır
+        function shiftAchStructureOnly(cats) {
+            return (shiftDeepCopy(cats) || []).map(c => { c.list = []; return c; });
+        }
+        function shiftDefaultAch() { return shiftDeepCopy(defaultAppConfig.achievementCategories); }
 
         function shiftTimeToMin(str) {
             const p = String(str || '').split(':');
@@ -2156,7 +2162,11 @@
                     weeklyClassSchedules: sched,
                     // Mevcut nöbet çizelgesi sabaha aktarılır; öğle boş başlar
                     aylikNobet: k === 'morning' ? shiftDeepCopy(single.aylikNobet || {}) : {},
-                    weeklyDuties: k === 'morning' ? shiftDeepCopy(single.weeklyDuties || {}) : {}
+                    weeklyDuties: k === 'morning' ? shiftDeepCopy(single.weeklyDuties || {}) : {},
+                    // Ayın Enleri: sabah mevcut kayıtları alır; öğle aynı alanlarla ama boş başlar
+                    achievementCategories: k === 'morning'
+                        ? shiftDeepCopy(single.achievementCategories && single.achievementCategories.length ? single.achievementCategories : shiftDefaultAch())
+                        : shiftAchStructureOnly(single.achievementCategories && single.achievementCategories.length ? single.achievementCategories : shiftDefaultAch())
                 };
             });
             return ds;
@@ -2177,6 +2187,9 @@
                 if (!ds[k].weeklyClassSchedules) ds[k].weeklyClassSchedules = {};
                 if (!ds[k].aylikNobet) ds[k].aylikNobet = {};
                 if (!ds[k].weeklyDuties) ds[k].weeklyDuties = {};
+                if (!Array.isArray(ds[k].achievementCategories)) {
+                    ds[k].achievementCategories = (k === 'morning') ? shiftDefaultAch() : shiftAchStructureOnly(shiftDefaultAch());
+                }
             });
         }
 
@@ -2215,6 +2228,13 @@
                 }
                 bellHours = appConfig.bellHours;
                 return;
+            }
+            // Güncelleme öncesi kaydedilmiş ikili veride Ayın Enleri ortaktı (düz alan): sabaha taşı, öğleye yapıyı kopyala
+            const _legacyAch = Object.getOwnPropertyDescriptor(appConfig, 'achievementCategories');
+            if (appConfig.doubleShift && _legacyAch && Array.isArray(_legacyAch.value) && _legacyAch.value.length) {
+                const _ds = appConfig.doubleShift;
+                if (_ds.morning && !Array.isArray(_ds.morning.achievementCategories)) _ds.morning.achievementCategories = shiftDeepCopy(_legacyAch.value);
+                if (_ds.afternoon && !Array.isArray(_ds.afternoon.achievementCategories)) _ds.afternoon.achievementCategories = shiftAchStructureOnly(_legacyAch.value);
             }
             // Çift modda düz alanlar (varsa) kaldırılır, yönlendirici özellikler kurulur
             SHIFT_FIELDS.forEach(f => { try { delete appConfig[f]; } catch (e) {} });
@@ -2263,6 +2283,13 @@
             try { saveBellHoursFromInputs(); } catch (e) {}
             try { saveWeeklyScheduleMatrix(); } catch (e) {}
             try { nobetAyiKaydet(); } catch (e) {}
+            // Ayın Enleri çalışma kopyası (panel açıkken) bağlı öğretime yazılır
+            try {
+                const _p = document.getElementById('admin-panel');
+                if (isDoubleMode() && _p && !_p.classList.contains('hidden')) {
+                    appConfig.achievementCategories = shiftDeepCopy(tempAchievementCategories) || [];
+                }
+            } catch (e) {}
         }
 
         // Pano ekranını bağlı öğretime göre yeniden çizer
@@ -2270,6 +2297,11 @@
             renderBellHoursTable();
             renderActiveScheduleGroup();
             renderActiveDuties();
+            // Ayın Enleri: öğretime göre kartı yeniden kur ve slayt döngüsünü sıfırla
+            achievementActiveIndex = {};
+            renderAchievementsCard();
+            (appConfig.achievementCategories || []).filter(c => c.active !== false).forEach(c => cycleAchievementCategory(c.id));
+            startCyclingModuleIntervals();
             shiftDecorate();
             calculateCountdownAndTableHighlight(new Date());
         }
@@ -2295,6 +2327,7 @@
             const cls = 'shift-badge shift-badge-' + __boundShift;
             const targets = [
                 document.getElementById('display-bellhours-title'),
+                document.getElementById('display-achievements-title'),
                 (document.getElementById('display-duty-title-text') || {}).parentElement
             ];
             targets.forEach(t => {
@@ -2319,10 +2352,18 @@
         /* ---------------------- YÖNETİM PANELİ ---------------------- */
 
         // Panel açılırken: düzenlenecek öğretimi seçer ve veriyi ona bağlar
+        // Ayın Enleri çalışma kopyasını bağlı öğretimin verisinden yeniden yükler
+        function shiftReloadAchTemp() {
+            tempAchievementCategories = shiftDeepCopy(appConfig.achievementCategories || []) || [];
+            achievementEditing = { catId: null, index: -1 };
+            achievementPendingFile = {};
+        }
+
         function shiftAdminOpenInit() {
             if (!isDoubleMode()) return;
             shiftAdminEditShift = shiftGetActive(new Date());
             shiftBind(shiftAdminEditShift);
+            shiftReloadAchTemp();
             const cls = adminClassList();
             if (cls.length && !cls.includes(activeAdminEditClass)) activeAdminEditClass = cls[0];
         }
@@ -2335,6 +2376,7 @@
             buildAdminBellHoursInputs();
             buildWeeklyScheduleMatrix();
             buildAylikNobetTablosu();
+            if (typeof renderAdminAchievementCategories === 'function') renderAdminAchievementCategories();
             renderShiftEditBars();
             renderTeachingTab();
             shiftRefreshDisplay();
@@ -2365,6 +2407,7 @@
             shiftCommitInputs();
             shiftAdminEditShift = key;
             shiftBind(key);
+            shiftReloadAchTemp();
             const cls = adminClassList();
             if (cls.length) activeAdminEditClass = cls[0];
             shiftRefreshAdmin();
@@ -2384,6 +2427,7 @@
             shiftInstallAccessors();
             shiftAdminEditShift = shiftGetActive(new Date());
             shiftBind(shiftAdminEditShift);
+            shiftReloadAchTemp();
             const cls = adminClassList();
             if (cls.length) activeAdminEditClass = cls[0];
         }
@@ -2395,13 +2439,14 @@
             shiftRemoveAccessors();
             SHIFT_FIELDS.forEach(f => {
                 if (back[f] !== undefined && back[f] !== null) appConfig[f] = back[f];
-                else appConfig[f] = (f === 'bellHours') ? shiftDeepCopy(SHIFT_SINGLE_DEFAULT_BELLS) : {};
+                else appConfig[f] = (f === 'bellHours') ? shiftDeepCopy(SHIFT_SINGLE_DEFAULT_BELLS) : (f === 'achievementCategories' ? shiftDefaultAch() : {});
             });
             delete appConfig.singleModeData;
             appConfig.teachingMode = 'single';
             __boundShift = null;
             bellHours = appConfig.bellHours;
             if (!classList.includes(activeAdminEditClass)) activeAdminEditClass = classList[0];
+            shiftReloadAchTemp();
         }
 
         function teachingModeSet(mode) {
@@ -5524,6 +5569,7 @@
             });
 
             applyModuleFontOverrides();
+            if (typeof shiftDecorate === 'function') shiftDecorate();
         }
 
         // Her modül için seçilen fontu, o modülün TÜM içeriğine (başlık + gövde)
