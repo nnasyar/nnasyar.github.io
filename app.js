@@ -2386,6 +2386,35 @@
         }
 
         // Ders programı / zil saatleri / nöbet sekmelerinin üstündeki "Sabah | Öğle" seçici
+        // Sürüm etiketi + dosya uyumsuzluğu uyarısı (yönetim panelinde görünür)
+        const PANO_BUILD = 'ikili-5';
+        function renderBuildBadge() {
+            const panel = document.getElementById('admin-panel');
+            if (!panel) return;
+            const h1 = panel.querySelector('h1');
+            if (h1 && !document.getElementById('build-badge')) {
+                const b = document.createElement('span');
+                b.id = 'build-badge';
+                b.className = 'text-[10px] bg-amber-500/20 text-amber-300 font-mono px-2 py-0.5 rounded';
+                b.textContent = 'İkili Öğretim · ' + PANO_BUILD;
+                b.title = 'Yüklü app.js sürümü. Bu etiketi görüyorsanız yeni app.js çalışıyor.';
+                h1.appendChild(b);
+            }
+            // pano49.html eski kalmışsa (yeni sekme/yer tutucular yok) açık uyarı göster
+            const need = ['tab-teaching'];
+            const missing = need.filter(id => !document.getElementById(id));
+            let warn = document.getElementById('build-mismatch-warning');
+            if (missing.length) {
+                if (!warn) {
+                    warn = document.createElement('div');
+                    warn.id = 'build-mismatch-warning';
+                    warn.className = 'mb-3 p-3 rounded-lg border border-red-500/50 bg-red-500/10 text-red-300 text-xs font-bold';
+                    warn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> pano49.html dosyası ESKİ sürüm: "Öğretim Düzeni" sekmesi bulunamadı. Güncel pano49.html dosyasını da yükleyin ve Ctrl+F5 ile yenileyin.';
+                    const body = panel.querySelector('.flex.items-center.justify-between');
+                    if (body && body.parentNode) body.parentNode.insertBefore(warn, body.nextSibling);
+                }
+            } else if (warn) { warn.remove(); }
+        }
         function renderShiftEditBars() {
             const dbl = isDoubleMode();
             // Seçici yer tutucusu pano49.html'de yoksa (eski HTML dosyası yüklenmişse) burada oluşturulur:
@@ -6526,6 +6555,7 @@
             document.getElementById('stat-ann-count').innerText = appConfig.announcements.length;
 
             panel.classList.remove('hidden');
+            renderBuildBadge();
             adminMarkClean();
             try { sessionStorage.setItem(ADMIN_OPEN_FLAG, '1'); } catch (e) {} // sayfa yenilenince panel açık kalsın
         }
