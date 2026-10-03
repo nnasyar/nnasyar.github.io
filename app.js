@@ -38,29 +38,23 @@
             adminPin: "",
             // Başka bir cihazda/tarayıcıda yapılan güncelleme bu ekrana ulaştığında
             // gösterilecek mesaj. Yönetim Paneli > Bulut Bağlantısı bölümünden
-            // değiştirilebilir; hem Pano49 hem Pano99 (Duyuru Panosu) için ayrı
-            // ayrı ayarlanır (Pano99 kendi appConfig/dpCloudState'inde tutar).
+            // değiştirilebilir.
             refreshMessage: "Panoda güncelleme var, yenileniyor...",
             // Bulut senkronizasyon yoklama sıklığı (saniye). Her ekran/cihaz bu süre
             // aralığıyla "yeni bir değişiklik var mı?" diye buluta bakar. Düşük değer =
             // değişiklikler ekranlara daha hızlı yansır ama bulut isteği sayısı artar.
-            // Yönetim Paneli > Bulut Bağlantısı bölümünden ayarlanabilir; Pano99'da da
-            // aynı isimli/işlevli bir alan vardır (dpCloudState.pollIntervalSeconds).
+            // Yönetim Paneli > Bulut Bağlantısı bölümünden ayarlanabilir.
             pollIntervalSeconds: 15,
             // Veri Kontrol Sıklığı için süreli (periyodik) kontrolün açık/kapalı olduğunu
             // belirler. true (varsayılan) = yukarıdaki saniyeye göre otomatik/periyodik
             // kontrol edilir. false = otomatik yoklama YAPILMAZ; güncellemeler yalnızca
             // sayfa manuel olarak yenilendiğinde (F5 / kiosk yeniden yüklendiğinde) görülür.
             pollIntervalEnabled: true,
-            // Ekran geçişi (Pano49 ↔ Pano99) kontrol sıklığı (saniye) — "display_control"
-            // tablosuna bakıp başka bir cihazdan ekran değiştirilip değiştirilmediğini
-            // kontrol eder. Veri kontrolünden AYRI bir zamanlayıcıdır.
-            displaySwitchPollSeconds: 5,
-            // Ekran Geçişi Kontrol Sıklığı için süreli (periyodik) kontrolün açık/kapalı
-            // olduğunu belirler. true (varsayılan) = periyodik kontrol edilir. false =
-            // otomatik yoklama YAPILMAZ; ekran geçişi yalnızca sayfa manuel yenilendiğinde
-            // (açılışta bir kez) kontrol edilir.
-            displaySwitchPollEnabled: true,
+            // Yönetim Paneli hareketsizlik zaman aşımı: panelde bu süre (dakika) boyunca
+            // hiçbir fare/klavye/dokunma hareketi olmazsa panel kapanır (kaydedilmemiş
+            // değişiklikler kaybolur). adminIdleEnabled=false ise panel kendiliğinden kapanmaz.
+            adminIdleEnabled: true,
+            adminIdleMinutes: 1.5,
             // Günlük Zil Saatleri kartının görünüm ayarları (satır/sütun boşluğu, teneffüs gösterimi, aktif ders vurgusu, başlık biçimi)
             bellHoursSettings: {
                 rowGap: 4,                 // Satır (dikey) boşluk - px (mutlak değer, varsayılan tasarımla aynı)
@@ -683,17 +677,8 @@
         //      + storage.objects için RLS politikaları
         //   (Tam SQL script'i ayrıca iletildi.)
         // ============================================================================
-        // Not: nnasyar.github.io üzerinde sunucu tarafı proxy ÇALIŞMAZ (GitHub Pages
-        // sadece düz dosya sunar) — orada doğrudan Supabase'e bağlanıyoruz. Netlify'da
-        // yönlendirme (redirect) yerine fonksiyonun GERÇEK adresini doğrudan
-        // kullanıyoruz (daha güvenilir). Diğer platformlarda (Cloudflare gibi)
-        // "/supabase-proxy" yolu kullanılır.
-        const __host = window.location.hostname;
-        const __supabaseUrl = (__host === "nnasyar.github.io")
-            ? "https://lvrwponfyvdxvypeewnw.supabase.co"
-            : __host.endsWith(".netlify.app")
-                ? (window.location.origin + "/.netlify/functions/supabase-proxy")
-                : (window.location.origin + "/supabase-proxy");
+        // GitHub Pages sadece düz dosya sunar; bu yüzden doğrudan Supabase'e bağlanılır.
+        const __supabaseUrl = "https://lvrwponfyvdxvypeewnw.supabase.co";
         const SUPABASE_CONFIG = {
             url: __supabaseUrl,
             anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2cndwb25meXZkeHZ5cGVld253Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxNjM1MDUsImV4cCI6MjEwMDczOTUwNX0.AqsnWHE3nPF_dQ8cxuqBGK_IIyqrK21gLFXgoGrGtls",
@@ -716,125 +701,6 @@
         // "Yönetici Şifresi" alanından bu şifreyi değiştirebilirsiniz.
         // ============================================================================
         const ADMIN_EMAIL = "nasyar@cozgen.com";
-
-        // ============================================================================
-        // EKRAN GEÇİŞİ (Pano49 ↔ Duyuru Panosu) — panox49 ile duyuru panosu editörü
-        // AYNI Supabase projesindeki küçük ve bağımsız "display_control" tablosunu
-        // (tek satır, id=1, "active" sütunu "pano" ya da "duyuru") paylaşır. Bu tabloya
-        // dokunmak appConfig'i (pano_config tablosu) HİÇ etkilemez — kasıtlı olarak ayrı
-        // tutuldu ki bir tarafın ekran geçişi diğer tarafın tüm ayarlarının üzerine
-        // yazma riski taşımasın.
-        //
-        // DUYURU_PANOSU_URL: duyuru panosu HTML dosyasının, bu pano49.html'e göre GÖRECELİ
-        // (relative) yolu. İkisini AYNI klasöre/repoya yüklerseniz aşağıdaki varsayılan
-        // dosya adı doğrudan çalışır; farklı bir isim/konum kullanırsanız burayı güncelleyin.
-        // ============================================================================
-        const DISPLAY_CONTROL_TABLE = 'display_control';
-        const DUYURU_PANOSU_URL = 'pano99.html';
-        let displayControlPollTimer = null;
-        let displayControlSwitching = false; // yönlendirme sırasında ikinci bir tetiklenmeyi önler
-
-        function setActiveDisplay(target) {
-            if (!supabaseClient) {
-                showCustomNotification('Bulut Bağlı Değil', 'Ekran geçişi için Supabase bağlantısı gerekli.');
-                return;
-            }
-            // Hâlâ çağrıldığı tıklamanın ("user gesture") içindeyken gerçek tam ekran
-            // senkron olarak istenir (bkz. checkAdminPinCode içindeki AYNI açıklama).
-            requestRealFullscreen();
-            displayControlSwitching = true;
-            supabaseClient
-                .from(DISPLAY_CONTROL_TABLE)
-                .update({ active: target, updated_at: new Date().toISOString() })
-                .eq('id', 1)
-                .then(({ error }) => {
-                    if (error) {
-                        console.warn('Ekran geçişi yazılamadı:', error);
-                        showCustomNotification('Hata', 'Ekran geçişi kaydedilemedi: ' + error.message);
-                        displayControlSwitching = false;
-                        return;
-                    }
-                    if (target === 'duyuru') {
-                        writeCMSLog('Ekran, Duyuru Panosu\'na geçiriliyor...');
-                        const sep = DUYURU_PANOSU_URL.includes('?') ? '&' : '?';
-                        // ÖNEMLİ: Buradan KASITLI olarak tam ekrandan ÇIKILMIYOR. Chrome/Edge gibi
-                        // tarayıcılar, AYNI sekmede aynı origin'e yapılan bir yönlendirmede gerçek
-                        // (OS düzeyinde) tam ekran durumunu koruyabiliyor — biz burada elle
-                        // exitFullscreen() çağırırsak (önceki sürümde olduğu gibi) tarayıcı
-                        // çubuğu geçiş anında görünüp kayboluyor ("yanlış işlem" hissi buradan
-                        // geliyordu). Hedef sayfa zaten kendi açılışında/ilk tıklamada tam ekranı
-                        // ister (bkz. armFullscreenPersistent) — bu yeterli ve güvenli.
-                        window.location.href = DUYURU_PANOSU_URL + sep + 'ekran=1';
-                    }
-                });
-        }
-
-        // Yönetim Paneli başlığındaki "Duyuru Panosuna Geç" düğmesine basılınca çağrılır.
-        // Panel zaten PIN/şifre ile açıldığı (oturum zaten doğrulanmış olduğu) için burada
-        // tekrar şifre sorulmaz — mevcut "Duyuru Panosunu Ekrana Getir" düğmesiyle aynı
-        // yetkilendirmeyi kullanır, sadece daha hızlı erişim için üstte de sunulur.
-        // Not: burada KASITLI olarak native confirm() KULLANILMIYOR — tam ekran (kiosk)
-        // modunda bazı tarayıcılarda native onay kutuları görünmez/engellenir ve buton
-        // "çalışmıyormuş" gibi görünürdü. Doğrudan geçiş yapılır.
-        function adminSwitchToDuyuruPanosu() {
-            requestRealFullscreen(); // bkz. checkAdminPinCode içindeki AYNI açıklama
-            setActiveDisplay('duyuru');
-        }
-
-        // Yönetim Paneli başlığındaki "Pano99'u Düzenle" düğmesine basılınca çağrılır.
-        // Bu, EKRAN GEÇİŞİ değildir (herkesin gördüğü yayını etkilemez) — sadece
-        // Duyuru Panosu'nun İÇERİĞİNİ düzenlemek için pano99.html'i, doğrudan düzenleme
-        // arayüzünde (yayın önizlemesi atlanarak) açar. AYNI sekmede yönlendirir (yeni
-        // sekme/pencere AÇMAZ) — tam ekran/kiosk modunda window.open() güvenilmez şekilde
-        // engellenebiliyor ya da arka planda sessizce açılıp fark edilmeyebiliyordu.
-        // Pano49 Yönetim Paneli'ne dönmek için pano99'daki "Pano49'a Dön" düğmesi kullanılır.
-        function adminOpenDuyuruPanosuEditor() {
-            requestRealFullscreen(); // bkz. checkAdminPinCode içindeki AYNI açıklama
-            const sep = DUYURU_PANOSU_URL.includes('?') ? '&' : '?';
-            window.location.href = DUYURU_PANOSU_URL + sep + 'duzenle=1';
-        }
-
-        // Anında (sayfa açılır açılmaz) ve ardından periyodik olarak kontrol eder;
-        // başka bir cihazdan (ör. duyuru panosu üzerinden) "duyuru" seçilmişse bu
-        // ekranı da otomatik olarak duyuru panosuna yönlendirir.
-        function displayControlCheckOnce() {
-            if (!supabaseClient || displayControlSwitching) return;
-            const adminPanel = document.getElementById('admin-panel');
-            const isAdminOpen = adminPanel && !adminPanel.classList.contains('hidden');
-            if (isAdminOpen) return; // aktif düzenlemeyi bozma; panel kapanınca zaten normal akışla tekrar kontrol edilecek
-            supabaseClient
-                .from(DISPLAY_CONTROL_TABLE)
-                .select('active')
-                .eq('id', 1)
-                .maybeSingle()
-                .then(({ data, error }) => {
-                    if (error || !data) return;
-                    if (data.active === 'duyuru') {
-                        displayControlSwitching = true;
-                        const sep = DUYURU_PANOSU_URL.includes('?') ? '&' : '?';
-                        // (bkz. setActiveDisplay içindeki AYNI açıklama) — kasıtlı olarak
-                        // tam ekrandan çıkılmıyor; hedef sayfa zaten tam ekran ister.
-                        window.location.href = DUYURU_PANOSU_URL + sep + 'ekran=1';
-                    }
-                })
-                .catch(() => {});
-        }
-
-        function displayControlStartPolling() {
-            if (!supabaseClient) return;
-            if (displayControlPollTimer) clearInterval(displayControlPollTimer);
-            displayControlCheckOnce();
-            // "Ekran Geçişi Kontrol Sıklığı" pasif ise süreli (periyodik) kontrol
-            // KURULMAZ; yalnızca yukarıdaki tek seferlik (sayfa açılışı/yenilemesi
-            // anındaki) kontrol yapılır — bir sonraki kontrol için sayfanın manuel
-            // yenilenmesi (F5) gerekir.
-            if (appConfig && appConfig.displaySwitchPollEnabled === false) return;
-            let intervalSec = parseInt(appConfig && appConfig.displaySwitchPollSeconds, 10);
-            if (!intervalSec || isNaN(intervalSec)) intervalSec = 5;
-            intervalSec = Math.min(300, Math.max(3, intervalSec));
-            displayControlPollTimer = setInterval(displayControlCheckOnce, intervalSec * 1000);
-        }
-        // ============================================================================
 
         let supabaseClient = null;
         if (CLOUD_SYNC_ENABLED) {
@@ -2945,8 +2811,8 @@
                 writeCMSLog("Bulut senkronizasyonu etkin, buluttaki veriler kontrol ediliyor...");
                 cloudSyncPullOnce();
                 cloudSyncStartListening();
-                displayControlStartPolling();
             }
+            adminRestoreAfterReload(); // yenileme sonrası yönetim paneli açıksa geri aç
 
             document.addEventListener('keydown', function(e) {
                 if (IS_DISPLAY_MODE) return; // TV/kiosk modunda yönetim paneli tuşla açılamaz
@@ -6239,21 +6105,9 @@
             }
         }
 
-        let pendingPinAction = 'panel'; // 'panel' -> Yönetim Paneli aç, 'switchDisplay' -> gizli geçiş butonu
-
+        
         function tryOpenAdminPanel() {
             if (IS_DISPLAY_MODE) return; // TV/kiosk modunda yönetim paneli hiçbir şekilde açılamaz
-            pendingPinAction = 'panel';
-            document.getElementById('pin-prompt-input').value = "";
-            document.getElementById('pin-prompt-modal').classList.remove('hidden');
-            document.getElementById('pin-prompt-input').focus();
-        }
-
-        // Ekranın bir köşesindeki görünmez butona (bkz. index.html #hidden-switch-trigger)
-        // tıklanınca çağrılır. Panel girişiyle AYNI Supabase Auth hesabını kullanır.
-        function tryHiddenDisplaySwitch() {
-            if (IS_DISPLAY_MODE) return; // TV/kiosk modunda bu da açılamaz
-            pendingPinAction = 'switchDisplay';
             document.getElementById('pin-prompt-input').value = "";
             document.getElementById('pin-prompt-modal').classList.remove('hidden');
             document.getElementById('pin-prompt-input').focus();
@@ -6283,8 +6137,6 @@
             // Aşağıdaki adımlar async (Supabase'e ağ isteği) olduğu için tarayıcı bu
             // "gesture" hakkını kısa sürede geri alabilir; bu yüzden gerçek tam ekran
             // isteği, hâlâ tam bu tıklamanın içindeyken, EN BAŞTA senkron olarak yapılır.
-            // Böylece ekran geçişi sırasında (bkz. setActiveDisplay) tarayıcı tam ekranı
-            // yeni sayfaya taşıyabiliyorsa, taşınacak "canlı" bir tam ekran hakkı olur.
             requestRealFullscreen();
             const now = Date.now();
             if (now < pinLockedUntil) {
@@ -6305,11 +6157,7 @@
                     pinWrongAttempts = 0;
                     closePinPrompt();
                     writeCMSLog("Güvenlik girişi başarılı (Supabase Auth).");
-                    if (pendingPinAction === 'switchDisplay') {
-                        setActiveDisplay('duyuru');
-                    } else {
-                        openAdminPanel();
-                    }
+                    openAdminPanel();
                 } else {
                     pinWrongAttempts++;
                     const waitMs = PIN_LOCK_STEPS_MS[Math.min(pinWrongAttempts, PIN_LOCK_STEPS_MS.length - 1)];
@@ -6326,8 +6174,85 @@
             }
         }
 
+        /* =========================================================================
+           YÖNETİM PANELİ OTURUMU (kaydet / yenile sonrası panelde kalma)
+           -------------------------------------------------------------------------
+           - "Değişiklikleri Kaydet" / "Yayınla" paneli KAPATMAZ.
+           - Sayfa yenilenirse (F5) ve Supabase oturumu hâlâ geçerliyse panel, en son
+             açık olan sekmeyle birlikte kendiliğinden yeniden açılır.
+           - Panelden yalnızca "Ana Sayfa" düğmesi (ya da hareketsizlik zaman aşımı)
+             çıkarır; bu durumda oturum kapatılır ve hatırlama bayrağı silinir.
+           - Bayrak sessionStorage'da tutulur: yalnızca bu sekmeyi kapsar, TV/başka
+             sekmeler etkilenmez.
+        ========================================================================= */
+        const ADMIN_OPEN_FLAG = 'panoAdminOpen';
+        const ADMIN_TAB_KEY = 'panoAdminTab';
+        let adminDirty = false;
+
+        function adminRememberOpen(on) {
+            try {
+                if (on) sessionStorage.setItem(ADMIN_OPEN_FLAG, '1');
+                else { sessionStorage.removeItem(ADMIN_OPEN_FLAG); sessionStorage.removeItem(ADMIN_TAB_KEY); }
+            } catch (e) {}
+        }
+
+        function adminLeaveSession() {
+            adminRememberOpen(false);
+            adminDirty = false;
+            if (supabaseClient) supabaseClient.auth.signOut();
+        }
+
+        // Kenar çubuğundaki ilgili sekme düğmesini bulup o sekmeye geçer
+        function adminGoTab(tabId) {
+            const links = document.querySelectorAll('#cms-sidebar-links button');
+            for (const b of links) {
+                const oc = b.getAttribute('onclick') || '';
+                if (oc.indexOf("'" + tabId + "'") !== -1) { switchTab(tabId, b); return; }
+            }
+        }
+
+        // "Ana Sayfa" düğmesi: kaydedilmemiş değişiklik varsa önce sorar
+        function adminGoHome() {
+            if (!adminDirty) { closeAdminPanelWithoutSaving(); return; }
+            askCustomConfirmation(
+                'Ana Sayfaya Geç',
+                'Kaydetmediğiniz değişiklikler kaybolacak. Yine de ana sayfaya geçilsin mi?',
+                function () { closeAdminPanelWithoutSaving(); }
+            );
+        }
+
+        // Sayfa yenilendiğinde (oturum hâlâ geçerliyse) paneli geri açar
+        async function adminRestoreAfterReload() {
+            if (IS_DISPLAY_MODE || !supabaseClient) return;
+            let flag = null;
+            try { flag = sessionStorage.getItem(ADMIN_OPEN_FLAG); } catch (e) {}
+            if (flag !== '1') return;
+            try {
+                const { data } = await supabaseClient.auth.getSession();
+                if (!data || !data.session) { adminRememberOpen(false); return; }
+                openAdminPanel();
+                let tab = null;
+                try { tab = sessionStorage.getItem(ADMIN_TAB_KEY); } catch (e) {}
+                if (tab && document.getElementById(tab)) adminGoTab(tab);
+                writeCMSLog('Sayfa yenilendi; yönetim paneli geri açıldı.');
+            } catch (e) { adminRememberOpen(false); }
+        }
+
+        (function adminTrackDirty() {
+            document.addEventListener('DOMContentLoaded', function () {
+                const panel = document.getElementById('admin-panel');
+                if (!panel) return;
+                ['input', 'change'].forEach(ev => panel.addEventListener(ev, () => { adminDirty = true; }, true));
+                panel.addEventListener('click', e => {
+                    if (e.target.closest && e.target.closest('.tab-content button, .tab-content [onclick]')) adminDirty = true;
+                }, true);
+            });
+        })();
+
         function openAdminPanel() {
             writeCMSLog("Yönetim Paneli açıldı.");
+            adminRememberOpen(true);
+            adminDirty = false;
             if (typeof supabaseStatusRefresh === 'function') supabaseStatusRefresh();
             const panel = document.getElementById('admin-panel');
             
@@ -6336,17 +6261,17 @@
             if (refreshMsgInputInit) refreshMsgInputInit.value = appConfig.refreshMessage || defaultAppConfig.refreshMessage;
             const pollIntervalInputInit = document.getElementById('input-poll-interval');
             if (pollIntervalInputInit) pollIntervalInputInit.value = appConfig.pollIntervalSeconds || defaultAppConfig.pollIntervalSeconds;
+            const adminIdleInputInit = document.getElementById('input-admin-idle-minutes');
+            const adminIdleEnabledInit = document.getElementById('input-admin-idle-enabled');
+            if (adminIdleInputInit) adminIdleInputInit.value = appConfig.adminIdleMinutes || defaultAppConfig.adminIdleMinutes;
+            if (adminIdleEnabledInit) {
+                adminIdleEnabledInit.checked = appConfig.adminIdleEnabled !== false;
+                if (adminIdleInputInit) adminIdleInputInit.disabled = !adminIdleEnabledInit.checked;
+            }
             const pollIntervalEnabledInputInit = document.getElementById('input-poll-interval-enabled');
             if (pollIntervalEnabledInputInit) {
                 pollIntervalEnabledInputInit.checked = appConfig.pollIntervalEnabled !== false;
                 if (pollIntervalInputInit) pollIntervalInputInit.disabled = !pollIntervalEnabledInputInit.checked;
-            }
-            const displaySwitchPollInputInit = document.getElementById('input-display-switch-poll');
-            if (displaySwitchPollInputInit) displaySwitchPollInputInit.value = appConfig.displaySwitchPollSeconds || defaultAppConfig.displaySwitchPollSeconds;
-            const displaySwitchPollEnabledInputInit = document.getElementById('input-display-switch-poll-enabled');
-            if (displaySwitchPollEnabledInputInit) {
-                displaySwitchPollEnabledInputInit.checked = appConfig.displaySwitchPollEnabled !== false;
-                if (displaySwitchPollInputInit) displaySwitchPollInputInit.disabled = !displaySwitchPollEnabledInputInit.checked;
             }
             document.getElementById('input-brand-sub').value = appConfig.brandSubText || defaultAppConfig.brandSubText;
             document.getElementById('input-brand-sub-visible').checked = appConfig.brandSubVisible !== false;
@@ -6519,8 +6444,8 @@
 
         function closeAdminPanelWithoutSaving() {
             document.getElementById('admin-panel').classList.add('hidden');
-            if (supabaseClient) supabaseClient.auth.signOut();
-            writeCMSLog("Yönetim Paneli kaydetmeden kapatıldı.");
+            adminLeaveSession();
+            writeCMSLog("Yönetim Paneli kapatıldı (ana sayfaya dönüldü).");
             if (typeof shiftSyncBinding === 'function') shiftSyncBinding();
         }
 
@@ -6558,6 +6483,14 @@
             if (refreshMsgInput) {
                 appConfig.refreshMessage = refreshMsgInput.value.trim() || defaultAppConfig.refreshMessage;
             }
+            const adminIdleEnabledInput = document.getElementById('input-admin-idle-enabled');
+            if (adminIdleEnabledInput) appConfig.adminIdleEnabled = adminIdleEnabledInput.checked;
+            const adminIdleInput = document.getElementById('input-admin-idle-minutes');
+            if (adminIdleInput) {
+                let m = parseFloat(String(adminIdleInput.value).replace(',', '.'));
+                if (!m || isNaN(m)) m = defaultAppConfig.adminIdleMinutes;
+                appConfig.adminIdleMinutes = Math.min(240, Math.max(0.5, m));
+            }
             const pollIntervalEnabledInput = document.getElementById('input-poll-interval-enabled');
             if (pollIntervalEnabledInput) appConfig.pollIntervalEnabled = pollIntervalEnabledInput.checked;
             const pollIntervalInput = document.getElementById('input-poll-interval');
@@ -6565,14 +6498,6 @@
                 let v = parseInt(pollIntervalInput.value, 10);
                 if (!v || isNaN(v)) v = defaultAppConfig.pollIntervalSeconds;
                 appConfig.pollIntervalSeconds = Math.min(300, Math.max(5, v));
-            }
-            const displaySwitchPollEnabledInput = document.getElementById('input-display-switch-poll-enabled');
-            if (displaySwitchPollEnabledInput) appConfig.displaySwitchPollEnabled = displaySwitchPollEnabledInput.checked;
-            const displaySwitchPollInput = document.getElementById('input-display-switch-poll');
-            if (displaySwitchPollInput) {
-                let v2 = parseInt(displaySwitchPollInput.value, 10);
-                if (!v2 || isNaN(v2)) v2 = defaultAppConfig.displaySwitchPollSeconds;
-                appConfig.displaySwitchPollSeconds = Math.min(300, Math.max(3, v2));
             }
 
             appConfig.schoolName = document.getElementById('input-school-name').value.trim() || defaultAppConfig.schoolName;
@@ -6687,17 +6612,15 @@
             appConfig.dutyStyle = tempDutyStyle || appConfig.dutyStyle;
 
             panoPersist();
-            if (typeof shiftSyncBinding === 'function') shiftSyncBinding(true); // panel kapanıyor: panoyu aktif öğretime döndür
+            if (typeof shiftSyncBinding === 'function') shiftSyncBinding(); // panel açık kalıyor: düzenlenen öğretim bağlı kalır
             renderPanoData();
             applyModuleSettingsToDashboard();
             startCyclingModuleIntervals();
             cloudSyncStartListening(); // yeni "pollIntervalSeconds" değeri varsa yoklama sıklığını hemen uygular
-            if (typeof displayControlStartPolling === 'function') displayControlStartPolling(); // yeni "displaySwitchPollSeconds" değerini hemen uygula
             fetchLiveWeather();
 
-            document.getElementById('admin-panel').classList.add('hidden');
-            if (supabaseClient) supabaseClient.auth.signOut();
-            showCustomNotification("Başarılı", "Tüm sistem değişiklikleri başarıyla kaydedildi ve pano güncellendi.");
+            adminDirty = false;
+            showCustomNotification("Başarılı", "Değişiklikler kaydedildi. Yönetim panelinde kalabilirsiniz; ana sayfaya geçmek için sağ üstteki \"Ana Sayfa\" düğmesini kullanın.");
             writeCMSLog("Tüm pano değişiklikleri başarıyla kaydedildi.");
         }
 
@@ -6714,7 +6637,7 @@
                 startCyclingModuleIntervals();
                 renderPanoData();
                 document.getElementById('admin-panel').classList.add('hidden');
-                if (supabaseClient) supabaseClient.auth.signOut();
+                adminLeaveSession();
                 showCustomNotification("Sıfırlandı", "Pano varsayılan ayarlara başarıyla döndürüldü.");
                 writeCMSLog("Sistem fabrika ayarlarına sıfırlandı.");
             });
@@ -6729,6 +6652,7 @@
                 link.className = "w-full text-left px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg text-sm flex items-center gap-3 transition";
             }
             el.className = "w-full text-left px-4 py-3 bg-cyan-600 text-white font-bold rounded-lg text-sm flex items-center gap-3 transition shadow-lg shadow-cyan-600/10";
+            try { sessionStorage.setItem(ADMIN_TAB_KEY, tabId); } catch (e) {}
             writeCMSLog(`Sekme değiştirildi: ${tabId}`);
         }
 
@@ -9479,8 +9403,19 @@
 // olmazsa, açık olan yönetim paneli ve/veya PIN kutusu otomatik kapatılır.
 // ============================================================================
 (function () {
-  var IDLE_LIMIT_MS = 90 * 1000; // 90 saniye
+  var PIN_IDLE_LIMIT_MS = 90 * 1000; // şifre kutusu için sabit 90 saniye
   var lastActivity = Date.now();
+
+  // Yönetim paneli zaman aşımı: Ayarlar > Yönetim Paneli Zaman Aşımı (dakika).
+  // null döner = "kapanmasın".
+  function adminIdleLimitMs() {
+    try {
+      if (appConfig && appConfig.adminIdleEnabled === false) return null;
+      var m = parseFloat(appConfig && appConfig.adminIdleMinutes);
+      if (!m || isNaN(m)) m = 1.5;
+      return Math.min(240, Math.max(0.5, m)) * 60 * 1000;
+    } catch (e) { return 90 * 1000; }
+  }
 
   ["mousemove", "mousedown", "keydown", "touchstart", "wheel"].forEach(function (evt) {
     window.addEventListener(evt, function () { lastActivity = Date.now(); }, { passive: true });
@@ -9488,7 +9423,6 @@
 
   setInterval(function () {
     var idleFor = Date.now() - lastActivity;
-    if (idleFor < IDLE_LIMIT_MS) return;
 
     var adminPanel = document.getElementById("admin-panel");
     var pinModal = document.getElementById("pin-prompt-modal");
@@ -9496,10 +9430,11 @@
     var adminOpen = adminPanel && !adminPanel.classList.contains("hidden");
     var pinOpen = pinModal && !pinModal.classList.contains("hidden");
 
-    if (adminOpen && typeof closeAdminPanelWithoutSaving === "function") {
+    var adminLimit = adminIdleLimitMs();
+    if (adminOpen && adminLimit !== null && idleFor >= adminLimit && typeof closeAdminPanelWithoutSaving === "function") {
       closeAdminPanelWithoutSaving();
     }
-    if (pinOpen && typeof closePinPrompt === "function") {
+    if (pinOpen && idleFor >= PIN_IDLE_LIMIT_MS && typeof closePinPrompt === "function") {
       closePinPrompt();
     }
   }, 5000); // her 5 saniyede bir kontrol et
