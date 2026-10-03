@@ -10,7 +10,7 @@
         const IS_DISPLAY_MODE = new URLSearchParams(window.location.search).get("ekran") === "1";
 
         const classList = [
-            "1/A", "1/B", "1/C", "1/D", "2/A", "2/B", "2/C", "2/D", "3/A", "3/B", "3/C", "3/D", "4/A", "4/B", "4/C", "4/D"
+            "1/A", "1/B", "1/C", "1/D", "1/E", "2/A", "2/B", "2/C", "2/D", "2/E", "3/A", "3/B", "3/C", "3/D", "3/E", "4/A", "4/B", "4/C", "4/D", "4/E"
         ];
 
         const daysOfWeek = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma"];
@@ -300,7 +300,133 @@
                     "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
                     "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
                 },
+                "1/B": {
+                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
+                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
+                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
+                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
+                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
+                },
+                "1/C": {
+                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
+                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
+                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
+                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
+                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
+                },
+                "1/D": {
+                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
+                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
+                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
+                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
+                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
+                },
+                "1/E": {
+                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
+                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
+                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
+                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
+                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
+                },
+                "2/A": {
+                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
+                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
+                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
+                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
+                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
+                },
+                "2/B": {
+                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
+                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
+                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
+                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
+                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
+                },
+                "2/C": {
+                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
+                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
+                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
+                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
+                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
+                },
+                "2/D": {
+                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
+                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
+                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
+                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
+                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
+                },
+                "2/E": {
+                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
+                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
+                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
+                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
+                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
+                },
+                "3/A": {
+                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
+                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
+                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
+                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
+                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
+                },
+                "3/B": {
+                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
+                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
+                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
+                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
+                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
+                },
                 "3/C": {
+                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
+                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
+                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
+                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
+                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
+                },
+                "3/D": {
+                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
+                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
+                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
+                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
+                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
+                },
+                "3/E": {
+                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
+                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
+                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
+                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
+                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
+                },
+                "4/A": {
+                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
+                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
+                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
+                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
+                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
+                },
+                "4/B": {
+                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
+                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
+                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
+                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
+                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
+                },
+                "4/C": {
+                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
+                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
+                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
+                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
+                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
+                },
+                "4/D": {
+                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
+                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
+                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
+                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
+                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
+                },
+                "4/E": {
                     "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
                     "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
                     "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
