@@ -9,9 +9,125 @@
         // ============================================================================
         const IS_DISPLAY_MODE = new URLSearchParams(window.location.search).get("ekran") === "1";
 
-        const classList = [
+        let classList = [
             "1/A", "1/B", "1/C", "1/D", "1/E", "2/A", "2/B", "2/C", "2/D", "2/E", "3/A", "3/B", "3/C", "3/D", "3/E", "4/A", "4/B", "4/C", "4/D", "4/E"
         ];
+
+        // ===== SINIFLARI YÖNET (localStorage) =====
+        function loadClassListFromStorage() {
+            const stored = localStorage.getItem('okulPanoClassList');
+            if (stored) {
+                try {
+                    const loaded = JSON.parse(stored);
+                    if (Array.isArray(loaded) && loaded.length > 0) {
+                        return loaded;
+                    }
+                } catch (e) {}
+            }
+            return classList;
+        }
+
+        function saveClassListToStorage(list) {
+            localStorage.setItem('okulPanoClassList', JSON.stringify(list));
+        }
+
+        classList = loadClassListFromStorage();
+
+        function addNewClass() {
+            const input = document.getElementById('new-class-input');
+            if (!input) return;
+            const className = input.value.trim().toUpperCase();
+            
+            if (!className) {
+                alert('Lütfen sınıf adı gir (örn: 1/F)');
+                return;
+            }
+            
+            if (classList.includes(className)) {
+                alert('Bu sınıf zaten var!');
+                return;
+            }
+            
+            classList.push(className);
+            saveClassListToStorage(classList);
+            
+            if (!appConfig.weeklyClassSchedules) {
+                appConfig.weeklyClassSchedules = {};
+            }
+            
+            appConfig.weeklyClassSchedules[className] = {
+                "Pazartesi": ["Boş", "Boş", "Boş", "Boş", "Boş", "Boş", "Boş"],
+                "Salı": ["Boş", "Boş", "Boş", "Boş", "Boş", "Boş", "Boş"],
+                "Çarşamba": ["Boş", "Boş", "Boş", "Boş", "Boş", "Boş", "Boş"],
+                "Perşembe": ["Boş", "Boş", "Boş", "Boş", "Boş", "Boş", "Boş"],
+                "Cuma": ["Boş", "Boş", "Boş", "Boş", "Boş", "Boş", "Boş"]
+            };
+            
+            saveAdminChanges();
+            refreshClassList();
+            buildWeeklyScheduleMatrix();
+            input.value = '';
+            alert('✅ Sınıf eklendi! "Haftalık Ders Matrisi" sekmesinden dersleri düzenlemeyi unutma.');
+        }
+
+        function deleteClass(className) {
+            if (!confirm(`"${className}" sınıfını sil?`)) {
+                return;
+            }
+            
+            classList = classList.filter(c => c !== className);
+            saveClassListToStorage(classList);
+            
+            if (appConfig.weeklyClassSchedules && appConfig.weeklyClassSchedules[className]) {
+                delete appConfig.weeklyClassSchedules[className];
+            }
+            
+            saveAdminChanges();
+            refreshClassList();
+            buildWeeklyScheduleMatrix();
+        }
+
+        function resetClassesToDefault() {
+            if (!confirm('Sınıfları varsayılana sıfırla? (1/A-1/E, 2/A-2/E, vb.)')) {
+                return;
+            }
+            
+            classList = [
+                "1/A", "1/B", "1/C", "1/D", "1/E",
+                "2/A", "2/B", "2/C", "2/D", "2/E",
+                "3/A", "3/B", "3/C", "3/D", "3/E",
+                "4/A", "4/B", "4/C", "4/D", "4/E"
+            ];
+            
+            saveClassListToStorage(classList);
+            saveAdminChanges();
+            refreshClassList();
+            buildWeeklyScheduleMatrix();
+        }
+
+        function refreshClassList() {
+            const container = document.getElementById('class-list-container');
+            if (!container) return;
+            
+            container.innerHTML = classList.map(c => `
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-3 flex items-center justify-between">
+                    <div>
+                        <div class="text-white font-bold text-sm">${c}</div>
+                        <div class="text-slate-500 text-xs mt-1">
+                            ${appConfig.weeklyClassSchedules && appConfig.weeklyClassSchedules[c] ? '✓ Ders Programı' : '✗ Ders Yok'}
+                        </div>
+                    </div>
+                    <button onclick="deleteClass('${c}')" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs rounded-lg font-bold">
+                        <i class="fa-solid fa-trash"></i> Sil
+                    </button>
+                </div>
+            `).join('');
+            
+            const countEl = document.getElementById('class-count');
+            if (countEl) countEl.textContent = classList.length;
+        }
+
+        setTimeout(() => refreshClassList(), 500);
 
         const daysOfWeek = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma"];
 
