@@ -660,7 +660,7 @@
                 <!-- TAB: ÖĞRETİM DÜZENİ (Normal / İkili Öğretim) -->
                 <div class="tab-content hidden space-y-6" id="tab-teaching">
                     <h2 class="text-lg font-bold text-amber-400 flex items-center gap-2 border-b border-slate-800 pb-2"><i class="fa-solid fa-sun"></i> Öğretim Düzeni</h2>
-                    <p class="text-xs text-slate-400">Okulunuzda tek öğretim (normal) mi yoksa sabah/öğle ikili öğretim mi uygulandığını seçin. İkili öğretimde <b class="text-yellow-400">zil saatleri</b>, <b class="text-yellow-400">ders programı</b> ve <b class="text-yellow-400">nöbetçi öğretmenler</b> sabah ve öğle için ayrı tutulur; pano saate göre doğru öğretimi otomatik gösterir. Duyuru, doğum günü, söz, medya gibi diğer alanlar ortaktır.</p>
+                    <p class="text-xs text-slate-400">Okulunuzda tek öğretim (normal) mi yoksa sabah/öğle ikili öğretim mi uygulandığını seçin. İkili öğretimde <b class="text-yellow-400">zil saatleri</b>, <b class="text-yellow-400">ders programı</b> ve <b class="text-yellow-400">nöbetçi öğretmenler</b> sabah ve öğle için ayrı tutulur; pano saate göre doğru öğretimi otomatik gösterir. <b class="text-yellow-400">Ayın Enleri</b> de ayrıdır. Duyuru, doğum günü, söz, medya gibi diğer alanlar ortaktır.</p>
 
                     <div class="grid grid-cols-2 gap-4">
                         <button type="button" id="teach-mode-single" onclick="teachingModeSet('single')" class="text-left p-4 rounded-xl border-2 border-slate-800 bg-slate-950 hover:border-cyan-600 transition">
@@ -698,11 +698,12 @@
 
                         <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-2">
                             <h3 class="text-white font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-list-check text-green-400"></i> Sabah / Öğle Verilerini Düzenleme</h3>
-                            <p class="text-[11px] text-slate-400">Zil Saatleri, Ders Programı ve Aylık Nöbet sekmelerinin en üstünde <b class="text-amber-400">Sabah | Öğle</b> seçici bulunur. Seçtiğiniz öğretimin verisini düzenlersiniz; ders sayısı da her öğretimde ayrı olabilir. Değişiklikler "Kaydet" ile uygulanır.</p>
+                            <p class="text-[11px] text-slate-400">Zil Saatleri, Ders Programı, Aylık Nöbet ve Ayın Enleri sekmelerinin en üstünde <b class="text-amber-400">Sabah | Öğle</b> seçici bulunur. Seçtiğiniz öğretimin verisini düzenlersiniz; ders sayısı da her öğretimde ayrı olabilir. Değişiklikler "Kaydet" ile uygulanır.</p>
                             <div class="flex items-center gap-2 flex-wrap pt-1">
                                 <button type="button" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-xs" onclick="switchTab('tab-hours', document.querySelector('[onclick*=\'tab-hours\']'))"><i class="fa-solid fa-clock text-yellow-400"></i> Zil Saatleri</button>
                                 <button type="button" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-xs" onclick="switchTab('tab-schedule', document.querySelector('[onclick*=\'tab-schedule\']'))"><i class="fa-solid fa-table text-yellow-400"></i> Ders Programı</button>
                                 <button type="button" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-xs" onclick="switchTab('tab-duties', document.querySelector('[onclick*=\'tab-duties\']'))"><i class="fa-solid fa-clipboard-user text-cyan-400"></i> Aylık Nöbet</button>
+                                <button type="button" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-xs" onclick="switchTab('tab-achievements', document.querySelector('[onclick*=\\'tab-achievements\\']'))"><i class="fa-solid fa-ranking-star text-pink-400"></i> Ayın Enleri</button>
                             </div>
                         </div>
                     </div>
@@ -1757,6 +1758,7 @@
 
                 <!-- TAB: AYIN ENLERİ (TEMİZ SINIF & ÖRNEK ÖĞRENCİ) YÖNETİMİ -->
                 <div class="tab-content hidden space-y-6" id="tab-achievements">
+                    <div class="shift-edit-bar hidden"></div>
                     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                         <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-ranking-star"></i> Ayın Enleri Başarı Tablosu Yönetimi</h2>
                         <span class="text-xs text-slate-400 max-w-md text-right">Her alan (örn. Ayın Temiz Sınıfı, Ayın Örnek Öğrencisi) ayrı bir hücre gibi yönetilir. Birden fazla kayıt ekleyebilir, alan başlıklarını değiştirebilir ve dilediğiniz kadar yeni alan (Ayın/Haftanın Eni) tanımlayabilirsiniz.</span>
