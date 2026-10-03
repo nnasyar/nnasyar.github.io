@@ -9,125 +9,11 @@
         // ============================================================================
         const IS_DISPLAY_MODE = new URLSearchParams(window.location.search).get("ekran") === "1";
 
-        let classList = [
-            "1/A", "1/B", "1/C", "1/D", "1/E", "2/A", "2/B", "2/C", "2/D", "2/E", "3/A", "3/B", "3/C", "3/D", "3/E", "4/A", "4/B", "4/C", "4/D", "4/E"
+        const DEFAULT_CLASS_LIST = [
+            "1/A", "1/B", "1/C", "1/D", "2/A", "2/B", "2/C", "2/D", "3/A", "3/B", "3/C", "3/D", "4/A", "4/B", "4/C", "4/D"
         ];
-
-        // ===== SINIFLARI YÖNET (localStorage) =====
-        function loadClassListFromStorage() {
-            const stored = localStorage.getItem('okulPanoClassList');
-            if (stored) {
-                try {
-                    const loaded = JSON.parse(stored);
-                    if (Array.isArray(loaded) && loaded.length > 0) {
-                        return loaded;
-                    }
-                } catch (e) {}
-            }
-            return classList;
-        }
-
-        function saveClassListToStorage(list) {
-            localStorage.setItem('okulPanoClassList', JSON.stringify(list));
-        }
-
-        classList = loadClassListFromStorage();
-
-        function addNewClass() {
-            const input = document.getElementById('new-class-input');
-            if (!input) return;
-            const className = input.value.trim().toUpperCase();
-            
-            if (!className) {
-                alert('Lütfen sınıf adı gir (örn: 1/F)');
-                return;
-            }
-            
-            if (classList.includes(className)) {
-                alert('Bu sınıf zaten var!');
-                return;
-            }
-            
-            classList.push(className);
-            saveClassListToStorage(classList);
-            
-            if (!appConfig.weeklyClassSchedules) {
-                appConfig.weeklyClassSchedules = {};
-            }
-            
-            appConfig.weeklyClassSchedules[className] = {
-                "Pazartesi": ["Boş", "Boş", "Boş", "Boş", "Boş", "Boş", "Boş"],
-                "Salı": ["Boş", "Boş", "Boş", "Boş", "Boş", "Boş", "Boş"],
-                "Çarşamba": ["Boş", "Boş", "Boş", "Boş", "Boş", "Boş", "Boş"],
-                "Perşembe": ["Boş", "Boş", "Boş", "Boş", "Boş", "Boş", "Boş"],
-                "Cuma": ["Boş", "Boş", "Boş", "Boş", "Boş", "Boş", "Boş"]
-            };
-            
-            saveAdminChanges();
-            refreshClassList();
-            buildWeeklyScheduleMatrix();
-            input.value = '';
-            alert('✅ Sınıf eklendi! "Haftalık Ders Matrisi" sekmesinden dersleri düzenlemeyi unutma.');
-        }
-
-        function deleteClass(className) {
-            if (!confirm(`"${className}" sınıfını sil?`)) {
-                return;
-            }
-            
-            classList = classList.filter(c => c !== className);
-            saveClassListToStorage(classList);
-            
-            if (appConfig.weeklyClassSchedules && appConfig.weeklyClassSchedules[className]) {
-                delete appConfig.weeklyClassSchedules[className];
-            }
-            
-            saveAdminChanges();
-            refreshClassList();
-            buildWeeklyScheduleMatrix();
-        }
-
-        function resetClassesToDefault() {
-            if (!confirm('Sınıfları varsayılana sıfırla? (1/A-1/E, 2/A-2/E, vb.)')) {
-                return;
-            }
-            
-            classList = [
-                "1/A", "1/B", "1/C", "1/D", "1/E",
-                "2/A", "2/B", "2/C", "2/D", "2/E",
-                "3/A", "3/B", "3/C", "3/D", "3/E",
-                "4/A", "4/B", "4/C", "4/D", "4/E"
-            ];
-            
-            saveClassListToStorage(classList);
-            saveAdminChanges();
-            refreshClassList();
-            buildWeeklyScheduleMatrix();
-        }
-
-        function refreshClassList() {
-            const container = document.getElementById('class-list-container');
-            if (!container) return;
-            
-            container.innerHTML = classList.map(c => `
-                <div class="bg-slate-900 border border-slate-700 rounded-lg p-3 flex items-center justify-between">
-                    <div>
-                        <div class="text-white font-bold text-sm">${c}</div>
-                        <div class="text-slate-500 text-xs mt-1">
-                            ${appConfig.weeklyClassSchedules && appConfig.weeklyClassSchedules[c] ? '✓ Ders Programı' : '✗ Ders Yok'}
-                        </div>
-                    </div>
-                    <button onclick="deleteClass('${c}')" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs rounded-lg font-bold">
-                        <i class="fa-solid fa-trash"></i> Sil
-                    </button>
-                </div>
-            `).join('');
-            
-            const countEl = document.getElementById('class-count');
-            if (countEl) countEl.textContent = classList.length;
-        }
-
-        setTimeout(() => refreshClassList(), 500);
+        // Sınıf/şube listesi artık değiştirilebilir: appConfig.classList içinde saklanır (yerel + bulut).
+        let classList = DEFAULT_CLASS_LIST.slice();
 
         const daysOfWeek = ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma"];
 
@@ -416,133 +302,7 @@
                     "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
                     "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
                 },
-                "1/B": {
-                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
-                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
-                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
-                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
-                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
-                },
-                "1/C": {
-                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
-                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
-                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
-                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
-                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
-                },
-                "1/D": {
-                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
-                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
-                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
-                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
-                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
-                },
-                "1/E": {
-                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
-                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
-                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
-                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
-                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
-                },
-                "2/A": {
-                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
-                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
-                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
-                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
-                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
-                },
-                "2/B": {
-                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
-                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
-                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
-                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
-                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
-                },
-                "2/C": {
-                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
-                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
-                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
-                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
-                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
-                },
-                "2/D": {
-                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
-                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
-                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
-                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
-                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
-                },
-                "2/E": {
-                    "Pazartesi": ["Türkçe", "Türkçe", "Matematik", "Müzik", "Görsel San.", "Beden Eğt.", "Beden Eğt."],
-                    "Salı": ["Matematik", "Matematik", "Türkçe", "Türkçe", "Hayat Bil.", "Müzik", "Oyun Etk."],
-                    "Çarşamba": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Serbest Etk.", "Serbest Etk."],
-                    "Perşembe": ["Okuma-Yazma", "Okuma-Yazma", "Beden Eğt.", "Matematik", "Türkçe", "Görsel San.", "Müzik"],
-                    "Cuma": ["Türkçe", "Türkçe", "Hayat Bil.", "Hayat Bil.", "Matematik", "Oyun Etk.", "Oyun Etk."]
-                },
-                "3/A": {
-                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
-                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
-                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
-                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
-                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
-                },
-                "3/B": {
-                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
-                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
-                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
-                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
-                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
-                },
                 "3/C": {
-                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
-                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
-                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
-                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
-                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
-                },
-                "3/D": {
-                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
-                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
-                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
-                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
-                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
-                },
-                "3/E": {
-                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
-                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
-                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
-                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
-                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
-                },
-                "4/A": {
-                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
-                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
-                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
-                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
-                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
-                },
-                "4/B": {
-                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
-                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
-                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
-                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
-                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
-                },
-                "4/C": {
-                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
-                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
-                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
-                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
-                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
-                },
-                "4/D": {
-                    "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
-                    "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
-                    "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
-                    "Perşembe": ["Türkçe", "Türkçe", "Matematik", "İngilizce", "İngilizce", "Beden Eğt.", "Beden Eğt."],
-                    "Cuma": ["Hayat Bil.", "Matematik", "Türkçe", "Türkçe", "Müzik", "Serbest Etk.", "Serbest Etk."]
-                },
-                "4/E": {
                     "Pazartesi": ["Hayat Bil.", "Hayat Bil.", "Türkçe", "Türkçe", "Matematik", "Görsel San.", "Serbest Etk."],
                     "Salı": ["Fen Bil.", "Fen Bil.", "Matematik", "Matematik", "Türkçe", "Türkçe", "Müzik"],
                     "Çarşamba": ["İngilizce", "İngilizce", "Matematik", "Matematik", "Türkçe", "Türkçe", "Fen Bil."],
@@ -2438,7 +2198,87 @@
         }
 
         // Sayfa açılışında / appConfig değiştirildiğinde (sıfırlama, yedekten yükleme) çağrılır
+        /* ===== SINIF / ŞUBE YÖNETİMİ ===== */
+        // Kaydedilmiş sınıf listesini yükler (yoksa varsayılanı kaydeder). classList ile
+        // appConfig.classList aynı dizi olduğundan push/splice otomatik olarak kayda yansır.
+        function classListSyncFromConfig() {
+            let src = Array.isArray(appConfig.classList) ? appConfig.classList : [];
+            src = src.map(c => String(c).trim()).filter((c, i, a) => c && a.indexOf(c) === i);
+            if (src.length === 0) src = DEFAULT_CLASS_LIST.slice();
+            classList = src;
+            appConfig.classList = classList;
+        }
+
+        function classNormalizeName(raw) {
+            return String(raw || '').trim().replace(/\s*[\/\\-]\s*/g, '/').replace(/\s+/g, '').toLocaleUpperCase('tr-TR');
+        }
+
+        function classSortList() {
+            classList.sort((a, b) => a.localeCompare(b, 'tr', { numeric: true }));
+        }
+
+        function classUiRefresh() {
+            const st = document.getElementById('stat-class-count');
+            if (st) st.textContent = classList.length;
+            try { buildAdminClassSelector(); } catch (e) {}
+            try { buildWeeklyScheduleMatrix(); } catch (e) {}
+            try { if (typeof renderTeachingTab === 'function') renderTeachingTab(); } catch (e) {}
+            try { renderActiveScheduleGroup(); } catch (e) {}
+        }
+
+        function addClassBranch() {
+            const input = document.getElementById('new-class-name-input');
+            if (!input) return;
+            const name = classNormalizeName(input.value);
+            if (!name) { showCustomNotification('Uyarı', 'Lütfen şube adını yazın (örn. 1/E veya 2/F).'); return; }
+            if (name.length > 12 || /[<>"'&`]/.test(name)) { showCustomNotification('Uyarı', 'Şube adı geçersiz. Örnek: 1/E'); return; }
+            if (classList.includes(name)) { showCustomNotification('Uyarı', name + ' zaten sınıf listesinde var.'); return; }
+
+            try { saveWeeklyScheduleMatrix(); } catch (e) {}
+            classList.push(name);
+            classSortList();
+
+            // İkili öğretimde yeni şube, şu an düzenlenen öğretime atanır
+            if (isDoubleMode()) {
+                shiftEnsureDoubleData();
+                appConfig.doubleShift.classShifts[name] = __boundShift || 'morning';
+            }
+            // Boş ders programı oluştur
+            const empty = {};
+            daysOfWeek.forEach(d => { empty[d] = Array(bellHours.length).fill(''); });
+            appConfig.weeklyClassSchedules[name] = empty;
+
+            activeAdminEditClass = name;
+            input.value = '';
+            panoPersist();
+            classUiRefresh();
+            writeCMSLog('Yeni şube eklendi: ' + name);
+            showCustomNotification('Eklendi', name + ' şubesi eklendi. Ders programını aşağıdaki tablodan doldurabilir veya Excel\'den yükleyebilirsiniz.');
+        }
+
+        function removeClassBranch(name) {
+            if (!classList.includes(name)) return;
+            if (classList.length <= 1) { showCustomNotification('Uyarı', 'En az bir sınıf kalmalıdır.'); return; }
+            askCustomConfirmation('Şubeyi Sil', name + ' şubesi ve ders programı silinecek. Onaylıyor musunuz?', function() {
+                classList.splice(classList.indexOf(name), 1);
+                // Tüm öğretimlerdeki programını ve öğretim atamasını temizle
+                try { delete appConfig.weeklyClassSchedules[name]; } catch (e) {}
+                const ds = appConfig.doubleShift;
+                if (ds) {
+                    if (ds.classShifts) delete ds.classShifts[name];
+                    SHIFT_KEYS.forEach(k => { if (ds[k] && ds[k].weeklyClassSchedules) delete ds[k].weeklyClassSchedules[name]; });
+                }
+                if (appConfig.singleModeData && appConfig.singleModeData.weeklyClassSchedules) delete appConfig.singleModeData.weeklyClassSchedules[name];
+                const cls = adminClassList();
+                if (!cls.includes(activeAdminEditClass)) activeAdminEditClass = cls[0] || classList[0];
+                panoPersist();
+                classUiRefresh();
+                writeCMSLog('Şube silindi: ' + name);
+            });
+        }
+
         function shiftInstall() {
+            classListSyncFromConfig();
             shiftRemoveAccessors();
             if (appConfig.teachingMode !== 'double') {
                 appConfig.teachingMode = 'single';
@@ -4843,7 +4683,7 @@
                 titleEl.innerText = 'DERS PROGRAMI · ' + SHIFT_LABELS[__boundShift || 'morning'].toUpperCase() + ' ÖĞRETİMİ' + (chunks.length > 1 ? ` (${gi + 1}/${chunks.length})` : '');
             } else if (activeScheduleGroup === 1) {
                 titleEl.innerText = "DERS PROGRAMI (3. VE 4. SINIFLAR)";
-                filteredClasses = classList.filter(c => c.startsWith('3/') || c.startsWith('4/'));
+                filteredClasses = classList.filter(c => !(c.startsWith('1/') || c.startsWith('2/')));
             } else {
                 titleEl.innerText = "DERS PROGRAMI (1. VE 2. SINIFLAR)";
                 filteredClasses = classList.filter(c => c.startsWith('1/') || c.startsWith('2/'));
@@ -8556,6 +8396,7 @@
         function buildAdminClassSelector() {
             const container = document.getElementById('schedule-class-badge-container');
             container.innerHTML = "";
+            const _st = document.getElementById('stat-class-count'); if (_st) _st.textContent = classList.length;
             const _selClasses = adminClassList();
             if (_selClasses.length === 0) {
                 container.innerHTML = '<span class="text-xs text-slate-500 italic">Bu öğretimde sınıf yok. "Öğretim Düzeni" sekmesinden sınıf atayın.</span>';
@@ -8572,6 +8413,12 @@
                 };
                 container.appendChild(btn);
             });
+            const delBtn = document.getElementById('delete-active-class-btn');
+            if (delBtn) {
+                delBtn.classList.toggle('hidden', !activeAdminEditClass || !classList.includes(activeAdminEditClass));
+                delBtn.title = activeAdminEditClass + ' şubesini sil';
+                delBtn.querySelector('span').textContent = (activeAdminEditClass || '') + ' şubesini sil';
+            }
         }
 
         /* HAFTALIK TOPLU DERS PROGRAMI MATRİSİ */
