@@ -300,6 +300,7 @@
     <div class="adm-shell fixed inset-0 bg-slate-950 z-[9999] hidden flex flex-col p-6 overflow-hidden text-slate-100" id="admin-panel">
         <div class="adm-topbar flex items-center justify-between pb-4 mb-5">
             <div class="flex items-center gap-4">
+                <button type="button" class="adm-burger" onclick="admToggleDrawer()" title="Menüyü aç/kapat"><i class="fa-solid fa-bars"></i></button>
                 <div class="adm-logo w-12 h-12 rounded-xl flex items-center justify-center text-2xl">
                     <i class="fa-solid fa-sliders"></i>
                 </div>
@@ -307,10 +308,11 @@
                     <h1 class="font-sans font-bold text-2xl tracking-wide text-white flex items-center gap-2">
                         DİJİTAL PANO YÖNETİM MERKEZİ <span class="adm-badge text-xs font-mono px-2 py-0.5 rounded">v8.1 STUDIO</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Pano verilerini yönetin, ders matrisini ve nöbet planlarını tasarlayın, temaları ve yerleşim şablonlarını tek tıkla uygulayın.</p>
+                    <p class="adm-sub text-xs text-slate-400">Pano verilerini yönetin, ders matrisini ve nöbet planlarını tasarlayın, temaları ve yerleşim şablonlarını tek tıkla uygulayın.</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
+                <button type="button" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg text-sm flex items-center gap-2" onclick="adminGoTab('tab-adminui')" title="Arayüz düzeni ve stil"><i class="fa-solid fa-table-columns"></i> Arayüz</button>
                 <div class="adm-skin-picker" title="Yönetim paneli arayüz rengi">
                     <button type="button" class="adm-skin-dot" data-skin="ocean" style="--c:#06b6d4" onclick="admSetSkin('ocean')" title="Okyanus"></button>
                     <button type="button" class="adm-skin-dot" data-skin="violet" style="--c:#8b5cf6" onclick="admSetSkin('violet')" title="Gece Moru"></button>
@@ -331,7 +333,8 @@
         </div>
 
         <!-- CMS Arayüzü Ana Gövde -->
-        <div class="flex flex-1 gap-6 overflow-hidden">
+        <div class="adm-scrim" onclick="admToggleDrawer(false)"></div>
+        <div class="adm-body flex flex-1 gap-6 overflow-hidden">
             <!-- Sol Menü / Sidebar -->
             <div class="adm-sidebar w-64 rounded-xl p-4 flex flex-col overflow-hidden">
                 <div class="adm-nav-search"><i class="fa-solid fa-magnifying-glass"></i><input id="cms-nav-search" type="text" placeholder="Menüde ara..." autocomplete="off" oninput="admFilterNav(this.value)"></div>
@@ -363,10 +366,11 @@
                         <button class="cms-nav-btn" data-tab="tab-modules" onclick="switchTab('tab-modules', this)"><i class="fa-solid fa-cubes"></i><span>Modül Ayarları</span></button>
                         <button class="cms-nav-btn" data-tab="tab-layout" onclick="switchTab('tab-layout', this)"><i class="fa-solid fa-table-cells"></i><span>Yerleşim Düzenleyici</span></button>
                         <button class="cms-nav-btn" data-tab="tab-theme" onclick="switchTab('tab-theme', this)"><i class="fa-solid fa-palette"></i><span>Pano Teması</span></button>
+                        <button class="cms-nav-btn" data-tab="tab-adminui" onclick="switchTab('tab-adminui', this)"><i class="fa-solid fa-table-columns"></i><span>Arayüz Düzeni &amp; Stil</span></button>
                     </div>
                     <div class="adm-nav-empty hidden">Sonuç bulunamadı</div>
                 </div>
-                <div class="pt-4 mt-2 border-t border-slate-800 text-[10px] text-slate-500 text-center font-mono shrink-0">
+                <div class="adm-side-foot pt-4 mt-2 border-t border-slate-800 text-[10px] text-slate-500 text-center font-mono shrink-0">
                     IP: LOCALHOST | SYSTEM ONLINE
                 </div>
             </div>
@@ -681,6 +685,15 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div class="tab-content hidden space-y-6 adm-nodirty" id="tab-adminui">
+                    <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2 border-b border-slate-800 pb-2"><i class="fa-solid fa-table-columns"></i> Arayüz Düzeni &amp; Stil</h2>
+                    <p class="text-xs text-slate-400">Yalnızca yönetim panelinin görünümünü değiştirir (panoyu etkilemez). Seçimler bu cihazda hatırlanır.</p>
+                    <div><h3 class="text-white font-bold text-sm mb-2">Hazır Stiller</h3><div class="flex flex-wrap gap-2" id="adm-ui-presets"></div></div>
+                    <div><h3 class="text-white font-bold text-sm mb-2">Menü Düzeni</h3><div class="adm-lay-grid" id="adm-ui-layouts"></div></div>
+                    <div class="adm-ui-rows" id="adm-ui-rows"></div>
+                    <button type="button" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg text-xs" onclick="admUiReset()"><i class="fa-solid fa-rotate-left"></i> Varsayılana Dön</button>
                 </div>
 
                 <div class="tab-content hidden space-y-6" id="tab-excel">

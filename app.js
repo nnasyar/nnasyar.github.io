@@ -6564,7 +6564,7 @@
                 if (!panel) return;
                 ['input', 'change'].forEach(ev => panel.addEventListener(ev, () => { adminDirty = true; }, true));
                 panel.addEventListener('click', e => {
-                    if (e.target.closest && e.target.closest('.tab-content button, .tab-content [onclick]')) adminDirty = true;
+                    if (e.target.closest && e.target.closest('.tab-content button, .tab-content [onclick]') && !e.target.closest('.adm-nodirty')) adminDirty = true;
                 }, true);
             });
         })();
@@ -6969,6 +6969,8 @@
             if (target) target.classList.remove('hidden');
 
             document.querySelectorAll('#cms-sidebar-links .cms-nav-btn').forEach(b => b.classList.toggle('active', b === el));
+            if (el && el.closest) { const g = el.closest('.adm-nav-group'); if (g) g.classList.remove('is-collapsed'); }
+            if (typeof admToggleDrawer === 'function') admToggleDrawer(false);
             try { sessionStorage.setItem(ADMIN_TAB_KEY, tabId); } catch (e) {}
             // Sekme değişince içerik alanını en üste kaydır
             const vp = document.getElementById('cms-content-viewport');
@@ -6979,6 +6981,7 @@
         // Yönetim paneli kenar çubuğunda arama (Türkçe harf duyarlı)
         function admFilterNav(q) {
             const needle = (q || '').trim().toLocaleLowerCase('tr');
+            const _sl = document.getElementById('cms-sidebar-links'); if (_sl) _sl.classList.toggle('is-searching', !!needle);
             let total = 0;
             document.querySelectorAll('#cms-sidebar-links .adm-nav-group').forEach(g => {
                 let visible = 0;
@@ -7010,6 +7013,84 @@
             let skin = 'ocean';
             try { skin = localStorage.getItem(ADMIN_SKIN_KEY) || 'ocean'; } catch (e) {}
             admSetSkin(skin);
+        })();
+
+
+        // ===== Yönetim paneli arayüz düzeni & stil (yalnızca bu cihazda hatırlanır) =====
+        const ADMIN_UI_KEY = 'panoAdminUi';
+        const ADM_UI_DEFAULT = { layout: 'classic', mode: 'dark', radius: 'round', surface: 'solid', scale: '100', sidew: 'normal', motion: 'on' };
+        // [id, ad, açıklama, dikdörtgenler: topbar | menü | içerik]
+        const ADM_LAYOUTS = [
+            ['classic', 'Klasik', 'Üst başlık + sol menü', [2,2,76,7, 2,12,18,38, 23,12,55,38]],
+            ['left', 'Sol Menü (Tam Boy)', 'Menü tüm yüksekliği kaplar', [23,2,55,7, 2,2,18,48, 23,12,55,38]],
+            ['right', 'Sağ Menü', 'Menü sağ kenarda', [2,2,55,7, 60,2,18,48, 2,12,55,38]],
+            ['rail', 'Simge Çubuğu', 'Dar, yalnız simgeler', [12,2,66,7, 2,2,7,48, 12,12,66,38]],
+            ['top', 'Üst Menü', 'Başlığın altında yatay sekmeler', [2,2,76,7, 2,12,76,6, 2,21,76,29]],
+            ['bottom', 'Alt Menü (Dock)', 'Dokunmatik ekran için alt çubuk', [2,2,76,7, 2,44,76,6, 2,12,76,29]],
+            ['gridtop', 'Izgara Menü', 'Tüm sekmeler üstte, çok satır', [2,2,76,7, 2,12,76,12, 2,27,76,23]],
+            ['floating', 'Yüzen Panel', 'Gölgeli, ayrı yüzen kartlar', [5,4,70,7, 5,14,16,33, 24,14,51,33]],
+            ['floatrail', 'Yüzen Simge Dock', 'Ortada yüzen simge çubuğu', [5,4,70,7, 5,20,8,21, 16,14,59,33]],
+            ['accordion', 'Akordeon Menü', 'Gruplar açılır/kapanır', [2,2,76,7, 2,12,18,38, 23,12,55,38]],
+            ['drawer', 'Çekmece Menü', 'Menü ☰ ile açılır, içerik tam genişlik', [2,2,76,7, 2,12,76,38, 2,12,76,38]],
+            ['focus', 'Odak Modu', 'Ortalanmış dar içerik + çekmece', [2,2,76,7, 2,12,12,38, 16,12,48,38]],
+            ['compact', 'Kompakt', 'Küçük boşluk, çok içerik', [2,2,76,5, 2,9,14,41, 18,9,60,41]]
+        ];
+        const ADM_PRESETS = [
+            ['Okul Klasiği', { layout: 'classic' }],
+            ['Kurumsal', { layout: 'left', surface: 'flat', radius: 'sharp' }],
+            ['Modern Cam', { layout: 'floating', surface: 'glass', radius: 'pill', mode: 'black' }],
+            ['Dokunmatik Ekran', { layout: 'bottom', scale: '115', radius: 'pill' }],
+            ['Verimli', { layout: 'compact', scale: '85', radius: 'sharp' }],
+            ['Gece Odak', { layout: 'focus', mode: 'black' }],
+            ['Açık Tema', { layout: 'top', mode: 'light' }]
+        ];
+        const ADM_ROWS = [
+            ['mode', 'Tema', [['dark', 'Koyu'], ['black', 'Siyah'], ['light', 'Açık']]],
+            ['radius', 'Köşeler', [['sharp', 'Keskin'], ['round', 'Yuvarlak'], ['pill', 'Çok yuvarlak']]],
+            ['surface', 'Yüzey', [['solid', 'Düz'], ['glass', 'Cam'], ['flat', 'Çerçevesiz'], ['outline', 'Hat']]],
+            ['scale', 'Boyut', [['85', '%85'], ['100', '%100'], ['115', '%115'], ['130', '%130']]],
+            ['sidew', 'Menü genişliği', [['narrow', 'Dar'], ['normal', 'Normal'], ['wide', 'Geniş']]],
+            ['motion', 'Animasyon', [['on', 'Açık'], ['off', 'Kapalı']]]
+        ];
+        let admUi = Object.assign({}, ADM_UI_DEFAULT);
+        try { Object.assign(admUi, JSON.parse(localStorage.getItem(ADMIN_UI_KEY) || '{}')); } catch (e) {}
+
+        function admUiApply() {
+            const p = document.getElementById('admin-panel');
+            if (!p) return;
+            [...p.classList].filter(c => /^adm-(lay|mode|rad|surf|scale|sw)-/.test(c) || c === 'adm-nomotion' || c === 'adm-drawer-open').forEach(c => p.classList.remove(c));
+            const u = admUi;
+            p.classList.add('adm-lay-' + u.layout, 'adm-mode-' + u.mode, 'adm-rad-' + u.radius, 'adm-surf-' + u.surface, 'adm-scale-' + u.scale, 'adm-sw-' + u.sidew);
+            if (u.motion === 'off') p.classList.add('adm-nomotion');
+            document.querySelectorAll('#adm-ui-layouts .adm-lay-card').forEach(b => b.classList.toggle('is-active', b.dataset.id === u.layout));
+            document.querySelectorAll('#adm-ui-rows .adm-segment button').forEach(b => b.classList.toggle('is-active', admUi[b.dataset.k] === b.dataset.v));
+            try { localStorage.setItem(ADMIN_UI_KEY, JSON.stringify(u)); } catch (e) {}
+        }
+        function admUiSet(k, v) { admUi[k] = v; admUiApply(); }
+        function admUiReset() { admUi = Object.assign({}, ADM_UI_DEFAULT); admUiApply(); }
+        function admUiPreset(i) { admUi = Object.assign({}, ADM_UI_DEFAULT, ADM_PRESETS[i][1]); admUiApply(); }
+        function admToggleDrawer(force) {
+            const p = document.getElementById('admin-panel');
+            if (p) p.classList.toggle('adm-drawer-open', typeof force === 'boolean' ? force : !p.classList.contains('adm-drawer-open'));
+        }
+        (function admUiBuild() {
+            const lay = document.getElementById('adm-ui-layouts');
+            if (!lay) return;
+            lay.innerHTML = ADM_LAYOUTS.map(([id, name, desc, r]) => {
+                const box = (i, f, o) => `<rect x="${r[i]}" y="${r[i+1]}" width="${r[i+2]}" height="${r[i+3]}" rx="${id.startsWith('float') ? 3 : 1.5}" fill="${f}" opacity="${o}"/>`;
+                return `<button type="button" class="adm-lay-card" data-id="${id}" onclick="admUiSet('layout','${id}')"><svg viewBox="0 0 80 52">${box(8, '#334155', .55)}${box(0, '#64748b', .8)}${box(4, 'var(--adm-accent)', .9)}</svg><b>${name}</b><span>${desc}</span></button>`;
+            }).join('');
+            document.getElementById('adm-ui-presets').innerHTML = ADM_PRESETS.map((p, i) => `<button type="button" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg text-xs" onclick="admUiPreset(${i})">${p[0]}</button>`).join('');
+            document.getElementById('adm-ui-rows').innerHTML = ADM_ROWS.map(([k, label, opts]) =>
+                `<div class="adm-ui-row"><label>${label}</label><div class="adm-segment" style="--n:${opts.length}">${opts.map(([v, t]) => `<button type="button" data-k="${k}" data-v="${v}" onclick="admUiSet('${k}','${v}')">${t}</button>`).join('')}</div></div>`).join('') +
+                `<div class="adm-ui-row"><label>Renk</label><div class="adm-skin-picker">${[['ocean','#06b6d4'],['violet','#8b5cf6'],['forest','#10b981'],['amber','#f59e0b'],['rose','#f43f5e']].map(([s, c]) => `<button type="button" class="adm-skin-dot" data-skin="${s}" style="--c:${c}" onclick="admSetSkin('${s}')"></button>`).join('')}</div></div>`;
+            // Simge çubuğu için ipuçları + akordeon grup başlıkları
+            document.querySelectorAll('#cms-sidebar-links .cms-nav-btn').forEach(b => { b.title = b.textContent.trim(); });
+            document.querySelectorAll('#cms-sidebar-links .adm-nav-title').forEach(t => t.addEventListener('click', () => {
+                if (document.getElementById('admin-panel').classList.contains('adm-lay-accordion')) t.parentElement.classList.toggle('is-collapsed');
+            }));
+            admSetSkin(localStorage.getItem(ADMIN_SKIN_KEY) || 'ocean');
+            admUiApply();
         })();
 
         // Duyuru biçimlendirme form kontrollerinden mevcut ayarları okur
