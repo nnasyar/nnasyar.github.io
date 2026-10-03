@@ -1771,3 +1771,29 @@
 .adm-pal i{display:block;height:26px;border-radius:7px;margin-bottom:4px;border:1px solid rgba(128,128,128,.35)}.adm-pal span{font-size:10px;color:#cbd5e1;font-weight:700}
 .adm-sw{width:30px;height:30px;border-radius:50%;border:2px solid transparent;background:var(--c);cursor:pointer;transition:transform .15s}.adm-sw:hover{transform:scale(1.15)}
 :is(.adm-pal,.adm-sw).is-active{border-color:#fff;box-shadow:0 0 0 2px var(--adm-accent)}
+
+/* Menü rengi / degrade */
+#admin-panel.adm-has-menu .adm-sidebar{background:var(--adm-menu-bg)!important}
+#admin-panel.adm-mode-light.adm-has-menu .adm-sidebar{filter:invert(1) hue-rotate(180deg)}
+#admin-panel.adm-menu-light .adm-sidebar .cms-nav-btn{color:#334155}
+#admin-panel.adm-menu-light .adm-sidebar .cms-nav-btn:hover{color:#000;background:rgba(0,0,0,.07)}
+#admin-panel.adm-menu-light .adm-sidebar .cms-nav-btn.active{color:#0f172a;background:rgba(0,0,0,.09)}
+#admin-panel.adm-menu-light .adm-sidebar :is(.adm-nav-title,.adm-side-foot){color:#475569}
+#admin-panel.adm-menu-light .adm-sidebar .adm-nav-search{background:rgba(255,255,255,.65)}
+#admin-panel.adm-menu-light .adm-sidebar .adm-nav-search input{color:#0f172a}
+.adm-sw[style*="gradient"]{background:var(--c)}
+/* Yoğunluk */
+#admin-panel.adm-den-compact .cms-nav-btn{padding:5px 10px;font-size:12px;gap:8px;margin-bottom:1px}
+#admin-panel.adm-den-compact .adm-nav-group{margin-bottom:8px}
+#admin-panel.adm-den-compact .adm-viewport{padding:1rem}
+#admin-panel.adm-den-compact .adm-topbar{padding-bottom:.5rem;margin-bottom:.6rem}
+#admin-panel.adm-den-compact .adm-sub{display:none}
+#admin-panel.adm-den-compact .space-y-6>:not([hidden])~:not([hidden]){margin-top:.9rem}
+#admin-panel.adm-den-compact .space-y-4>:not([hidden])~:not([hidden]){margin-top:.6rem}
+#admin-panel.adm-den-compact :is(.p-5,.p-4){padding:.75rem}
+#admin-panel.adm-den-compact :is(.gap-6,.gap-4){gap:.6rem}
+#admin-panel.adm-den-compact :is(.text-xs,.text-sm){line-height:1.25}
+#admin-panel.adm-den-cozy .cms-nav-btn{padding:12px 14px;margin-bottom:4px}
+#admin-panel.adm-den-cozy .adm-viewport{padding:2rem}
+#admin-panel.adm-den-cozy .space-y-6>:not([hidden])~:not([hidden]){margin-top:2rem}
+#admin-panel.adm-den-cozy :is(.p-5,.p-4){padding:1.5rem}

@@ -7019,7 +7019,7 @@
 
         // ===== Yönetim paneli arayüz düzeni & stil (yalnızca bu cihazda hatırlanır) =====
         const ADMIN_UI_KEY = 'panoAdminUi';
-        const ADM_UI_DEFAULT = { layout: 'classic', palette: 'night', accent: '', radius: 'round', surface: 'solid', scale: '100', sidew: 'normal', motion: 'on' };
+        const ADM_UI_DEFAULT = { layout: 'classic', palette: 'night', accent: '', radius: 'round', surface: 'solid', scale: '100', sidew: 'normal', motion: 'on', density: 'normal', menu: '', menu2: '', mgrad: 'solid' };
         // [id, ad, açıklama, dikdörtgenler: topbar | menü | içerik]
         const ADM_LAYOUTS = [
             ['classic', 'Klasik', 'Üst başlık + sol menü', [2,2,76,7, 2,12,18,38, 23,12,55,38]],
@@ -7046,6 +7046,8 @@
             ['Verimli', { layout: 'compact', scale: '85', radius: 'sharp' }],
             ['Gece Odak', { layout: 'focus', palette: 'navy' }],
             ['Açık Tema', { layout: 'top', palette: 'light' }],
+            ['Okyanus Degrade', { layout: 'left', menu: '#0b3b5c', menu2: '#06b6d4', mgrad: 'd', accent: '#06b6d4' }],
+            ['Gün Batımı', { layout: 'left', menu: '#7f1d1d', menu2: '#f97316', mgrad: 'v', accent: '#f97316', palette: 'wine' }],
             ['Orman Sakin', { layout: 'floattop', palette: 'forest', accent: '#10b981', radius: 'pill' }],
             ['Kâğıt', { layout: 'left', palette: 'lightwarm', accent: '#f97316', surface: 'flat' }],
             ['Mor Dock', { layout: 'dock', palette: 'violet', accent: '#a855f7', surface: 'glass', radius: 'pill' }]
@@ -7053,6 +7055,8 @@
         const ADM_ROWS = [
             ['radius', 'Köşeler', [['sharp', 'Keskin'], ['round', 'Yuvarlak'], ['pill', 'Çok yuvarlak']]],
             ['surface', 'Yüzey', [['solid', 'Düz'], ['glass', 'Cam'], ['flat', 'Çerçevesiz'], ['outline', 'Hat']]],
+            ['density', 'Yoğunluk', [['compact', 'Kompakt'], ['normal', 'Normal'], ['cozy', 'Rahat']]],
+            ['mgrad', 'Menü degradesi', [['solid', 'Düz'], ['v', 'Dikey'], ['d', 'Çapraz'], ['h', 'Yatay'], ['radial', 'Radyal']]],
             ['scale', 'Boyut', [['85', '%85'], ['100', '%100'], ['115', '%115'], ['130', '%130']]],
             ['sidew', 'Menü genişliği', [['narrow', 'Dar'], ['normal', 'Normal'], ['wide', 'Geniş']]],
             ['motion', 'Animasyon', [['on', 'Açık'], ['off', 'Kapalı']]]
@@ -7069,6 +7073,7 @@
             ['lightwarm', 'Krem', '#f8f1e6', _PV.coffee, true], ['lightrose', 'Açık Gül', '#fbecef', _PV.wine, true]
         ];
         const ADM_ACCENTS = ['#06b6d4','#0ea5e9','#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899','#f43f5e','#f97316','#f59e0b','#84cc16','#10b981','#14b8a6','#94a3b8'];
+        const ADM_MENUCOLORS = ['#0f172a','#1e3a5f','#134e4a','#14532d','#3b0764','#7f1d1d','#78350f','#1f2937','#000000','#f1f5f9','#dbeafe','#dcfce7','#fef3c7','#fce7f3','#0ea5e9','#8b5cf6','#f43f5e','#f97316'];
         function admRgb(h) { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
         let admUi = Object.assign({}, ADM_UI_DEFAULT);
         try { Object.assign(admUi, JSON.parse(localStorage.getItem(ADMIN_UI_KEY) || '{}')); } catch (e) {}
@@ -7077,9 +7082,9 @@
         function admUiApply() {
             const p = document.getElementById('admin-panel');
             if (!p) return;
-            [...p.classList].filter(c => /^adm-(lay|mode|rad|surf|scale|sw)-/.test(c) || c === 'adm-nomotion' || c === 'adm-drawer-open').forEach(c => p.classList.remove(c));
+            [...p.classList].filter(c => /^adm-(lay|mode|rad|surf|scale|sw|den)-/.test(c) || c === 'adm-nomotion' || c === 'adm-drawer-open').forEach(c => p.classList.remove(c));
             const u = admUi;
-            p.classList.add('adm-lay-' + u.layout, 'adm-rad-' + u.radius, 'adm-surf-' + u.surface, 'adm-scale-' + u.scale, 'adm-sw-' + u.sidew);
+            p.classList.add('adm-lay-' + u.layout, 'adm-rad-' + u.radius, 'adm-surf-' + u.surface, 'adm-scale-' + u.scale, 'adm-sw-' + u.sidew, 'adm-den-' + u.density);
             if (u.motion === 'off') p.classList.add('adm-nomotion');
             const P = ADM_PALETTES.find(x => x[0] === u.palette) || ADM_PALETTES[0];
             ['--adm-bg1', '--adm-bg2', '--adm-surface', '--adm-surface-2', '--adm-border'].forEach((n, i) => { if (P[3]) p.style.setProperty(n, P[3][i]); else p.style.removeProperty(n); });
@@ -7091,7 +7096,19 @@
                 p.style.setProperty('--adm-accent-soft', `rgba(${r},${g},${b},.16)`);
             } else ['--adm-accent', '--adm-accent-2', '--adm-accent-soft'].forEach(n => p.style.removeProperty(n));
             document.querySelectorAll('#adm-ui-rows .adm-pal').forEach(b => b.classList.toggle('is-active', b.dataset.pal === u.palette));
-            document.querySelectorAll('#adm-ui-rows .adm-sw').forEach(b => b.classList.toggle('is-active', b.dataset.acc === u.accent));
+            document.querySelectorAll('#adm-ui-rows .adm-sw').forEach(b => b.classList.toggle('is-active', b.dataset.acc !== undefined && b.dataset.acc === u.accent));
+            // Menü rengi / degrade
+            p.classList.toggle('adm-has-menu', !!u.menu);
+            if (u.menu) {
+                const c1 = admRgb(u.menu), c2 = u.menu2 ? admRgb(u.menu2) : c1.map(v => Math.round(v * .5));
+                const m2 = u.menu2 || `rgb(${c2.join(',')})`;
+                const dir = { v: 'to bottom', d: '135deg', h: 'to right' }[u.mgrad];
+                p.style.setProperty('--adm-menu-bg', u.mgrad === 'solid' ? u.menu : (u.mgrad === 'radial' ? `radial-gradient(circle at top left,${u.menu},${m2})` : `linear-gradient(${dir},${u.menu},${m2})`));
+                const lum = (u.mgrad === 'solid' ? c1 : c1.map((v, i) => (v + c2[i]) / 2)).reduce((s, v, i) => s + v * [.299, .587, .114][i], 0) / 255;
+                p.classList.toggle('adm-menu-light', lum > .6);
+            } else { p.style.removeProperty('--adm-menu-bg'); p.classList.remove('adm-menu-light'); }
+            document.querySelectorAll('#adm-ui-rows .adm-sw[data-menu]').forEach(b => b.classList.toggle('is-active', b.dataset.menu === u.menu));
+            document.querySelectorAll('#adm-ui-rows .adm-sw[data-menu2]').forEach(b => b.classList.toggle('is-active', b.dataset.menu2 === u.menu2));
             document.querySelectorAll('#adm-ui-layouts .adm-lay-card').forEach(b => b.classList.toggle('is-active', b.dataset.id === u.layout));
             document.querySelectorAll('#adm-ui-rows .adm-segment button').forEach(b => b.classList.toggle('is-active', admUi[b.dataset.k] === b.dataset.v));
             try { localStorage.setItem(ADMIN_UI_KEY, JSON.stringify(u)); } catch (e) {}
@@ -7120,7 +7137,8 @@
             }));
             document.getElementById('adm-ui-rows').insertAdjacentHTML('afterbegin',
                 `<div class="adm-ui-row"><label>Renk paleti<br><small style="font-weight:400;color:#64748b">Koyu ve açık</small></label><div class="adm-pal-grid">${ADM_PALETTES.map(p => `<button type="button" class="adm-pal" data-pal="${p[0]}" onclick="admUiSet('palette','${p[0]}')"><i style="background:${p[2]}"></i><span>${p[1]}</span></button>`).join('')}</div></div>` +
-                `<div class="adm-ui-row"><label>Vurgu rengi</label><div class="adm-acc-grid"><button type="button" class="adm-sw" data-acc="" style="--c:linear-gradient(135deg,#06b6d4,#f43f5e)" title="Üst çubuktaki renk" onclick="admUiSet('accent','')"></button>${ADM_ACCENTS.map(h => `<button type="button" class="adm-sw" data-acc="${h}" style="--c:${h}" onclick="admUiSet('accent','${h}')"></button>`).join('')}</div></div>`);
+                `<div class="adm-ui-row"><label>Vurgu rengi</label><div class="adm-acc-grid"><button type="button" class="adm-sw" data-acc="" style="--c:linear-gradient(135deg,#06b6d4,#f43f5e)" title="Üst çubuktaki renk" onclick="admUiSet('accent','')"></button>${ADM_ACCENTS.map(h => `<button type="button" class="adm-sw" data-acc="${h}" style="--c:${h}" onclick="admUiSet('accent','${h}')"></button>`).join('')}</div></div>` +
+                [['menu', 'Menü rengi', 'Tema ile aynı'], ['menu2', 'Degrade sonu', 'Otomatik (koyulaşır)']].map(([k, t, d]) => `<div class="adm-ui-row"><label>${t}</label><div class="adm-acc-grid"><button type="button" class="adm-sw" data-${k}="" style="--c:linear-gradient(135deg,#334155,#94a3b8)" title="${d}" onclick="admUiSet('${k}','')"></button>${ADM_MENUCOLORS.map(h => `<button type="button" class="adm-sw" data-${k}="${h}" style="--c:${h}" onclick="admUiSet('${k}','${h}')"></button>`).join('')}</div></div>`).join(''));
             admUiApply();
         })();
 
