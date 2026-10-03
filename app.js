@@ -764,6 +764,7 @@
                         // çubuğu geçiş anında görünüp kayboluyor ("yanlış işlem" hissi buradan
                         // geliyordu). Hedef sayfa zaten kendi açılışında/ilk tıklamada tam ekranı
                         // ister (bkz. armFullscreenPersistent) — bu yeterli ve güvenli.
+                        try { sessionStorage.removeItem(ADMIN_OPEN_FLAG); } catch (e) {}
                         window.location.href = DUYURU_PANOSU_URL + sep + 'ekran=1';
                     }
                 });
@@ -791,6 +792,7 @@
         function adminOpenDuyuruPanosuEditor() {
             requestRealFullscreen(); // bkz. checkAdminPinCode içindeki AYNI açıklama
             const sep = DUYURU_PANOSU_URL.includes('?') ? '&' : '?';
+            try { sessionStorage.removeItem(ADMIN_OPEN_FLAG); } catch (e) {}
             window.location.href = DUYURU_PANOSU_URL + sep + 'duzenle=1';
         }
 
@@ -814,6 +816,7 @@
                         const sep = DUYURU_PANOSU_URL.includes('?') ? '&' : '?';
                         // (bkz. setActiveDisplay içindeki AYNI açıklama) — kasıtlı olarak
                         // tam ekrandan çıkılmıyor; hedef sayfa zaten tam ekran ister.
+                        try { sessionStorage.removeItem(ADMIN_OPEN_FLAG); } catch (e) {}
                         window.location.href = DUYURU_PANOSU_URL + sep + 'ekran=1';
                     }
                 })
@@ -2385,8 +2388,26 @@
         // Ders programı / zil saatleri / nöbet sekmelerinin üstündeki "Sabah | Öğle" seçici
         function renderShiftEditBars() {
             const dbl = isDoubleMode();
+            // Seçici yer tutucusu pano49.html'de yoksa (eski HTML dosyası yüklenmişse) burada oluşturulur:
+            // böylece Sabah | Öğle seçici HTML sürümüne bağlı kalmadan 4 sekmede de görünür.
+            ['tab-schedule', 'tab-hours', 'tab-duties', 'tab-achievements'].forEach(function (tid) {
+                const tab = document.getElementById(tid);
+                if (tab && !tab.querySelector('.shift-edit-bar')) {
+                    const holder = document.createElement('div');
+                    holder.className = 'shift-edit-bar hidden';
+                    tab.insertBefore(holder, tab.firstChild);
+                }
+            });
             document.querySelectorAll('.shift-edit-bar').forEach(bar => {
-                if (!dbl) { bar.innerHTML = ''; bar.classList.add('hidden'); return; }
+                if (!dbl) {
+                    // Normal (tekli) modda seçici yok; neden çıkmadığı anlaşılsın diye kısa bir bilgi gösterilir
+                    bar.classList.remove('hidden');
+                    bar.innerHTML = `<div class="flex items-center gap-3 flex-wrap bg-slate-950 border border-slate-800 rounded-xl px-3 py-2">
+                        <span class="text-[11px] text-slate-500"><i class="fa-solid fa-circle-info text-slate-500"></i> Sabah | Öğle seçici yalnızca <b>İkili Öğretim</b> modunda görünür (şu an Normal öğretim açık).</span>
+                        <button type="button" onclick="switchTab('tab-teaching', document.querySelector('[onclick*=&quot;tab-teaching&quot;]'))" class="px-3 py-1 rounded-lg text-[11px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/40 hover:bg-amber-500/25"><i class="fa-solid fa-sun"></i> Öğretim Düzeni'ne git</button>
+                    </div>`;
+                    return;
+                }
                 bar.classList.remove('hidden');
                 const mk = (key, icon, color) => {
                     const on = (__boundShift === key);
@@ -2397,7 +2418,7 @@
                         <span class="text-[11px] text-slate-400 font-bold"><i class="fa-solid fa-pen-to-square text-amber-400"></i> Düzenlenen öğretim:</span>
                         ${mk('morning', 'fa-sun', 'bg-amber-400')}
                         ${mk('afternoon', 'fa-cloud-sun', 'bg-indigo-300')}
-                        <span class="text-[10px] text-slate-500">Bu sekmedeki zil saatleri, ders programı ve nöbet çizelgesi seçili öğretime aittir.</span>
+                        <span class="text-[10px] text-slate-500">Bu sekmedeki veriler (zil saatleri, ders programı, nöbet çizelgesi, Ayın Enleri) seçili öğretime aittir.</span>
                     </div>`;
             });
         }
@@ -6505,9 +6526,75 @@
             document.getElementById('stat-ann-count').innerText = appConfig.announcements.length;
 
             panel.classList.remove('hidden');
+            adminMarkClean();
+            try { sessionStorage.setItem(ADMIN_OPEN_FLAG, '1'); } catch (e) {} // sayfa yenilenince panel açık kalsın
         }
 
+        /* =========================================================================
+           YÖNETİM PANELİ: KALICI OTURUM / ANA SAYFAYA DÖN
+           - Kaydet / Yayınla panelden ÇIKARMAZ.
+           - Sayfa yenilenirse (F5) Supabase oturumu hâlâ geçerliyse panel yeniden açılır.
+           - Panelden yalnızca "Ana Sayfaya Dön" düğmesiyle çıkılır.
+        ========================================================================= */
+        const ADMIN_OPEN_FLAG = 'panoAdminOpen';
+        let adminDirty = false;
+        function adminMarkClean() { adminDirty = false; }
+
+        (function adminTrackDirty() {
+            const panel = document.getElementById('admin-panel');
+            if (!panel) return;
+            const mark = () => { adminDirty = true; };
+            panel.addEventListener('input', mark, true);
+            panel.addEventListener('change', mark, true);
+            panel.addEventListener('click', function (e) {
+                const b = e.target.closest && e.target.closest('button');
+                if (!b) return;
+                const oc = b.getAttribute('onclick') || '';
+                if (/switchTab|saveAdminChanges|publishNow|adminGoHome|closeAdmin|adminSwitchEditShift|forceRefreshDisplays|adminSwitchToDuyuru|adminOpenDuyuru/.test(oc)) return;
+                if (b.disabled) return;
+                adminDirty = true;
+            }, true);
+        })();
+
+        // "Ana Sayfaya Dön": panelden çıkar ve panoyu gösterir. Kaydedilmemiş değişiklik varsa sorar.
+        function adminGoHome() {
+            const leave = function () {
+                closeAdminPanelWithoutSaving();
+                if (typeof shiftSyncBinding === 'function') shiftSyncBinding(true); // panoyu aktif öğretime döndür
+            };
+            if (adminDirty) {
+                askCustomConfirmation(
+                    'Kaydedilmemiş Değişiklikler',
+                    'Kaydetmediğiniz değişiklikler var. Kaydetmeden ana sayfaya dönülürse bu değişiklikler kaybolur. Devam edilsin mi?',
+                    leave
+                );
+            } else {
+                leave();
+            }
+        }
+
+        // Sayfa yenilendiğinde (F5) panel açıktıysa ve oturum hâlâ geçerliyse paneli geri açar.
+        function adminRestoreAfterReload() {
+            let flagged = false;
+            try { flagged = sessionStorage.getItem(ADMIN_OPEN_FLAG) === '1'; } catch (e) {}
+            if (!flagged) return;
+            if (IS_DISPLAY_MODE || !supabaseClient) { try { sessionStorage.removeItem(ADMIN_OPEN_FLAG); } catch (e) {} return; }
+            supabaseClient.auth.getSession().then(function (res) {
+                const session = res && res.data && res.data.session;
+                if (session) {
+                    openAdminPanel();
+                    writeCMSLog('Sayfa yenilendi: yönetim paneli otomatik yeniden açıldı.');
+                } else {
+                    try { sessionStorage.removeItem(ADMIN_OPEN_FLAG); } catch (e) {}
+                }
+            }).catch(function () {
+                try { sessionStorage.removeItem(ADMIN_OPEN_FLAG); } catch (e) {}
+            });
+        }
+        window.addEventListener('load', function () { setTimeout(adminRestoreAfterReload, 400); });
+
         function closeAdminPanelWithoutSaving() {
+            try { sessionStorage.removeItem(ADMIN_OPEN_FLAG); } catch (e) {}
             document.getElementById('admin-panel').classList.add('hidden');
             if (supabaseClient) supabaseClient.auth.signOut();
             writeCMSLog("Yönetim Paneli kaydetmeden kapatıldı.");
@@ -6677,7 +6764,7 @@
             appConfig.dutyStyle = tempDutyStyle || appConfig.dutyStyle;
 
             panoPersist();
-            if (typeof shiftSyncBinding === 'function') shiftSyncBinding(true); // panel kapanıyor: panoyu aktif öğretime döndür
+            if (typeof shiftSyncBinding === 'function') shiftSyncBinding(); // panel açık kalıyor: düzenlenen öğretim bağlı kalır
             renderPanoData();
             applyModuleSettingsToDashboard();
             startCyclingModuleIntervals();
@@ -6685,9 +6772,9 @@
             if (typeof displayControlStartPolling === 'function') displayControlStartPolling(); // yeni "displaySwitchPollSeconds" değerini hemen uygula
             fetchLiveWeather();
 
-            document.getElementById('admin-panel').classList.add('hidden');
-            if (supabaseClient) supabaseClient.auth.signOut();
-            showCustomNotification("Başarılı", "Tüm sistem değişiklikleri başarıyla kaydedildi ve pano güncellendi.");
+            // Panel KAPANMAZ ve oturum kapatılmaz: çıkmak için "Ana Sayfaya Dön" düğmesi kullanılır.
+            adminMarkClean();
+            showCustomNotification("Kaydedildi", "Değişiklikler kaydedildi ve pano güncellendi. Yönetim panelinde devam edebilirsiniz.");
             writeCMSLog("Tüm pano değişiklikleri başarıyla kaydedildi.");
         }
 
