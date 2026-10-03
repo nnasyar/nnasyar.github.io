@@ -6653,6 +6653,9 @@
             }
             el.className = "w-full text-left px-4 py-3 bg-cyan-600 text-white font-bold rounded-lg text-sm flex items-center gap-3 transition shadow-lg shadow-cyan-600/10";
             try { sessionStorage.setItem(ADMIN_TAB_KEY, tabId); } catch (e) {}
+            // Sekme değişince içerik alanını en üste kaydır
+            const vp = document.getElementById('cms-content-viewport');
+            if (vp) vp.scrollTop = 0;
             writeCMSLog(`Sekme değiştirildi: ${tabId}`);
         }
 
