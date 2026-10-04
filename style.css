@@ -1797,3 +1797,14 @@
 #admin-panel.adm-den-cozy .adm-viewport{padding:2rem}
 #admin-panel.adm-den-cozy .space-y-6>:not([hidden])~:not([hidden]){margin-top:2rem}
 #admin-panel.adm-den-cozy :is(.p-5,.p-4){padding:1.5rem}
+
+/* Panel genelinde arama sonuçları */
+.adm-sr{position:fixed;z-index:80;width:min(380px,92vw);max-height:62vh;overflow:auto;background:var(--adm-surface);border:1px solid var(--adm-accent);border-radius:14px;box-shadow:0 24px 60px -12px #000;padding:6px}
+.adm-sr.hidden{display:none}
+.adm-sr h5{font-size:10px;letter-spacing:.08em;color:var(--adm-accent);padding:8px 8px 4px;font-weight:800;text-transform:uppercase}
+.adm-sr button{display:block;width:100%;text-align:left;padding:7px 10px;border-radius:8px;font-size:12px;color:#cbd5e1;line-height:1.35}
+.adm-sr button:hover,.adm-sr button.is-sel{background:var(--adm-accent-soft);color:#fff}
+.adm-sr mark{background:var(--adm-accent);color:#000;border-radius:3px;padding:0 2px}
+.adm-sr .adm-sr-n{padding:12px;font-size:12px;color:#94a3b8}
+.adm-hit{outline:2px solid var(--adm-accent);outline-offset:4px;border-radius:6px;background:var(--adm-accent-soft);animation:admHit 1s ease 2}
+@keyframes admHit{50%{outline-color:transparent;background:transparent}}

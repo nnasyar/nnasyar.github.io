@@ -338,7 +338,7 @@
         <div class="adm-body flex flex-1 gap-6 overflow-hidden">
             <!-- Sol Menü / Sidebar -->
             <div class="adm-sidebar w-64 rounded-xl p-4 flex flex-col overflow-hidden">
-                <div class="adm-nav-search"><i class="fa-solid fa-magnifying-glass"></i><input id="cms-nav-search" type="text" placeholder="Menüde ara..." autocomplete="off" oninput="admFilterNav(this.value)"></div>
+                <div class="adm-nav-search"><i class="fa-solid fa-magnifying-glass"></i><input id="cms-nav-search" type="text" placeholder="Tüm panelde ara... (Ctrl+K)" autocomplete="off" oninput="admFilterNav(this.value);admGlobalSearch(this.value)" onkeydown="admSearchKey(event)" onfocus="admGlobalSearch(this.value)"></div>
                 <div class="overflow-y-auto flex-1 pr-1" id="cms-sidebar-links">
                     <div class="adm-nav-group"><div class="adm-nav-title">Genel</div>
                         <button class="cms-nav-btn active" data-tab="tab-dashboard" onclick="switchTab('tab-dashboard', this)"><i class="fa-solid fa-chart-line"></i><span>Kontrol Paneli Özet</span></button>
@@ -369,7 +369,7 @@
                         <button class="cms-nav-btn" data-tab="tab-theme" onclick="switchTab('tab-theme', this)"><i class="fa-solid fa-palette"></i><span>Pano Teması</span></button>
                         <button class="cms-nav-btn" data-tab="tab-adminui" onclick="switchTab('tab-adminui', this)"><i class="fa-solid fa-table-columns"></i><span>Arayüz Düzeni &amp; Stil</span></button>
                     </div>
-                    <div class="adm-nav-empty hidden">Sonuç bulunamadı</div>
+                    <div class="adm-nav-empty hidden">Menüde eşleşme yok. Panel içi sonuçlar arama kutusunun altında listelenir.</div>
                 </div>
                 <div class="adm-side-foot pt-4 mt-2 border-t border-slate-800 text-[10px] text-slate-500 text-center font-mono shrink-0">
                     Prepared by <b class="text-slate-300">Mehmet Nasır ÇÖZGEN</b><br>IP: LOCALHOST | SYSTEM ONLINE

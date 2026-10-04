@@ -2422,7 +2422,7 @@
             st.textContent = `
                 .shift-badge{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;font-size:.62em;font-weight:700;letter-spacing:.04em;vertical-align:middle;white-space:nowrap}
                 .shift-badge-morning{background:rgba(255,183,3,.18);color:#ffb703;border:1px solid rgba(255,183,3,.5)}
-                .shift-badge-afternoon{background:rgba(129,140,248,.18);color:#a5b4fc;border:1px solid rgba(129,140,248,.5)}
+                .shift-badge-afternoon{background:rgba(99,102,241,.35);color:#e0e7ff;border:1px solid rgba(165,180,252,.8)}
             `;
             document.head.appendChild(st);
         })();
@@ -2471,15 +2471,19 @@
             document.querySelectorAll('.shift-edit-bar').forEach(bar => {
                 if (!dbl) { bar.innerHTML = ''; bar.classList.add('hidden'); return; }
                 bar.classList.remove('hidden');
+                const SHIFT_BTN = {
+                    morning:   { on: 'bg-amber-400 text-black border-amber-200 shadow-lg shadow-amber-500/40 ring-2 ring-amber-300/60', off: 'bg-amber-400/10 text-amber-300 border-amber-400/40 hover:bg-amber-400/20' },
+                    afternoon: { on: 'bg-indigo-500 text-white border-indigo-200 shadow-lg shadow-indigo-500/50 ring-2 ring-indigo-300/70', off: 'bg-indigo-400/10 text-indigo-300 border-indigo-400/40 hover:bg-indigo-400/20' }
+                };
                 const mk = (key, icon, color) => {
                     const on = (__boundShift === key);
-                    return `<button type="button" onclick="adminSwitchEditShift('${key}')" class="px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 border transition ${on ? color + ' text-black border-transparent shadow-lg' : 'bg-slate-900 text-slate-400 border-slate-700 hover:text-white'}"><i class="fa-solid ${icon}"></i> ${SHIFT_LABELS[key]} Öğretimi</button>`;
+                    return `<button type="button" onclick="adminSwitchEditShift('${key}')" class="px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 border transition ${on ? SHIFT_BTN[key].on : SHIFT_BTN[key].off}"><i class="fa-solid ${icon}"></i> ${SHIFT_LABELS[key]} Öğretimi</button>`;
                 };
                 bar.innerHTML = `
                     <div class="flex items-center gap-3 flex-wrap bg-slate-950 border border-amber-500/30 rounded-xl p-3">
                         <span class="text-[11px] text-slate-400 font-bold"><i class="fa-solid fa-pen-to-square text-amber-400"></i> Düzenlenen öğretim:</span>
                         ${mk('morning', 'fa-sun', 'bg-amber-400')}
-                        ${mk('afternoon', 'fa-cloud-sun', 'bg-indigo-300')}
+                        ${mk('afternoon', 'fa-cloud-sun', 'bg-indigo-500')}
                         <span class="text-[10px] text-slate-500">Bu sekmedeki veriler (zil saatleri, ders programı, nöbet, doğum günleri vb.) seçili öğretime aittir.</span>
                     </div>`;
             });
@@ -2633,7 +2637,7 @@
                     const k = ds.classShifts[c] || 'morning';
                     const styl = k === 'morning'
                         ? 'bg-amber-400/15 border-amber-400/50 text-amber-300'
-                        : 'bg-indigo-400/15 border-indigo-400/50 text-indigo-300';
+                        : 'bg-indigo-500/25 border-indigo-400/70 text-indigo-200';
                     return `<button type="button" onclick="shiftToggleClass('${c}')" class="flex items-center justify-between gap-2 px-3 py-2 rounded-lg border text-xs font-bold transition hover:brightness-125 ${styl}" title="Tıklayınca öğretimi değişir"><span>${c}</span><span class="text-[10px] opacity-90"><i class="fa-solid ${k === 'morning' ? 'fa-sun' : 'fa-cloud-sun'}"></i> ${SHIFT_LABELS[k]}</span></button>`;
                 }).join('');
             }
@@ -7010,6 +7014,100 @@
         }
 
         // Yönetim paneli kenar çubuğunda arama (Türkçe harf duyarlı)
+        // ===== Tüm yönetim panelinde arama (menü + her sekmenin içeriği) =====
+        let __admHits = [];
+        function admSrEsc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+        function admSrBox() {
+            let b = document.getElementById('adm-search-results');
+            if (!b) {
+                b = document.createElement('div');
+                b.id = 'adm-search-results';
+                b.className = 'adm-sr hidden';
+                document.getElementById('admin-panel').appendChild(b);
+            }
+            return b;
+        }
+        function admGlobalSearch(q) {
+            const box = admSrBox(), input = document.getElementById('cms-nav-search');
+            const needle = (q || '').trim().toLocaleLowerCase('tr');
+            __admHits = [];
+            if (needle.length < 2) { box.classList.add('hidden'); return; }
+            const seen = new Set();
+            const add = (tabId, el, txt) => { if (!seen.has(el) && __admHits.length < 80) { seen.add(el); __admHits.push({ tabId, el, txt }); } };
+            document.querySelectorAll('#admin-panel .tab-content').forEach(tab => {
+                const w = document.createTreeWalker(tab, NodeFilter.SHOW_TEXT, { acceptNode: n => {
+                    const p = n.parentElement;
+                    if (!p || /^(SCRIPT|STYLE|OPTION|TEXTAREA)$/.test(p.tagName)) return NodeFilter.FILTER_REJECT;
+                    return n.nodeValue.trim().length > 1 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+                } });
+                let n;
+                while ((n = w.nextNode())) {
+                    const txt = n.nodeValue.replace(/\s+/g, ' ').trim();
+                    if (txt.toLocaleLowerCase('tr').includes(needle)) add(tab.id, n.parentElement, txt);
+                }
+                tab.querySelectorAll('input[type=text],input:not([type]),input[type=number],textarea,select').forEach(el => {
+                    const txt = (el.getAttribute('placeholder') || '') + ' ' + (el.tagName === 'SELECT' ? '' : (el.value || ''));
+                    if (txt.trim() && txt.toLocaleLowerCase('tr').includes(needle)) add(tab.id, el, txt.trim());
+                });
+            });
+            const groups = {};
+            __admHits.forEach((h, i) => { (groups[h.tabId] = groups[h.tabId] || []).push(i); });
+            const re = new RegExp(needle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+            let html = '';
+            Object.keys(groups).forEach(tid => {
+                const nb = document.querySelector(`#cms-sidebar-links .cms-nav-btn[data-tab="${tid}"]`);
+                const title = nb ? nb.textContent.trim() : tid;
+                html += `<h5><i class="${nb && nb.querySelector('i') ? nb.querySelector('i').className : 'fa-solid fa-folder'}"></i> ${admSrEsc(title)} <span style="opacity:.6">(${groups[tid].length})</span></h5>`;
+                groups[tid].forEach(i => {
+                    const t = __admHits[i].txt;
+                    const pos = t.toLocaleLowerCase('tr').indexOf(needle);
+                    const s = t.length > 90 ? ('…' + t.slice(Math.max(0, pos - 25), pos + 65) + '…') : t;
+                    html += `<button type="button" data-i="${i}" onclick="admSearchGo(${i})">${admSrEsc(s).replace(new RegExp(admSrEsc(needle).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), m => `<mark>${m}</mark>`)}</button>`;
+                });
+            });
+            box.innerHTML = html || `<div class="adm-sr-n">Panel içinde "${admSrEsc(q.trim())}" bulunamadı.</div>`;
+            const r = input.getBoundingClientRect();
+            box.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 392)) + 'px';
+            box.style.top = (r.bottom + 6) + 'px';
+            box.classList.remove('hidden');
+        }
+        function admSearchGo(i) {
+            const h = __admHits[i];
+            if (!h) return;
+            const btn = document.querySelector(`#cms-sidebar-links .cms-nav-btn[data-tab="${h.tabId}"]`);
+            switchTab(h.tabId, btn);
+            admSrBox().classList.add('hidden');
+            let d = h.el.closest('details');
+            while (d) { d.open = true; d = d.parentElement && d.parentElement.closest('details'); }
+            setTimeout(() => {
+                h.el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                h.el.classList.add('adm-hit');
+                setTimeout(() => h.el.classList.remove('adm-hit'), 2800);
+            }, 80);
+        }
+        function admSearchKey(e) {
+            const box = admSrBox();
+            const items = [...box.querySelectorAll('button')];
+            let cur = items.findIndex(b => b.classList.contains('is-sel'));
+            if (e.key === 'Escape') { e.target.value = ''; admFilterNav(''); box.classList.add('hidden'); }
+            else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (!items.length) return;
+                if (cur >= 0) items[cur].classList.remove('is-sel');
+                cur = e.key === 'ArrowDown' ? (cur + 1) % items.length : (cur <= 0 ? items.length - 1 : cur - 1);
+                items[cur].classList.add('is-sel');
+                items[cur].scrollIntoView({ block: 'nearest' });
+            } else if (e.key === 'Enter' && items.length) admSearchGo(+(items[Math.max(cur, 0)].dataset.i));
+        }
+        document.addEventListener('click', e => {
+            const b = document.getElementById('adm-search-results');
+            if (b && !b.contains(e.target) && e.target.id !== 'cms-nav-search') b.classList.add('hidden');
+        });
+        document.addEventListener('keydown', e => {
+            const p = document.getElementById('admin-panel'), i = document.getElementById('cms-nav-search');
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k' && p && !p.classList.contains('hidden') && i) { e.preventDefault(); i.focus(); i.select(); }
+        });
+
         function admFilterNav(q) {
             const needle = (q || '').trim().toLocaleLowerCase('tr');
             const _sl = document.getElementById('cms-sidebar-links'); if (_sl) _sl.classList.toggle('is-searching', !!needle);
