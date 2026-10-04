@@ -2745,7 +2745,7 @@
                 title: cat.title || "Alan",
                 icon: cat.icon || "fa-star",
                 active: cat.active !== false,
-                list: (cat.list || []).map(r => ({ title: r.title || "", cls: r.cls || "", img: r.img || "", active: r.active !== false })),
+                list: (cat.list || []).map(r => ({ title: r.title || "", cls: r.cls || "", ...(r.after !== undefined ? { after: r.after } : {}), ...(r.br !== undefined ? { br: r.br } : {}), img: r.img || "", active: r.active !== false })),
                 style: {
                     font: "", size: "14", color: "", textAlign: "left", justify: "center",
                     imgPosition: "left", imgSize: 44, imgShape: "rounded",
@@ -8372,14 +8372,29 @@
                 <!-- KAYIT EKLEME (URL veya Bilgisayardan Manuel Yükleme) -->
                 <div class="grid grid-cols-2 gap-3">
                     <div class="form-group">
-                        <label class="text-xs text-slate-400 block mb-1">Başlık / Ad Soyad <span class="text-slate-600">(isteğe bağlı)</span></label>
-                        <input type="text" id="ach-record-title-${cat.id}" placeholder="Örn: M. Asaf ÇÖZÜM" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs">
+                        <label class="text-xs text-slate-400 block mb-1">Önce gelen metin / Ad Soyad <span class="text-slate-600">(isteğe bağlı)</span></label>
+                        <input type="text" id="ach-record-title-${cat.id}" oninput="achPreview('${cat.id}')" placeholder="Örn: M. Asaf ÇÖZÜM" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs">
                     </div>
                     <div class="form-group">
                         <label class="text-xs text-slate-400 block mb-1">Sınıf <span class="text-slate-600">(isteğe bağlı)</span></label>
-                        <select id="ach-record-class-${cat.id}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs">${achClassOptions('')}</select>
+                        <select id="ach-record-class-${cat.id}" onchange="achClassChanged('${cat.id}')" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs">${achClassOptions('')}</select>
                     </div>
-                    <p class="col-span-2 text-[10px] text-slate-500 -mt-1"><i class="fa-solid fa-circle-info"></i> Yalnızca başlık: <b>başlık</b> · Yalnızca sınıf: <b>3/C Sınıfı</b> · İkisi birden: <b>Ad Soyad (3/C)</b>. Sınıf listesi seçili öğretimin şubelerini gösterir.</p>
+                    <div class="form-group">
+                        <label class="text-xs text-slate-400 block mb-1">Sınıf biçimi (parantez)</label>
+                        <select id="ach-record-br-${cat.id}" onchange="achPreview('${cat.id}')" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs">
+                            <option value="auto">Otomatik (başlık varsa parantez)</option>
+                            <option value="paren">( ) Parantezli</option>
+                            <option value="square">[ ] Köşeli parantez</option>
+                            <option value="curly">{ } Süslü parantez</option>
+                            <option value="dash">- Tire ile</option>
+                            <option value="none">Parantezsiz (düz)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-xs text-slate-400 block mb-1">Sınıftan sonra gelen metin <span class="text-slate-600">(isteğe bağlı)</span></label>
+                        <input type="text" id="ach-record-after-${cat.id}" oninput="achPreview('${cat.id}')" placeholder="Örn: Sınıfı" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs">
+                    </div>
+                    <p class="col-span-2 text-[11px] text-slate-400"><i class="fa-solid fa-eye text-cyan-400"></i> Panoda görünüm: <b class="text-white" id="ach-record-prev-${cat.id}">—</b> <span class="text-slate-600">· Sıra: önce metin → sınıf → sonra metin. Sınıf listesi seçili öğretimin şubelerini gösterir.</span></p>
                     <div class="form-group">
                         <label class="text-xs text-slate-400 block mb-1">Görsel Adresi (URL)</label>
                         <input type="text" id="ach-record-url-${cat.id}" placeholder="https://..." class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs"
@@ -8552,10 +8567,34 @@
 
         // Kayıt metni: başlık ve/veya sınıf (pano ve yönetim listesinde aynı biçim)
         function achRecordText(rec) {
-            const t = (rec && rec.title || '').trim(), c = (rec && rec.cls || '').trim();
-            if (t && c) return `${t} (${c})`;
-            if (c) return `${c} Sınıfı`;
-            return t;
+            const t = (rec && rec.title || '').trim(), c = (rec && rec.cls || '').trim(), af = (rec && rec.after || '').trim();
+            // Eski kayıtlar (biçim alanı yok): yalnızca sınıf ise "3/C Sınıfı"
+            if (rec && rec.br === undefined && rec.after === undefined && c && !t) return `${c} Sınıfı`;
+            let br = (rec && rec.br) || 'auto';
+            if (br === 'auto') br = t ? 'paren' : 'none';
+            const cs = c ? ({ paren: `(${c})`, square: `[${c}]`, curly: `{${c}}`, dash: `- ${c}`, none: c }[br] || c) : '';
+            return [t, cs, af].filter(Boolean).join(' ');
+        }
+        function achReadForm(catId) {
+            const g = id => document.getElementById(id + catId);
+            return { title: (g('ach-record-title-') || {}).value ? g('ach-record-title-').value.trim() : '', cls: g('ach-record-class-') ? g('ach-record-class-').value : '',
+                after: g('ach-record-after-') ? g('ach-record-after-').value.trim() : '', br: g('ach-record-br-') ? g('ach-record-br-').value : 'auto' };
+        }
+        function achPreview(catId) {
+            const el = document.getElementById('ach-record-prev-' + catId);
+            if (el) el.textContent = achRecordText(achReadForm(catId)) || '—';
+        }
+        // Sınıf seçilince başlık ve son metin boşsa "Sınıfı" önerilir (değiştirilebilir/silinebilir)
+        function achClassChanged(catId) {
+            const f = achReadForm(catId);
+            const af = document.getElementById('ach-record-after-' + catId);
+            if (f.cls && !f.title && !f.after && af) af.value = 'Sınıfı';
+            achPreview(catId);
+        }
+        function achResetFormExtras(catId) {
+            const c = document.getElementById('ach-record-class-' + catId), b = document.getElementById('ach-record-br-' + catId), af = document.getElementById('ach-record-after-' + catId);
+            if (c) c.value = ''; if (b) b.value = 'auto'; if (af) af.value = '';
+            achPreview(catId);
         }
         // Sınıf seçeneği: bağlı öğretimin şubeleri (kayıtlı sınıf başka öğretimdense yine de listelenir)
         function achClassOptions(selected) {
@@ -8599,6 +8638,8 @@
             const title = titleInput.value.trim();
             const clsSel = document.getElementById('ach-record-class-' + catId);
             const cls = clsSel ? clsSel.value : '';
+            const after = (document.getElementById('ach-record-after-' + catId) || { value: '' }).value.trim();
+            const br = (document.getElementById('ach-record-br-' + catId) || { value: 'auto' }).value;
             const img = achievementPendingFile[catId] || urlInput.value.trim();
 
             if (!title && !cls) {
@@ -8609,14 +8650,16 @@
             if (achievementEditing.catId === catId && achievementEditing.index !== -1) {
                 cat.list[achievementEditing.index].title = title;
                 cat.list[achievementEditing.index].cls = cls;
+                cat.list[achievementEditing.index].after = after;
+                cat.list[achievementEditing.index].br = br;
                 cat.list[achievementEditing.index].img = img;
-                writeCMSLog(`Ayın Enleri kaydı güncellendi: ${achRecordText({ title, cls })}`);
+                writeCMSLog(`Ayın Enleri kaydı güncellendi: ${achRecordText({ title, cls, after, br })}`);
                 cancelEditAchievementRecord(catId);
             } else {
-                cat.list.push({ title, cls, img, active: true });
-                writeCMSLog(`Ayın Enleri: yeni kayıt eklendi (${cat.title}): ${achRecordText({ title, cls })}`);
+                cat.list.push({ title, cls, after, br, img, active: true });
+                writeCMSLog(`Ayın Enleri: yeni kayıt eklendi (${cat.title}): ${achRecordText({ title, cls, after, br })}`);
                 titleInput.value = "";
-                if (clsSel) clsSel.value = "";
+                achResetFormExtras(catId);
                 urlInput.value = "";
                 clearAchievementPendingFile(catId);
             }
@@ -8630,7 +8673,12 @@
             const rec = cat.list[index];
             document.getElementById('ach-record-title-' + catId).value = rec.title || "";
             const _cs = document.getElementById('ach-record-class-' + catId);
-            if (_cs) { _cs.innerHTML = achClassOptions(rec.cls || ''); _cs.value = rec.cls || ''; }
+if (_cs) { _cs.innerHTML = achClassOptions(rec.cls || ''); _cs.value = rec.cls || ''; }
+            const _legacyCls = rec.br === undefined && rec.after === undefined && rec.cls && !rec.title;
+            const _b = document.getElementById('ach-record-br-' + catId), _a = document.getElementById('ach-record-after-' + catId);
+            if (_b) _b.value = rec.br || 'auto';
+            if (_a) _a.value = rec.after !== undefined ? rec.after : (_legacyCls ? 'Sınıfı' : '');
+            achPreview(catId);
             document.getElementById('ach-record-url-' + catId).value = (rec.img && !rec.img.startsWith('data:')) ? rec.img : "";
             if (rec.img && rec.img.startsWith('data:')) {
                 achievementPendingFile[catId] = rec.img;
@@ -8650,7 +8698,7 @@
             const urlInput = document.getElementById('ach-record-url-' + catId);
             if (titleInput) titleInput.value = "";
             if (urlInput) urlInput.value = "";
-            const _cs2 = document.getElementById('ach-record-class-' + catId); if (_cs2) _cs2.value = "";
+            achResetFormExtras(catId);
             clearAchievementPendingFile(catId);
             const submitBtn = document.getElementById('ach-submit-btn-' + catId);
             if (submitBtn) submitBtn.innerText = "Listeye Ekle";
