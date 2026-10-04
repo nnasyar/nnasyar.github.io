@@ -2081,7 +2081,7 @@
         ========================================================================= */
         const SHIFT_KEYS = ['morning', 'afternoon'];
         const SHIFT_LABELS = { morning: 'Sabah', afternoon: 'Öğle' };
-        const SHIFT_FIELDS = ['bellHours', 'weeklyClassSchedules', 'aylikNobet', 'weeklyDuties', 'achievementCategories'];
+        const SHIFT_FIELDS = ['bellHours', 'weeklyClassSchedules', 'aylikNobet', 'weeklyDuties', 'achievementCategories', 'birthdays'];
         const SHIFT_DEFAULT_BELLS = {
             morning:   [['08:00', '08:40'], ['08:50', '09:30'], ['09:40', '10:20'], ['10:30', '11:10'], ['11:20', '12:00']],
             afternoon: [['12:30', '13:10'], ['13:20', '14:00'], ['14:10', '14:50'], ['15:00', '15:40'], ['15:50', '16:30']]
@@ -2092,6 +2092,7 @@
             { id: 5, start: '13:20', end: '14:00' }, { id: 6, start: '14:10', end: '14:50' },
             { id: 7, start: '15:00', end: '15:40' }
         ];
+        let __legacyBirthdays = null;   // eski (ortak) doğum günü listesi: ilk açılışta öğretimlere bölünür
         let __boundShift = null;            // şu an hangi öğretimin verisine bağlıyız (tekli modda null)
         let shiftAdminEditShift = 'morning'; // yönetim panelinde düzenlenen öğretim
 
@@ -2125,6 +2126,11 @@
             return out;
         }
 
+        // Doğum günlerini sınıfın bağlı olduğu öğretime göre ayırır (sınıfı bilinmeyenler sabaha gider)
+        function shiftSplitBirthdays(list, classShifts, key) {
+            return (Array.isArray(list) ? list : []).filter(b => ((classShifts || {})[b && b.class] || 'morning') === key).map(b => ({ ...b }));
+        }
+
         // Tekli moddaki mevcut veriden ilk ikili öğretim verisini üretir
         function shiftSeedFromSingle(single) {
             const ds = { activeMode: 'auto', classShifts: {}, morning: {}, afternoon: {} };
@@ -2143,6 +2149,7 @@
                     // Mevcut nöbet çizelgesi sabaha aktarılır; öğle boş başlar
                     aylikNobet: k === 'morning' ? shiftDeepCopy(single.aylikNobet || {}) : {},
                     weeklyDuties: k === 'morning' ? shiftDeepCopy(single.weeklyDuties || {}) : {},
+                    birthdays: shiftSplitBirthdays(single.birthdays, ds.classShifts, k),
                     // Ayın Enleri: sabah mevcut kayıtları alır; öğle aynı alanlarla ama boş başlar
                     achievementCategories: k === 'morning'
                         ? shiftDeepCopy(single.achievementCategories && single.achievementCategories.length ? single.achievementCategories : shiftDefaultAch())
@@ -2167,6 +2174,10 @@
                 if (!ds[k].weeklyClassSchedules) ds[k].weeklyClassSchedules = {};
                 if (!ds[k].aylikNobet) ds[k].aylikNobet = {};
                 if (!ds[k].weeklyDuties) ds[k].weeklyDuties = {};
+                if (!Array.isArray(ds[k].birthdays)) {
+                    const _src = __legacyBirthdays || (appConfig.singleModeData && appConfig.singleModeData.birthdays) || [];
+                    ds[k].birthdays = shiftSplitBirthdays(_src, ds.classShifts, k);
+                }
                 if (!Array.isArray(ds[k].achievementCategories)) {
                     ds[k].achievementCategories = (k === 'morning') ? shiftDefaultAch() : shiftAchStructureOnly(shiftDefaultAch());
                 }
@@ -2289,6 +2300,9 @@
                 bellHours = appConfig.bellHours;
                 return;
             }
+            // Güncelleme öncesi kaydedilmiş ikili veride doğum günleri ortaktı (düz alan): öğretimlere böl
+            const _legacyBd = Object.getOwnPropertyDescriptor(appConfig, 'birthdays');
+            if (appConfig.doubleShift && _legacyBd && Array.isArray(_legacyBd.value)) __legacyBirthdays = _legacyBd.value;
             // Güncelleme öncesi kaydedilmiş ikili veride Ayın Enleri ortaktı (düz alan): sabaha taşı, öğleye yapıyı kopyala
             const _legacyAch = Object.getOwnPropertyDescriptor(appConfig, 'achievementCategories');
             if (appConfig.doubleShift && _legacyAch && Array.isArray(_legacyAch.value) && _legacyAch.value.length) {
@@ -2348,6 +2362,7 @@
                 const _p = document.getElementById('admin-panel');
                 if (isDoubleMode() && _p && !_p.classList.contains('hidden')) {
                     appConfig.achievementCategories = shiftDeepCopy(tempAchievementCategories) || [];
+                    appConfig.birthdays = [...tempBirthdays];
                 }
             } catch (e) {}
         }
@@ -2358,6 +2373,8 @@
             renderActiveScheduleGroup();
             renderActiveDuties();
             // Ayın Enleri: öğretime göre kartı yeniden kur ve slayt döngüsünü sıfırla
+            birthdayCycleIndex = 0;
+            try { cycleBirthdayWidget(); } catch (e) {}
             achievementActiveIndex = {};
             renderAchievementsCard();
             (appConfig.achievementCategories || []).filter(c => c.active !== false).forEach(c => cycleAchievementCategory(c.id));
@@ -2387,6 +2404,7 @@
             const cls = 'shift-badge shift-badge-' + __boundShift;
             const targets = [
                 document.getElementById('display-bellhours-title'),
+                document.getElementById('display-birthday-title'),
                 document.getElementById('display-achievements-title'),
                 (document.getElementById('display-duty-title-text') || {}).parentElement
             ];
@@ -2415,6 +2433,7 @@
         // Ayın Enleri çalışma kopyasını bağlı öğretimin verisinden yeniden yükler
         function shiftReloadAchTemp() {
             tempAchievementCategories = shiftDeepCopy(appConfig.achievementCategories || []) || [];
+            try { tempBirthdays = [...(appConfig.birthdays || [])]; selectedBirthdayIndices.clear(); } catch (e) {}
             achievementEditing = { catId: null, index: -1 };
             achievementPendingFile = {};
         }
@@ -2437,6 +2456,10 @@
             buildWeeklyScheduleMatrix();
             buildAylikNobetTablosu();
             if (typeof renderAdminAchievementCategories === 'function') renderAdminAchievementCategories();
+            try {
+                renderAdminBirthdays();
+                const _bc = document.getElementById('stat-birthday-count'); if (_bc) _bc.innerText = (appConfig.birthdays || []).length;
+            } catch (e) {}
             renderShiftEditBars();
             renderTeachingTab();
             shiftRefreshDisplay();
@@ -2457,7 +2480,7 @@
                         <span class="text-[11px] text-slate-400 font-bold"><i class="fa-solid fa-pen-to-square text-amber-400"></i> Düzenlenen öğretim:</span>
                         ${mk('morning', 'fa-sun', 'bg-amber-400')}
                         ${mk('afternoon', 'fa-cloud-sun', 'bg-indigo-300')}
-                        <span class="text-[10px] text-slate-500">Bu sekmedeki zil saatleri, ders programı ve nöbet çizelgesi seçili öğretime aittir.</span>
+                        <span class="text-[10px] text-slate-500">Bu sekmedeki veriler (zil saatleri, ders programı, nöbet, doğum günleri vb.) seçili öğretime aittir.</span>
                     </div>`;
             });
         }
@@ -2496,11 +2519,18 @@
             if (!isDoubleMode()) return;
             shiftCommitInputs();
             const back = appConfig.singleModeData || {};
+            const _seen = new Set();
+            const _mergedB = [];
+            SHIFT_KEYS.forEach(k => ((appConfig.doubleShift[k] || {}).birthdays || []).forEach(b => {
+                const id = [b.class, b.name, b.date].join('|');
+                if (!_seen.has(id)) { _seen.add(id); _mergedB.push({ ...b }); }
+            }));
             shiftRemoveAccessors();
             SHIFT_FIELDS.forEach(f => {
                 if (back[f] !== undefined && back[f] !== null) appConfig[f] = back[f];
                 else appConfig[f] = (f === 'bellHours') ? shiftDeepCopy(SHIFT_SINGLE_DEFAULT_BELLS) : (f === 'achievementCategories' ? shiftDefaultAch() : {});
             });
+            appConfig.birthdays = _mergedB;
             delete appConfig.singleModeData;
             appConfig.teachingMode = 'single';
             __boundShift = null;
@@ -5246,6 +5276,7 @@
             const titleEl = document.getElementById('display-birthday-title');
             const cardEl = document.getElementById('birthday-dashboard-card');
             if (titleEl) titleEl.innerText = settings.title || defaultAppConfig.birthdayWidget.title;
+            if (titleEl && typeof shiftDecorate === 'function') shiftDecorate();
             if (cardEl) cardEl.style.flex = String(settings.cardSize || 1);
         }
 
@@ -7499,6 +7530,13 @@
         }
 
         function renderAdminBirthdays() {
+            const _sel = document.getElementById('new-birthday-class');
+            if (_sel) {
+                const keep = _sel.value;
+                const cls = isDoubleMode() ? adminClassList() : classList;
+                _sel.innerHTML = cls.map(c => `<option value="${c}">${c}</option>`).join('');
+                if (cls.includes(keep)) _sel.value = keep;
+            }
             const wrapper = document.getElementById('admin-birthdays-list-wrapper');
             wrapper.innerHTML = "";
 
@@ -9484,6 +9522,30 @@
         /* =========================================
            BUGÜN DOĞANLAR (DOĞUM GÜNÜ) EXCEL YÜKLEME / ŞABLON
         ========================================= */
+        // İkili öğretimde yüklenen doğum günlerini sınıfın öğretimine göre sabah/öğle listelerine dağıtır.
+        // Dosyada kaydı bulunan öğretimlerin listesi değiştirilir; kaydı olmayan öğretim aynen kalır.
+        // Sınıfı tanınmayan kayıtlar şu an düzenlenen öğretime eklenir. commit=true ise doğrudan kaydedilir.
+        function birthdaysDistributeImport(list, commit) {
+            if (!isDoubleMode()) {
+                if (commit) appConfig.birthdays = list; else tempBirthdays = list;
+                return null;
+            }
+            const ds = appConfig.doubleShift, cur = __boundShift || 'morning';
+            const groups = { morning: [], afternoon: [] };
+            list.forEach(b => {
+                const n = classNormalizeName(b.class);
+                if (classList.includes(n)) b.class = n;
+                const k = ds.classShifts[b.class];
+                groups[(k === 'morning' || k === 'afternoon') ? k : cur].push(b);
+            });
+            SHIFT_KEYS.forEach(k => {
+                if (!groups[k].length) return;
+                if (k === cur) { if (commit) appConfig.birthdays = groups[k]; else tempBirthdays = groups[k]; }
+                else ds[k].birthdays = groups[k];
+            });
+            return groups;
+        }
+
         function dogumExcelYukle(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -9513,10 +9575,11 @@
                     });
 
                     if (loadedBirthdays.length > 0) {
-                        tempBirthdays = loadedBirthdays;
+                        const g = birthdaysDistributeImport(loadedBirthdays, false);
                         cancelEditBirthday();
                         renderAdminBirthdays();
-                        showCustomNotification("Doğum Günleri Yüklendi", `${loadedBirthdays.length} adet kayıt listeye aktarıldı. Kaydetmek için "Değişiklikleri Kaydet" butonuna basın.`);
+                        const detay = g ? ` Dağılım: Sabah ${g.morning.length}, Öğle ${g.afternoon.length} (sınıfın öğretimine göre).` : '';
+                        showCustomNotification("Doğum Günleri Yüklendi", `${loadedBirthdays.length} adet kayıt aktarıldı.${detay} Kaydetmek için "Değişiklikleri Kaydet" butonuna basın.`);
                         writeCMSLog(`Doğum Günü Excel yüklendi: ${loadedBirthdays.length} kayıt.`);
                     } else {
                         showCustomNotification("Veri Bulunamadı", "Excel'de okunabilir doğum günü kaydı bulunamadı. Lütfen şablonu indirip kullanın.");
@@ -9713,7 +9776,7 @@
 
             // Doğum Günleri
             const bdayRows = [["Sınıf", "Ad Soyad", "Tarih (GG.AA)"]];
-            (appConfig.birthdays || []).forEach(b => {
+            (isDoubleMode() ? SHIFT_KEYS.flatMap(k => appConfig.doubleShift[k].birthdays || []) : (appConfig.birthdays || [])).forEach(b => {
                 bdayRows.push([b.class, b.name, b.date]);
             });
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(bdayRows), "Dogum_Gunleri");
@@ -9787,8 +9850,8 @@
                             }
                         });
                         if (loadedBirthdays.length > 0) {
-                            appConfig.birthdays = loadedBirthdays;
-                            tempBirthdays = [...loadedBirthdays];
+                            birthdaysDistributeImport(loadedBirthdays, true);
+                            tempBirthdays = [...(appConfig.birthdays || [])];
                         }
                     }
 
