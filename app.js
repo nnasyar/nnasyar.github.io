@@ -2655,6 +2655,7 @@
         if (!appConfig.dutyPositions || !Array.isArray(appConfig.dutyPositions) || appConfig.dutyPositions.length === 0) {
             appConfig.dutyPositions = JSON.parse(JSON.stringify(defaultAppConfig.dutyPositions));
         } else {
+            migrateOldDefaultDutyPositions();
             // Eksik alanları (icon/color) tamamla, id'siz kayıt varsa üret
             appConfig.dutyPositions = appConfig.dutyPositions.map((p, idx) => ({
                 id: p.id || ('yer_' + Date.now() + '_' + idx),
@@ -9359,6 +9360,22 @@ if (_cs) { _cs.innerHTML = achClassOptions(rec.cls || ''); _cs.value = rec.cls |
                 .trim();
         }
 
+        // Eski fabrika ayarındaki nöbet yerleri (İdareci, Kantin, Bahçe, Zemin Kat, 1. Kat, 2. Kat) kaydedilmişse
+        // yeni varsayılana (Bahçe, Zemin Kat, 1. Kat, 2. Kat, İdareci) geçirir. Kullanıcının özelleştirdiği
+        // listelere dokunulmaz.
+        function migrateOldDefaultDutyPositions() {
+            const pos = appConfig.dutyPositions;
+            if (!Array.isArray(pos)) return;
+            const oldIds = ['idareci', 'kantin', 'bahce', 'zemin', 'kat1', 'kat2'];
+            const oldLabels = ['idareci', 'kantin', 'bahce', 'zemin kat', '1. kat', '2. kat'];
+            const isOldDefault = pos.length === oldIds.length &&
+                pos.every((p, i) => p.id === oldIds[i] && trNorm(p.label) === oldLabels[i]);
+            if (isOldDefault) {
+                appConfig.dutyPositions = JSON.parse(JSON.stringify(defaultAppConfig.dutyPositions));
+                try { localStorage.setItem('okulPanoDataV8', JSON.stringify(appConfig)); } catch (e) {}
+            }
+        }
+
         // Bilinen (fabrika ayarı) nöbet yerleri için esnek başlık tanıma kalıpları (normalize metin üzerinde çalışır).
         const DUTY_LEGACY_HEADER_PATTERNS = {
             kantin:  /kantin/,
@@ -9502,11 +9519,20 @@ if (_cs) { _cs.innerHTML = achClassOptions(rec.cls || ''); _cs.value = rec.cls |
             const ay  = nobetAktifAy;
             const ayAdi = TURKCE_AYLAR[ay];
             const gunSayisi = new Date(yil, ay + 1, 0).getDate();
-            const positions = appConfig.dutyPositions || [];
 
-            // Başlık satırı — güncel nöbet yerleri listesine göre dinamik üretilir
+            // Şablon sütunları SABİTTİR: Tarih | Gün | Bahçe | Zemin Kat | 1. Kat | 2. Kat | İdareci
+            // (Kayıtlı nöbet yeri listesi ne olursa olsun bu sırada iner.) Kullanıcının ayrıca eklediği
+            // özel nöbet yerleri varsa İdareci'den sonra eklenir.
+            const SABLON_SUTUNLARI = ['Bahçe', 'Zemin Kat', '1. Kat', '2. Kat', 'İdareci'];
+            const eskiIdler = ['idareci', 'kantin', 'bahce', 'zemin', 'kat1', 'kat2'];
+            const ozelYerler = (appConfig.dutyPositions || [])
+                .filter(p => !eskiIdler.includes(p.id))
+                .map(p => p.label);
+            const basliklar = [...SABLON_SUTUNLARI, ...ozelYerler];
+            const positions = basliklar;
+
             const rows = [
-                ["Tarih", "Gün", ...positions.map(p => p.label)]
+                ["Tarih", "Gün", ...basliklar]
             ];
 
             for (let g = 1; g <= gunSayisi; g++) {
