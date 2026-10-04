@@ -2745,7 +2745,7 @@
                 title: cat.title || "Alan",
                 icon: cat.icon || "fa-star",
                 active: cat.active !== false,
-                list: (cat.list || []).map(r => ({ title: r.title || "", img: r.img || "", active: r.active !== false })),
+                list: (cat.list || []).map(r => ({ title: r.title || "", cls: r.cls || "", img: r.img || "", active: r.active !== false })),
                 style: {
                     font: "", size: "14", color: "", textAlign: "left", justify: "center",
                     imgPosition: "left", imgSize: 44, imgShape: "rounded",
@@ -5066,7 +5066,7 @@
 
             imgEl.style.opacity = 0;
             setTimeout(() => {
-                titleEl.innerText = record.title || 'Açıklanmadı';
+                titleEl.innerText = achRecordText(record) || 'Açıklanmadı';
                 imgEl.src = record.img || placeholder;
                 imgEl.style.opacity = 1;
             }, 400);
@@ -8371,10 +8371,15 @@
 
                 <!-- KAYIT EKLEME (URL veya Bilgisayardan Manuel Yükleme) -->
                 <div class="grid grid-cols-2 gap-3">
-                    <div class="form-group col-span-2">
-                        <label class="text-xs text-slate-400 block mb-1">Kayıt Başlığı (Sınıf / Öğrenci / vb.)</label>
-                        <input type="text" id="ach-record-title-${cat.id}" placeholder="Örn: 3/C Sınıfı" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs">
+                    <div class="form-group">
+                        <label class="text-xs text-slate-400 block mb-1">Başlık / Ad Soyad <span class="text-slate-600">(isteğe bağlı)</span></label>
+                        <input type="text" id="ach-record-title-${cat.id}" placeholder="Örn: M. Asaf ÇÖZÜM" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs">
                     </div>
+                    <div class="form-group">
+                        <label class="text-xs text-slate-400 block mb-1">Sınıf <span class="text-slate-600">(isteğe bağlı)</span></label>
+                        <select id="ach-record-class-${cat.id}" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs">${achClassOptions('')}</select>
+                    </div>
+                    <p class="col-span-2 text-[10px] text-slate-500 -mt-1"><i class="fa-solid fa-circle-info"></i> Yalnızca başlık: <b>başlık</b> · Yalnızca sınıf: <b>3/C Sınıfı</b> · İkisi birden: <b>Ad Soyad (3/C)</b>. Sınıf listesi seçili öğretimin şubelerini gösterir.</p>
                     <div class="form-group">
                         <label class="text-xs text-slate-400 block mb-1">Görsel Adresi (URL)</label>
                         <input type="text" id="ach-record-url-${cat.id}" placeholder="https://..." class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs"
@@ -8545,6 +8550,20 @@
             `;
         }
 
+        // Kayıt metni: başlık ve/veya sınıf (pano ve yönetim listesinde aynı biçim)
+        function achRecordText(rec) {
+            const t = (rec && rec.title || '').trim(), c = (rec && rec.cls || '').trim();
+            if (t && c) return `${t} (${c})`;
+            if (c) return `${c} Sınıfı`;
+            return t;
+        }
+        // Sınıf seçeneği: bağlı öğretimin şubeleri (kayıtlı sınıf başka öğretimdense yine de listelenir)
+        function achClassOptions(selected) {
+            const list = (isDoubleMode() ? adminClassList() : classList).slice();
+            if (selected && !list.includes(selected)) list.push(selected);
+            return '<option value="">— Sınıf seçme —</option>' + list.map(c => `<option value="${escapeHtml(c)}"${c === selected ? ' selected' : ''}>${escapeHtml(c)}</option>`).join('');
+        }
+
         function renderAdminAchievementRecordList(catId) {
             const cat = tempAchievementCategories.find(c => c.id === catId);
             const wrapper = document.getElementById('ach-list-wrapper-' + catId);
@@ -8558,7 +8577,7 @@
                 row.innerHTML = `
                     <div class="flex items-center gap-2 min-w-0">
                         <img src="${rec.img || 'https://placehold.co/40x40/070b13/fff?text=%3F'}" class="w-8 h-8 rounded object-cover border border-slate-700 shrink-0">
-                        <span class="text-slate-300 truncate">${index + 1}. ${escapeHtml(rec.title || '(başlıksız)')}</span>
+                        <span class="text-slate-300 truncate">${index + 1}. ${escapeHtml(achRecordText(rec) || '(başlıksız)')}</span>
                     </div>
                     <div class="flex items-center gap-1 shrink-0">
                         <button class="px-2 py-1 rounded-full text-[10px] font-bold ${rec.active === false ? 'bg-slate-800 text-slate-400' : 'bg-emerald-500/20 text-emerald-400'}" onclick="toggleAchievementRecordActive('${catId}', ${index})">${rec.active === false ? 'Pasif' : 'Aktif'}</button>
@@ -8578,22 +8597,26 @@
             const titleInput = document.getElementById('ach-record-title-' + catId);
             const urlInput = document.getElementById('ach-record-url-' + catId);
             const title = titleInput.value.trim();
+            const clsSel = document.getElementById('ach-record-class-' + catId);
+            const cls = clsSel ? clsSel.value : '';
             const img = achievementPendingFile[catId] || urlInput.value.trim();
 
-            if (!title) {
-                showCustomNotification("Eksik Bilgi", "Lütfen bir başlık girin.");
+            if (!title && !cls) {
+                showCustomNotification("Eksik Bilgi", "Lütfen bir başlık (ad soyad) girin veya sınıf seçin.");
                 return;
             }
 
             if (achievementEditing.catId === catId && achievementEditing.index !== -1) {
                 cat.list[achievementEditing.index].title = title;
+                cat.list[achievementEditing.index].cls = cls;
                 cat.list[achievementEditing.index].img = img;
-                writeCMSLog(`Ayın Enleri kaydı güncellendi: ${title}`);
+                writeCMSLog(`Ayın Enleri kaydı güncellendi: ${achRecordText({ title, cls })}`);
                 cancelEditAchievementRecord(catId);
             } else {
-                cat.list.push({ title, img, active: true });
-                writeCMSLog(`Ayın Enleri: yeni kayıt eklendi (${cat.title}): ${title}`);
+                cat.list.push({ title, cls, img, active: true });
+                writeCMSLog(`Ayın Enleri: yeni kayıt eklendi (${cat.title}): ${achRecordText({ title, cls })}`);
                 titleInput.value = "";
+                if (clsSel) clsSel.value = "";
                 urlInput.value = "";
                 clearAchievementPendingFile(catId);
             }
@@ -8606,6 +8629,8 @@
             achievementEditing = { catId, index };
             const rec = cat.list[index];
             document.getElementById('ach-record-title-' + catId).value = rec.title || "";
+            const _cs = document.getElementById('ach-record-class-' + catId);
+            if (_cs) { _cs.innerHTML = achClassOptions(rec.cls || ''); _cs.value = rec.cls || ''; }
             document.getElementById('ach-record-url-' + catId).value = (rec.img && !rec.img.startsWith('data:')) ? rec.img : "";
             if (rec.img && rec.img.startsWith('data:')) {
                 achievementPendingFile[catId] = rec.img;
@@ -8625,6 +8650,7 @@
             const urlInput = document.getElementById('ach-record-url-' + catId);
             if (titleInput) titleInput.value = "";
             if (urlInput) urlInput.value = "";
+            const _cs2 = document.getElementById('ach-record-class-' + catId); if (_cs2) _cs2.value = "";
             clearAchievementPendingFile(catId);
             const submitBtn = document.getElementById('ach-submit-btn-' + catId);
             if (submitBtn) submitBtn.innerText = "Listeye Ekle";
