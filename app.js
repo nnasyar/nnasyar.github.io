@@ -323,12 +323,11 @@
                bahce, zemin, kat1, kat2, idareci) uyumlu kalması için bilerek aynı tutulmuştur.
                Kullanıcı dilediği kadar yeni nöbet yeri ekleyip silebilir, sırasını değiştirebilir. */
             dutyPositions: [
-                { id: 'idareci', label: 'İdareci',  icon: 'fa-user-tie',       color: '#00b4d8' },
-                { id: 'kantin',  label: 'Kantin',    icon: 'fa-cookie-bite',   color: '#ffb703' },
                 { id: 'bahce',   label: 'Bahçe',     icon: 'fa-tree',          color: '#38b000' },
                 { id: 'zemin',   label: 'Zemin Kat', icon: 'fa-door-open',     color: '#38bdf8' },
                 { id: 'kat1',    label: '1. Kat',    icon: 'fa-arrow-up-1-9',  color: '#d90429' },
-                { id: 'kat2',    label: '2. Kat',    icon: 'fa-stairs',        color: '#9d4edd' }
+                { id: 'kat2',    label: '2. Kat',    icon: 'fa-stairs',        color: '#9d4edd' },
+                { id: 'idareci', label: 'İdareci',   icon: 'fa-user-tie',      color: '#00b4d8' }
             ],
 
             /* NÖBET KARTI GÖRSEL ÖZELLEŞTİRME AYARLARI */
@@ -9345,43 +9344,53 @@ if (_cs) { _cs.innerHTML = achClassOptions(rec.cls || ''); _cs.value = rec.cls |
             return null;
         }
 
-        // Bilinen (fabrika ayarı) nöbet yerleri için esnek başlık tanıma kalıpları.
-        const DUTY_LEGACY_HEADER_PATTERNS = {
-            kantin:  /kantin/i,
-            bahce:   /bahçe|bahce|bahçesi/i,
-            zemin:   /zemin|giriş|giris|0\.?\s*kat/i,
-            kat1:    /1\.?\s*kat/i,
-            kat2:    /2\.?\s*kat/i,
-            idareci: /idareci|müdür|mudur|nöbetçi\s*i|nobetci\s*i/i
-        };
-
-        const LEGACY_DUTY_IDS = ['idareci', 'kantin', 'bahce', 'zemin', 'kat1', 'kat2'];
-        function isUsingLegacyDefaultDutyIds() {
-            const ids = (appConfig.dutyPositions || []).map(p => p.id);
-            return LEGACY_DUTY_IDS.every(id => ids.includes(id));
+        // Türkçe karakterleri sadeleştirir (İ/ı/Ş/Ğ/Ü/Ö/Ç -> i/i/s/g/u/o/c) ve küçük harfe çevirir.
+        // JS'de /idareci/i kalıbı "İdareci" yazısını eşleştirmez; bu yüzden hem başlık hem kalıp normalize edilir.
+        function trNorm(v) {
+            return String(v == null ? '' : v)
+                .replace(/İ/g, 'i').replace(/I/g, 'i').replace(/ı/g, 'i')
+                .replace(/Ş/g, 's').replace(/ş/g, 's')
+                .replace(/Ğ/g, 'g').replace(/ğ/g, 'g')
+                .replace(/Ü/g, 'u').replace(/ü/g, 'u')
+                .replace(/Ö/g, 'o').replace(/ö/g, 'o')
+                .replace(/Ç/g, 'c').replace(/ç/g, 'c')
+                .toLowerCase()
+                .replace(/\s+/g, ' ')
+                .trim();
         }
+
+        // Bilinen (fabrika ayarı) nöbet yerleri için esnek başlık tanıma kalıpları (normalize metin üzerinde çalışır).
+        const DUTY_LEGACY_HEADER_PATTERNS = {
+            kantin:  /kantin/,
+            bahce:   /bahce/,
+            zemin:   /zemin|giris|0\.?\s*kat/,
+            kat1:    /1\.?\s*kat/,
+            kat2:    /2\.?\s*kat/,
+            idareci: /idareci|mudur|nobetci\s*i/
+        };
 
         // Başlık satırında hangi sütunun hangi nöbet yerine ait olduğunu bulur.
         // Kullanıcının sonradan eklediği/yeniden adlandırdığı nöbet yerleri için
         // sütun etiketi doğrudan nöbet yerinin adına göre tanınır.
         function nobetSutunAlgila(headerRow) {
             const etiketler = {
-                tarih: /tarih|date|gün no|günno/i,
-                gun:   /^gün$|^gun$|weekday|day/i
+                tarih: /tarih|date|gun no|gunno/,
+                gun:   /^gun$|^weekday$|^day$/
             };
             (appConfig.dutyPositions || []).forEach(pos => {
                 if (DUTY_LEGACY_HEADER_PATTERNS[pos.id]) {
                     etiketler[pos.id] = DUTY_LEGACY_HEADER_PATTERNS[pos.id];
                 } else {
-                    const escaped = String(pos.label || pos.id).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    etiketler[pos.id] = new RegExp(escaped, 'i');
+                    const escaped = trNorm(pos.label || pos.id).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    etiketler[pos.id] = new RegExp(escaped);
                 }
             });
             const map = {};
             headerRow.forEach((cell, idx) => {
-                const s = String(cell || '').trim();
+                const s = trNorm(cell);
+                if (!s) return;
                 for (const [alan, re] of Object.entries(etiketler)) {
-                    if (map[alan] === undefined && re.test(s)) map[alan] = idx;
+                    if (map[alan] === undefined && re.test(s)) { map[alan] = idx; break; }
                 }
             });
             return map;
@@ -9422,11 +9431,9 @@ if (_cs) { _cs.innerHTML = achClassOptions(rec.cls || ''); _cs.value = rec.cls |
                         }
                     }
 
-                    // Başlık bulunamadıysa şablon formatını dene (sütun sırası: Tarih|Gün|Kantin|Bahçe|Zemin|1.Kat|2.Kat|İdareci)
-                    // veya eski okul formatı (col 2=tarih, col 4-9=alanlar). Bu sabit-sıra yedeği
-                    // sadece nöbet yerleri hâlâ fabrika ayarındaki 6 kalemden oluşuyorsa denenir;
-                    // kullanıcı nöbet yerlerini özelleştirdiyse yalnızca başlık eşleşmesine güvenilir.
-                    const kullanSablonFormat = headerIdx === -1 && isUsingLegacyDefaultDutyIds();
+                    // Başlık bulunamadıysa konum tabanlı okuma: Tarih | Gün | (nöbet yerleri, ayarlardaki sırayla)
+                    // veya 2 boş sütunlu eski okul formatı (sütun 2 = tarih).
+                    const kullanSablonFormat = headerIdx === -1;
                     
                     const baslangicIdx = headerIdx === -1 ? 0 : headerIdx + 1;
                     const positions = appConfig.dutyPositions || [];
@@ -9447,17 +9454,12 @@ if (_cs) { _cs.innerHTML = achClassOptions(rec.cls || ''); _cs.value = rec.cls |
                                 }
                             });
                         } else if (kullanSablonFormat) {
-                            // Eski okul Excel formatı: col0=Tarih, col1=Gün, col2=Kantin, col3=Bahçe, col4=Zemin, col5=1.Kat, col6=2.Kat, col7=İdareci
-                            // VEYA: col2=Tarih, col3=Gün, col4=Kantin... (5.satırdan başlayan eski format)
                             tarih = excelTarihCevir(row[0]) || excelTarihCevir(row[2]);
                             if (tarih && !isNaN(tarih)) {
                                 const offset = excelTarihCevir(row[0]) ? 2 : 4;
-                                kayit.kantin  = String(row[offset]   || '').trim();
-                                kayit.bahce   = String(row[offset+1] || '').trim();
-                                kayit.zemin   = String(row[offset+2] || '').trim();
-                                kayit.kat1    = String(row[offset+3] || '').trim();
-                                kayit.kat2    = String(row[offset+4] || '').trim();
-                                kayit.idareci = String(row[offset+5] || '').trim();
+                                positions.forEach((p, k) => {
+                                    kayit[p.id] = String(row[offset + k] ?? '').trim();
+                                });
                             }
                         }
 
