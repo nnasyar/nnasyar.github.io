@@ -8,7 +8,7 @@
     <!-- Google Fonts & FontAwesome Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Roboto:wght@400;500;700&family=Fira+Code:wght@400;500&family=Poppins:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Oswald:wght@400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@500;600;700&family=Roboto:wght@400;500;700&family=Fira+Code:wght@400;500&family=Poppins:wght@400;500;600;700&family=Montserrat:wght@400;600;700&family=Oswald:wght@400;500;700&family=Bebas+Neue&family=Nunito:wght@400;600;700&family=Lato:wght@400;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Excel & Tailwind CSS -->
@@ -50,15 +50,15 @@
     <div class="dashboard-container" id="pano-main-dashboard">
 
         <!-- Bugün Doğanlar -->
-        <div class="dashboard-card pano-module" id="birthday-dashboard-card" data-module="birthday" style="border-color: color-mix(in srgb, var(--neon-red) 30%, transparent);">
+        <div class="dashboard-card pano-module" id="birthday-dashboard-card" data-module="birthday">
             <div class="card-header" id="display-birthday-title">BUGÜN DOĞANLAR 🎂</div>
             <div class="card-body" id="birthday-container-box"></div>
         </div>
 
         <!-- Ders Programı Kartı -->
-        <div class="dashboard-card pano-module" id="schedule-dashboard-card" data-module="schedule" style="border-color: color-mix(in srgb, var(--neon-blue) 30%, transparent);">
-            <div class="card-header" id="display-schedule-group-title" style="background: linear-gradient(to right, color-mix(in srgb, var(--neon-blue) 35%, var(--bg-dark)), var(--bg-dark)); border-bottom-color: var(--neon-blue);">SINIFLARIN DERS DURUMLARI</div>
-            <div class="card-body" style="padding: 6px;">
+        <div class="dashboard-card pano-module" id="schedule-dashboard-card" data-module="schedule">
+            <div class="card-header" id="display-schedule-group-title">SINIFLARIN DERS DURUMLARI</div>
+            <div class="card-body">
                 <div class="schedule-grid" id="class-schedule-container"></div>
             </div>
         </div>
@@ -89,30 +89,30 @@
         </div>
 
         <!-- Günün Sözü -->
-        <div class="dashboard-card pano-module" id="quote-dashboard-card" data-module="quote" style="border-color: var(--card-border);">
-            <div class="card-header" id="display-quote-title" style="font-size: 9px; padding: 2px 4px; text-align:center;">GÜNÜN SÖZÜ</div>
-            <div class="card-body" style="padding: 6px; text-align: center; justify-content: center;">
-                <div style="font-style: italic; font-size: 11px; color: #f1f5f9; line-height: 1.35;" id="display-quote">"Akıllı kimsenin lisanı kalbindedir. Düşünerek söyler."</div>
-                <div style="font-size: 10px; color: var(--neon-blue); font-weight: bold; margin-top: 3px;" id="display-quote-author">Hz. Ali (r.a.)</div>
+        <div class="dashboard-card pano-module" id="quote-dashboard-card" data-module="quote">
+            <div class="card-header" id="display-quote-title">GÜNÜN SÖZÜ</div>
+            <div class="card-body quote-body">
+                <div class="quote-text" id="display-quote">"Akıllı kimsenin lisanı kalbindedir. Düşünerek söyler."</div>
+                <div class="quote-author" id="display-quote-author">Hz. Ali (r.a.)</div>
             </div>
         </div>
 
         <!-- Belirli Gün & Hava Durumu -->
-        <div class="dashboard-card pano-module" id="specialday-weather-card" data-module="specialday" style="border-color: var(--card-border); padding: 4px 8px;">
+        <div class="dashboard-card pano-module" id="specialday-weather-card" data-module="specialday">
             <!-- Bu iki alan (Belirli Gün / Hava Durumu) "Ayın Enleri" kartındaki gibi bağımsız
                  hücreler olarak yönetilir: yerleşimleri (yatay/dikey) ve aralarındaki ayırıcı
                  (çizgi/noktalı desen/simge/yok) renderSpecialDayWeatherLayout() tarafından
                  appConfig.specialDayWidget ayarlarına göre anlık üretilir. -->
             <div class="specialday-flex sdw-layout-column" id="specialday-weather-flex">
                 <div class="sdw-area" id="specialday-area">
-                    <div style="font-size: 8px; color: var(--text-muted); text-transform: uppercase;" id="display-specialday-title">Belirli Gün / Hafta</div>
-                    <div style="font-weight: bold; font-size: 11px; color: var(--neon-yellow); margin-top: 1px;" id="display-special-day">Belirli Gün Bulunmuyor</div>
+                    <div class="sd-label" id="display-specialday-title">Belirli Gün / Hafta</div>
+                    <div class="sd-value" id="display-special-day">Belirli Gün Bulunmuyor</div>
                     <img id="display-special-day-img" class="hidden" alt="" style="max-width:100%; max-height:28px; object-fit:contain; margin-top:2px; display:block;">
                 </div>
                 <div class="sdw-separator sdw-sep-line" id="specialday-separator"></div>
                 <div class="sdw-area" id="weather-area">
-                    <div style="font-size: 8px; color: var(--text-muted);" id="display-weather-label">HAVA DURUMU</div>
-                    <div style="font-size: 13px; font-weight: bold; color: var(--neon-blue);" id="display-weather">
+                    <div class="sd-label" id="display-weather-label">HAVA DURUMU</div>
+                    <div class="sd-weather" id="display-weather">
                         <span id="display-weather-city">Yükleniyor...</span>
                         <span id="display-weather-temp"></span>
                         <span id="display-weather-icon"></span>
@@ -123,8 +123,8 @@
 
         <!-- Günlük Zil Saatleri Tablosu -->
         <div class="dashboard-card pano-module" id="bellhours-dashboard-card" data-module="bellhours">
-            <div class="card-header" id="display-bellhours-title" style="background: linear-gradient(to right, color-mix(in srgb, var(--neon-yellow) 32%, var(--bg-dark)), var(--bg-dark)); border-bottom-color: var(--neon-yellow); font-size: 12px; padding: 4px;">GÜNLÜK ZİL SAATLERİ</div>
-            <div class="card-body" style="padding: 4px;">
+            <div class="card-header" id="display-bellhours-title">GÜNLÜK ZİL SAATLERİ</div>
+            <div class="card-body">
                 <table class="lesson-schedule-table">
                     <thead>
                         <tr>
@@ -140,8 +140,8 @@
 
         <!-- Duyurular Paneli -->
         <div class="dashboard-card announcements-box pano-module" id="announcements-dashboard-card" data-module="announcements">
-            <div class="card-header" id="display-announcements-title" style="font-size: 12px; padding: 4px;">DUYURULAR 📢</div>
-            <div class="card-body" style="padding: 6px;">
+            <div class="card-header" id="display-announcements-title">DUYURULAR 📢</div>
+            <div class="card-body">
                 <div class="ann-list" id="display-announcements-list"></div>
             </div>
         </div>
@@ -164,9 +164,9 @@
         </div>
 
         <!-- Ayın Örnekleri -->
-        <div class="dashboard-card pano-module" id="achievements-dashboard-card" data-module="achievements" style="border-color: color-mix(in srgb, var(--neon-blue) 30%, transparent);">
-            <div class="card-header" id="display-achievements-title" style="background: linear-gradient(to right, #0077b6, #03045e); border-bottom-color: var(--neon-blue); font-size: 13px; padding: 4px;">AYIN ENLERİ</div>
-            <div class="card-body" style="gap: 10px; padding: 6px;">
+        <div class="dashboard-card pano-module" id="achievements-dashboard-card" data-module="achievements">
+            <div class="card-header" id="display-achievements-title">AYIN ENLERİ</div>
+            <div class="card-body">
                 <!-- Ayın Enleri alanları artık dinamiktir: renderAchievementsCard() appConfig.achievementCategories
                      listesine göre burada anlık üretilir (istenildiği kadar alan, aralarda ayırıcı ile). -->
                 <div class="achievements-flex ach-layout-column" id="achievements-container"></div>
@@ -175,8 +175,8 @@
 
         <!-- Nöbetçi Öğretmenler Bölümü -->
         <div class="dashboard-card duty-container pano-module" id="duty-dashboard-card" data-module="duty">
-            <div class="card-header" style="background: linear-gradient(to right, #0a1128, #1c2541); border-bottom-color: var(--neon-blue);"><span id="display-duty-title-text">BUGÜN GÖREVLİ NÖBETÇİ ÖĞRETMENLER</span> (<span id="display-duty-day-name">PAZARTESİ</span>)</div>
-            <div class="card-body" style="padding: 6px;">
+            <div class="card-header" ><span id="display-duty-title-text">BUGÜN GÖREVLİ NÖBETÇİ ÖĞRETMENLER</span> (<span id="display-duty-day-name">PAZARTESİ</span>)</div>
+            <div class="card-body">
                 <!-- Nöbet yerleri artık dinamiktir: kartlar renderActiveDuties() tarafından
                      appConfig.dutyPositions listesine göre burada anlık üretilir. -->
                 <div class="duty-grid" id="duty-grid-container"></div>
@@ -187,6 +187,7 @@
     <!-- YERLEŞİM DÜZENLEYİCİ ARAÇ ÇUBUĞU (canlı sürükle/boyutlandır modunda görünür) -->
     <div class="pano-edit-toolbar" id="pano-edit-toolbar">
         <span class="pet-title"><i class="fa-solid fa-arrows-up-down-left-right"></i> Düzenleme Modu</span>
+        <button class="pet-btn-secondary" onclick="panoPreviewOpen()" title="Sayfayı seçtiğiniz TV boyutunda önizle"><i class="fa-solid fa-eye"></i> Önizleme</button>
         <button class="pet-btn-primary" onclick="panoFinishLiveEdit(true)"><i class="fa-solid fa-check"></i> Bitti (Kaydet)</button>
         <button class="pet-btn-secondary" onclick="panoFinishLiveEdit(false)"><i class="fa-solid fa-rotate-left"></i> Vazgeç</button>
     </div>
@@ -207,6 +208,34 @@
         <input type="range" min="16" max="120" id="pano-panel-hh" oninput="panoPanelUpdate()">
         <label>Modül Başlığı Yazı Boyutu: <span class="pep-value" id="pano-panel-hfs-val">15</span>px</label>
         <input type="range" min="8" max="48" id="pano-panel-hfs" oninput="panoPanelUpdate()">
+        <!-- Kart/öğe listesi olan modüllerde görünür (Nöbet, Ders Programı, Ayın Enleri, Duyurular, Belirli Gün) -->
+        <div id="pano-panel-grid-wrap" style="display:none;">
+            <label>Sütun Sayısı: <span class="pep-value" id="pano-panel-gc-val">Otomatik</span></label>
+            <input type="range" min="0" max="12" id="pano-panel-gc" oninput="panoPanelUpdate()">
+            <label>Satır Sayısı: <span class="pep-value" id="pano-panel-gr-val">Otomatik</span></label>
+            <input type="range" min="0" max="12" id="pano-panel-gr" oninput="panoPanelUpdate()">
+            <div style="font-size:10px;color:#64748b;margin-top:3px;">0 = otomatik. Öğeler seçtiğiniz sütun/satır sayısına göre ızgaraya dizilir.</div>
+        </div>
+        <!-- Açılır kompakt menü: başlık gizleme, renk, arka plan, efekt, çerçeve... -->
+        <details class="pep-look" id="pano-panel-look">
+            <summary><i class="fa-solid fa-sliders"></i> Modül Görünümü</summary>
+            <div id="pano-panel-look-body"></div>
+        </details>
+    </div>
+
+    <!-- ADMİN İÇİ SAYFA ÖNİZLEMESİ (oturumdan çıkmadan, farklı TV boyutlarında) -->
+    <div id="pano-preview-modal" class="pano-pv" style="display:none;">
+        <div class="pano-pv-bar">
+            <span class="pv-title"><i class="fa-solid fa-eye"></i> Önizleme</span>
+            <select id="pano-pv-device" onchange="panoPreviewRender(false)"></select>
+            <select id="pano-pv-profile" onchange="panoPreviewRender(true)"></select>
+            <span id="pano-pv-info" class="pv-info"></span>
+            <button type="button" onclick="panoPreviewRender(true)" title="Güncel ayarlarla yenile"><i class="fa-solid fa-rotate"></i> Yenile</button>
+            <button type="button" class="pv-close" onclick="panoPreviewClose()"><i class="fa-solid fa-xmark"></i> Kapat</button>
+        </div>
+        <div class="pano-pv-stage" id="pano-pv-stage">
+            <div class="pano-pv-outer" id="pano-pv-outer"><iframe id="pano-pv-iframe" title="Pano önizlemesi"></iframe></div>
+        </div>
     </div>
 
     <!-- GÜVENLİK GİRİŞ EKRANI (Supabase Auth) -->
@@ -321,6 +350,9 @@
                     <button type="button" class="adm-skin-dot" data-skin="amber" style="--c:#f59e0b" onclick="admSetSkin('amber')" title="Kehribar"></button>
                     <button type="button" class="adm-skin-dot" data-skin="rose" style="--c:#f43f5e" onclick="admSetSkin('rose')" title="Gül"></button>
                 </div>
+                <button class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold rounded-lg text-sm flex items-center gap-2" onclick="panoPreviewOpen()" title="Yönetim panelinden çıkmadan panonun önizlemesini açar">
+                    <i class="fa-solid fa-eye"></i> Önizleme
+                </button>
                 <button class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg text-sm flex items-center gap-2" onclick="adminGoHome()" title="Yönetim panelinden çıkıp panonun ana sayfasına geçer">
                     <i class="fa-solid fa-house"></i> Ana Sayfa
                 </button>
@@ -344,10 +376,11 @@
                         <button class="cms-nav-btn active" data-tab="tab-dashboard" onclick="switchTab('tab-dashboard', this)"><i class="fa-solid fa-chart-line"></i><span>Kontrol Paneli Özet</span></button>
                         <button class="cms-nav-btn" data-tab="tab-general" onclick="switchTab('tab-general', this)"><i class="fa-solid fa-school"></i><span>Kimlik & Güvenlik</span></button>
                         <button class="cms-nav-btn" data-tab="tab-teaching" onclick="switchTab('tab-teaching', this)"><i class="fa-solid fa-sun"></i><span>Öğretim Düzeni (Tekli / İkili)</span></button>
-                        <button class="cms-nav-btn" data-tab="tab-cloud" onclick="switchTab('tab-cloud', this)"><i class="fa-solid fa-cloud"></i><span>Bulut &amp; Sistem</span></button>
+                        <button class="cms-nav-btn" data-tab="tab-cloud" onclick="switchTab('tab-cloud', this)"><i class="fa-solid fa-cloud"></i><span>Bulut, Excel &amp; Yedekleme</span></button>
+                        <button class="cms-nav-btn" data-tab="tab-backup" style="display:none" tabindex="-1" aria-hidden="true" onclick="switchTab('tab-backup', this)"><i class="fa-solid fa-vault"></i><span>Yedekleme Merkezi</span></button>
                     </div>
                     <div class="adm-nav-group"><div class="adm-nav-title">İçerik</div>
-                        <button class="cms-nav-btn" data-tab="tab-excel" onclick="switchTab('tab-excel', this)"><i class="fa-solid fa-file-excel"></i><span>Excel Entegrasyonu</span></button>
+                        <button class="cms-nav-btn" data-tab="tab-excel" style="display:none" tabindex="-1" aria-hidden="true" onclick="switchTab('tab-excel', this)"><i class="fa-solid fa-file-excel"></i><span>Excel Entegrasyonu</span></button>
                         <button class="cms-nav-btn" data-tab="tab-schedule" onclick="switchTab('tab-schedule', this)"><i class="fa-solid fa-calendar-days"></i><span>Haftalık Ders Matrisi</span></button>
                         <button class="cms-nav-btn" data-tab="tab-playlist" onclick="switchTab('tab-playlist', this)"><i class="fa-solid fa-images"></i><span>Görsel Oynatma Listesi</span></button>
                         <button class="cms-nav-btn" data-tab="tab-listmanagers" onclick="switchTab('tab-listmanagers', this)"><i class="fa-solid fa-bullhorn"></i><span>Duyurular</span></button>
@@ -364,7 +397,7 @@
                         <button class="cms-nav-btn" data-tab="tab-marquee" onclick="switchTab('tab-marquee', this)"><i class="fa-solid fa-align-left"></i><span>Kayan Yazı</span></button>
                     </div>
                     <div class="adm-nav-group"><div class="adm-nav-title">Görünüm</div>
-                        <button class="cms-nav-btn" data-tab="tab-modules" onclick="switchTab('tab-modules', this)"><i class="fa-solid fa-cubes"></i><span>Modül Ayarları</span></button>
+                        <button class="cms-nav-btn" data-tab="tab-modules" onclick="switchTab('tab-modules', this)"><i class="fa-solid fa-cubes"></i><span>Modül Renk &amp; Çerçeve</span></button>
                         <button class="cms-nav-btn" data-tab="tab-layout" onclick="switchTab('tab-layout', this)"><i class="fa-solid fa-table-cells"></i><span>Yerleşim Düzenleyici</span></button>
                         <button class="cms-nav-btn" data-tab="tab-theme" onclick="switchTab('tab-theme', this)"><i class="fa-solid fa-palette"></i><span>Pano Teması</span></button>
                         <button class="cms-nav-btn" data-tab="tab-adminui" onclick="switchTab('tab-adminui', this)"><i class="fa-solid fa-table-columns"></i><span>Arayüz Düzeni &amp; Stil</span></button>
@@ -382,28 +415,28 @@
                 <!-- TAB 0: CONTROL PANEL -->
                 <div class="tab-content block space-y-6" id="tab-dashboard">
                     <div class="grid grid-cols-4 gap-4">
-                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 flex items-center gap-4">
+                        <div class="adm-stat bg-slate-950 p-4 rounded-xl border border-slate-850 flex items-center gap-4" style="--st:#06b6d4">
                             <div class="w-12 h-12 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400 text-xl"><i class="fa-solid fa-graduation-cap"></i></div>
                             <div>
                                 <h4 class="text-2xl font-bold text-white" id="stat-class-count">16</h4>
                                 <p class="text-xs text-slate-400">Aktif Sınıf</p>
                             </div>
                         </div>
-                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 flex items-center gap-4">
+                        <div class="adm-stat bg-slate-950 p-4 rounded-xl border border-slate-850 flex items-center gap-4" style="--st:#10b981">
                             <div class="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-xl"><i class="fa-solid fa-user-shield"></i></div>
                             <div>
                                 <h4 class="text-2xl font-bold text-white" id="stat-duty-count">25</h4>
                                 <p class="text-xs text-slate-400">Kayıtlı Nöbetçi</p>
                             </div>
                         </div>
-                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 flex items-center gap-4">
+                        <div class="adm-stat bg-slate-950 p-4 rounded-xl border border-slate-850 flex items-center gap-4" style="--st:#f43f5e">
                             <div class="w-12 h-12 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-400 text-xl"><i class="fa-solid fa-cake-candles"></i></div>
                             <div>
                                 <h4 class="text-2xl font-bold text-white" id="stat-birthday-count">0</h4>
                                 <p class="text-xs text-slate-400">Doğum Günü Kaydı</p>
                             </div>
                         </div>
-                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 flex items-center gap-4">
+                        <div class="adm-stat bg-slate-950 p-4 rounded-xl border border-slate-850 flex items-center gap-4" style="--st:#f59e0b">
                             <div class="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400 text-xl"><i class="fa-solid fa-bullhorn"></i></div>
                             <div>
                                 <h4 class="text-2xl font-bold text-white" id="stat-ann-count">0</h4>
@@ -413,18 +446,19 @@
                     </div>
 
                     <div class="grid grid-cols-3 gap-6">
-                        <div class="col-span-2 bg-slate-950 border border-slate-800 rounded-xl p-5">
+                        <div class="adm-frame col-span-2 bg-slate-950 border border-slate-800 rounded-xl p-5" style="--st:#06b6d4">
                             <h3 class="text-white font-bold mb-3 flex items-center gap-2"><i class="fa-solid fa-laptop-code text-cyan-400"></i> Akıllı Okul Yönetim Merkezi</h3>
                             <p class="text-xs text-slate-400 mb-4 leading-relaxed">Pano sistemi kesintisiz ve tam performans çalışmaktadır. Haftalık planlanan tüm ders programları, nöbetçiler ve doğum tarihleri veri tabanında (LocalStorage) saklanır. Excel dosyasını kullanarak tüm verileri topluca güncelleyebilirsiniz.</p>
                             <div class="flex gap-3">
                                 <button class="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-lg text-xs" onclick="adminGoTab('tab-excel')">Excel Yönetimine Git</button>
                                 <button class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg text-xs" onclick="exportDataToJSON()">JSON Sistem Yedeği Al</button>
                                 <button class="px-4 py-2.5 bg-amber-700 hover:bg-amber-600 text-white font-bold rounded-lg text-xs" onclick="document.getElementById('json-restore-input').click()">Yedekten Geri Yükle</button>
+                                <button class="px-4 py-2.5 bg-cyan-900/60 hover:bg-cyan-800 text-cyan-200 font-bold rounded-lg text-xs border border-cyan-500/40" onclick="adminGoTab('tab-backup')"><i class="fa-solid fa-vault"></i> Yedekleme Merkezi</button>
                                 <input type="file" id="json-restore-input" accept="application/json,.json" class="hidden" onchange="importDataFromJSONFile(event)">
                             </div>
-                            <p class="text-[10px] text-slate-500 mt-2">Not: Bu yedek pano ayarlarını/temayı/verileri geri yükler; fotoğrafların kendisi Supabase Storage'da ayrı durur (yedek dosyasında sadece fotoğraf linkleri vardır).</p>
+                            <p class="text-[10px] text-slate-500 mt-2">Not: Hızlı yedek tüm bölümleri tek dosyada indirir; seçmeli/şifreli yedek ve önizlemeli geri yükleme için Yedekleme Merkezi'ni kullanın. Yedek pano ayarlarını/temayı/verileri geri yükler; fotoğrafların kendisi Supabase Storage'da ayrı durur (yedek dosyasında sadece fotoğraf linkleri vardır).</p>
                         </div>
-                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
+                        <div class="adm-frame bg-slate-950 border border-slate-800 rounded-xl p-5 flex flex-col justify-between" style="--st:#10b981">
                             <h4 class="text-white font-bold flex items-center gap-2 mb-2"><i class="fa-solid fa-circle-check text-emerald-400"></i> Sistem Sağlığı</h4>
                             <div class="space-y-2 text-xs">
                                 <div class="flex justify-between border-b border-slate-800/50 pb-1.5"><span class="text-slate-400">Open-Meteo API:</span><span class="text-emerald-400 font-bold">Aktif</span></div>
@@ -437,6 +471,7 @@
 
                 <!-- TAB 1: GENEL VE GÜVENLİK -->
                 <div class="tab-content hidden space-y-6" id="tab-general">
+                    <div class="shift-edit-bar hidden" data-view-mod="brand"></div>
                     <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2 border-b border-slate-800 pb-2"><i class="fa-solid fa-school"></i> Okul Tanıtım & Kimlik Verileri</h2>
                     <div class="grid grid-cols-2 gap-6">
                         <div class="space-y-4">
@@ -660,7 +695,23 @@
                                 <option value="morning">Hep Sabah öğretimi</option>
                                 <option value="afternoon">Hep Öğle öğretimi</option>
                             </select>
+                            <div id="teach-switch-time-box" class="flex items-center gap-3 flex-wrap">
+                                <label for="teach-switch-time" class="text-xs text-slate-300 font-bold"><i class="fa-solid fa-clock text-yellow-400"></i> Sabah → Öğle geçiş saati:</label>
+                                <input type="time" id="teach-switch-time" onchange="shiftSetSwitchTime(this.value)" class="bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white">
+                                <button type="button" id="teach-switch-time-reset" onclick="shiftSetSwitchTime('')" class="hidden px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-yellow-400 border border-yellow-500/30 font-bold rounded-lg text-[11px]"><i class="fa-solid fa-wand-magic-sparkles"></i> Otomatik hesapla</button>
+                                <span class="text-[11px] text-slate-500" id="teach-switch-time-note"></span>
+                            </div>
                             <p class="text-[11px] text-slate-400" id="teach-switch-info"></p>
+                            <div class="pt-3 border-t border-slate-800 space-y-2">
+                                <h4 class="text-white font-bold text-xs">Modül başlıklarında "SABAH / ÖĞLE ÖĞRETİMİ" yazısı</h4>
+                                <p class="text-[11px] text-slate-500">İşaretli modüllerde başlığın yanında öğretim yazısı görünür; işareti kaldırırsanız gizlenir.</p>
+                                <div class="flex flex-wrap gap-x-5 gap-y-2" id="teach-shift-label-opts"></div>
+                            </div>
+                            <div class="pt-3 border-t border-slate-800 space-y-2">
+                                <h4 class="text-white font-bold text-xs"><i class="fa-solid fa-layer-group text-cyan-400"></i> Modülde Hangi Öğretimin İçeriği Görünsün?</h4>
+                                <p class="text-[11px] text-slate-500"><b>(içerik)</b> Ayın Enleri ve Bugün Doğanlar: <i>Otomatik</i> panoda o an gösterilen öğretimin içeriği; <i>Sabah / Öğle</i> seçilen öğretimin içeriği sabit; <i>Tamamı</i> iki öğretimin içeriği birlikte. <b>(gösterim)</b> diğer modüller: <i>İkili öğretim</i> kutusunu işaretleyin (işaretsizse modül hep görünür); işaretlenince <i>Sabah / Öğle</i> modül yalnızca o öğretim gösterilirken görünür, <i>Tamamı</i> hep gösterir. Aynı seçenekler her modülün sekmesinin en üstündeki çubukta da vardır.</p>
+                                <div class="space-y-2" id="teach-shift-view-opts"></div>
+                            </div>
                         </div>
 
                         <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-3">
@@ -689,15 +740,90 @@
                 </div>
 
                 <div class="tab-content hidden space-y-6 adm-nodirty" id="tab-adminui">
-                    <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2 border-b border-slate-800 pb-2"><i class="fa-solid fa-table-columns"></i> Arayüz Düzeni &amp; Stil</h2>
-                    <p class="text-xs text-slate-400">Yalnızca yönetim panelinin görünümünü değiştirir (panoyu etkilemez). Seçimler bu cihazda hatırlanır.</p>
-                    <div><h3 class="text-white font-bold text-sm mb-2">Hazır Stiller</h3><div class="flex flex-wrap gap-2" id="adm-ui-presets"></div></div>
-                    <div><h3 class="text-white font-bold text-sm mb-2">Menü Düzeni</h3><div class="adm-lay-grid" id="adm-ui-layouts"></div></div>
-                    <div class="adm-ui-rows" id="adm-ui-rows"></div>
-                    <button type="button" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg text-xs" onclick="admUiReset()"><i class="fa-solid fa-rotate-left"></i> Varsayılana Dön</button>
+                    <div class="adm-st-head">
+                        <div>
+                            <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-table-columns"></i> Arayüz Düzeni &amp; Stil</h2>
+                            <p class="text-xs text-slate-400 mt-1">Yalnızca yönetim panelinin görünümünü değiştirir (panoyu etkilemez). Her seçim anında uygulanır ve bu cihazda hatırlanır.</p>
+                        </div>
+                        <div class="adm-st-actions">
+                            <button type="button" class="adm-preset-btn" onclick="admUiSaveMine()"><i class="fa-solid fa-bookmark"></i> Stili Kaydet</button>
+                            <button type="button" class="adm-preset-btn" onclick="admUiExport()"><i class="fa-solid fa-copy"></i> Dışa Aktar</button>
+                            <button type="button" class="adm-preset-btn" onclick="admUiImport()"><i class="fa-solid fa-paste"></i> İçe Aktar</button>
+                            <button type="button" class="adm-preset-btn" onclick="admUiReset()"><i class="fa-solid fa-rotate-left"></i> Sıfırla</button>
+                        </div>
+                    </div>
+                    <div class="adm-st-grid">
+                        <div class="adm-st-main">
+                            <nav class="adm-st-nav" id="adm-st-nav">
+                                <button type="button" data-pane="presets" class="is-active" onclick="admStTab('presets')"><i class="fa-solid fa-wand-magic-sparkles"></i> Hazır Stiller</button>
+                                <button type="button" data-pane="layout" onclick="admStTab('layout')"><i class="fa-solid fa-table-columns"></i> Menü Düzeni</button>
+                                <button type="button" data-pane="colors" onclick="admStTab('colors')"><i class="fa-solid fa-palette"></i> Renkler</button>
+                                <button type="button" data-pane="menu" onclick="admStTab('menu')"><i class="fa-solid fa-fill-drip"></i> Menü Rengi</button>
+                                <button type="button" data-pane="text" onclick="admStTab('text')"><i class="fa-solid fa-font"></i> Yazı &amp; Font</button>
+                                <button type="button" data-pane="fx" onclick="admStTab('fx')"><i class="fa-solid fa-hand-pointer"></i> Etkileşim</button>
+                                <button type="button" data-pane="shape" onclick="admStTab('shape')"><i class="fa-solid fa-sliders"></i> Biçim</button>
+                            </nav>
+                            <section class="adm-st-pane is-active" data-pane="presets">
+                                <h3 class="adm-st-title">Hazır Stiller <small>Tek tıkla düzen + renk + biçim uygular</small></h3>
+                                <div class="adm-st-presets" id="adm-ui-presets"></div>
+                                <h3 class="adm-st-title mt-4">Kayıtlı Stillerim <small>“Stili Kaydet” ile bu cihaza eklenir</small></h3>
+                                <div class="flex flex-wrap gap-2" id="adm-ui-mine"></div>
+                            </section>
+                            <section class="adm-st-pane" data-pane="layout">
+                                <h3 class="adm-st-title">Menü Düzeni <small>Menünün yeri ve davranışı</small></h3>
+                                <div class="adm-chips" id="adm-ui-lay-filter"></div>
+                                <div class="adm-lay-grid" id="adm-ui-layouts"></div>
+                                <h3 class="adm-st-title mt-4">Menü Biçimi <small>Öğe stili, yazı boyutu ve simgeler</small></h3>
+                                <div class="adm-ui-rows" id="adm-ui-menuopts"></div>
+                            </section>
+                            <section class="adm-st-pane" data-pane="colors">
+                                <h3 class="adm-st-title">Renk Paleti <small>Panelin zemini ve yüzeyleri</small></h3>
+                                <div class="adm-pal-groups" id="adm-ui-pal"></div>
+                                <h3 class="adm-st-title mt-4">Vurgu Rengi <small>Seçili öğe, düğme ve kenarlıklar</small></h3>
+                                <div class="adm-ui-rows" id="adm-ui-accent"></div>
+                            </section>
+                            <section class="adm-st-pane" data-pane="menu">
+                                <h3 class="adm-st-title">Menü Rengi &amp; Degrade <small>Kenar çubuğu zemini</small></h3>
+                                <div class="adm-ui-rows" id="adm-ui-menucol"></div>
+                            </section>
+                            <section class="adm-st-pane" data-pane="text">
+                                <h3 class="adm-st-title">Yazı Renkleri <small>Seçilen renk zeminde okunmuyorsa otomatik düzeltilir</small></h3>
+                                <div class="adm-ui-rows" id="adm-ui-txcol"></div>
+                                <h3 class="adm-st-title mt-4">Panel Yazı Tipi <small>İçerik, başlık ve formlar</small></h3>
+                                <div class="adm-font-grid" id="adm-ui-font"></div>
+                                <h3 class="adm-st-title mt-4">Menü Yazı Tipi <small>Yalnızca kenar çubuğu / menü</small></h3>
+                                <div class="adm-font-grid" id="adm-ui-mfont"></div>
+                            </section>
+                            <section class="adm-st-pane" data-pane="fx">
+                                <h3 class="adm-st-title">Hover (Üzerine Gelince) <small>Düğme, menü, liste satırı ve kartlar</small></h3>
+                                <div class="adm-ui-rows" id="adm-ui-hov"></div>
+                                <div class="adm-ui-rows" id="adm-ui-fx"></div>
+                            </section>
+                            <section class="adm-st-pane" data-pane="shape">
+                                <h3 class="adm-st-title">Biçim <small>Köşe, yüzey, yoğunluk, boyut, animasyon</small></h3>
+                                <div class="adm-ui-rows" id="adm-ui-rows"></div>
+                            </section>
+                        </div>
+                        <aside class="adm-st-side">
+                            <div class="adm-st-card">
+                                <h4><i class="fa-solid fa-eye"></i> Canlı Önizleme</h4>
+                                <div class="adm-mini" id="adm-ui-mini"><div class="adm-mini-menu"><i></i><i></i><i></i></div><div class="adm-mini-body"><b></b><span></span><span></span><em>Düğme</em></div></div>
+                                <div class="adm-st-summary" id="adm-ui-summary"></div>
+                                <div class="adm-ui-note" id="adm-ui-note"></div>
+                                <div class="adm-st-sample"><b>Örnek başlık</b><p>Normal metin satırı örneği 123</p><small>Soluk açıklama metni</small></div>
+                                <button type="button" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg text-xs px-3 py-2">Hover örneği: üzerine gelin</button>
+                                <div class="adm-st-sample adm-st-msample"><b>Menü örneği</b><span>Menü öğesi</span><small>Bölüm başlığı</small></div>
+                            </div>
+                        </aside>
+                    </div>
                 </div>
 
                 <div class="tab-content hidden space-y-6" id="tab-excel">
+                    <div class="cloud-subtabs flex items-center gap-2 flex-wrap bg-slate-950 border border-slate-800 rounded-xl p-2">
+                        <button type="button" data-sub="tab-cloud" onclick="switchTab('tab-cloud')" class="px-3 py-1.5 rounded-lg text-xs font-bold border transition bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800"><i class="fa-solid fa-cloud"></i> Bulut &amp; Sistem</button>
+                        <button type="button" data-sub="tab-excel" onclick="switchTab('tab-excel')" class="px-3 py-1.5 rounded-lg text-xs font-bold border transition bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800"><i class="fa-solid fa-file-excel"></i> Excel Entegrasyonu</button>
+                        <button type="button" data-sub="tab-backup" onclick="switchTab('tab-backup')" class="px-3 py-1.5 rounded-lg text-xs font-bold border transition bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800"><i class="fa-solid fa-vault"></i> Yedekleme Merkezi</button>
+                    </div>
                     <h2 class="text-lg font-bold text-emerald-400 flex items-center gap-2 border-b border-slate-800 pb-2"><i class="fa-solid fa-file-excel"></i> Excel Entegrasyon ve Yedekleme Arabirimi</h2>
                     <p class="text-xs text-slate-300 leading-relaxed">Haftalık ders programlarını, gün bazlı nöbetçileri ve öğrenci doğum tarihlerini Excel dosyası ile topluca yükleyebilir veya yedeğini alabilirsiniz.</p>
                     
@@ -798,17 +924,21 @@
                         </div>
 
                         <!-- Genel Düzen -->
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-3 gap-3">
                             <div class="form-group">
                                 <label class="text-[10px] text-slate-400 block mb-1">Sütun Sayısı</label>
-                                <input type="number" id="sbs-columns" min="2" max="8" value="4" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs" oninput="updateScheduleBoardLivePreview()">
+                                <input type="number" id="sbs-columns" min="1" max="8" value="4" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs" oninput="updateScheduleBoardLivePreview()">
+                            </div>
+                            <div class="form-group">
+                                <label class="text-[10px] text-slate-400 block mb-1">Satır Sayısı (0 = otomatik)</label>
+                                <input type="number" id="sbs-rows" min="0" max="20" value="0" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs" oninput="updateScheduleBoardLivePreview()">
                             </div>
                             <div class="form-group">
                                 <label class="text-[10px] text-slate-400 block mb-1">Kutular Arası Boşluk (px)</label>
                                 <input type="number" id="sbs-gap" min="0" max="24" value="6" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs" oninput="updateScheduleBoardLivePreview()">
                             </div>
                         </div>
-                        <p class="text-[10px] text-slate-500 -mt-2">Sınıf adı ve ders adı için dikey/yatay hizalama ayarları artık aşağıda kendi bölümlerinde ayrı ayrı yapılır.</p>
+                        <p class="text-[10px] text-slate-500 -mt-2">Satır sayısı girilirse pano en fazla satır × sütun kadar sınıf gösterir; fazlası modül süresi dolunca sonraki sayfada görünür. Sınıf adı ve ders adı için dikey/yatay hizalama ayarları artık aşağıda kendi bölümlerinde ayrı ayrı yapılır.</p>
 
                         <!-- Kutu Renklendirme -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-slate-800">
@@ -976,6 +1106,7 @@
 
                 <!-- TAB 4: GÖRSEL MEDYA OYNATMA LİSTESİ -->
                 <div class="tab-content hidden space-y-6" id="tab-playlist">
+                    <div class="shift-edit-bar hidden" data-view-mod="media"></div>
                     <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2 border-b border-slate-800 pb-2"><i class="fa-solid fa-photo-film"></i> Pano Medya Galerisi Oynatma Listesi</h2>
                     <div class="grid grid-cols-3 gap-6">
                         <div class="col-span-2 space-y-4">
@@ -1141,6 +1272,7 @@
 
                 <!-- TAB 5: LİSTELER (DUYURULAR & BELİRLİ GÜNLER) -->
                 <div class="tab-content hidden space-y-6" id="tab-listmanagers">
+                    <div class="shift-edit-bar hidden" data-view-mod="announcements"></div>
                     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                         <h2 class="text-lg font-bold text-red-400 flex items-center gap-2"><i class="fa-solid fa-bullhorn"></i> Duyuru Panosu Yönetimi</h2>
                         <span class="text-xs text-slate-400 max-w-md text-right">Belirli Gün & Hava Durumu ayarları artık ayrı bir sekmeden yönetiliyor.</span>
@@ -1193,6 +1325,9 @@
                                 <label class="flex items-center gap-2 text-[10px] text-slate-400 mb-3">
                                     <input type="checkbox" id="new-announcement-bold" onchange="updateAnnouncementLivePreview()"> Kalın (Bold) Yazı
                                 </label>
+                                <label class="flex items-center gap-2 text-[10px] text-slate-400 mb-3">
+                                    <input type="checkbox" id="new-announcement-inmarquee" checked onchange="updateMarqueeLivePreview()"> <i class="fa-solid fa-align-left text-yellow-400"></i> Alt yazıda (kayan yazı bandında) da göster
+                                </label>
 
                                 <!-- Canlı Önizleme -->
                                 <div class="text-[10px] text-slate-500 mb-1">Önizleme:</div>
@@ -1213,6 +1348,7 @@
 
                 <!-- TAB: BELİRLİ GÜN & HAVA DURUMU YÖNETİMİ (Duyuru & Belirli Günler sekmesinden ayrıldı) -->
                 <div class="tab-content hidden space-y-6" id="tab-specialday">
+                    <div class="shift-edit-bar hidden" data-view-mod="specialday"></div>
                     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                         <h2 class="text-lg font-bold text-yellow-400 flex items-center gap-2"><i class="fa-solid fa-cloud-sun"></i> Belirli Gün & Hava Durumu Yönetimi</h2>
                         <span class="text-xs text-slate-400 max-w-md text-right">Panodaki tek kartta sırayla dönen belirli gün/hafta metinleri ile canlı hava durumu buradan yönetilir.</span>
@@ -1557,6 +1693,7 @@
 
                 <!-- TAB: GÜNÜN SÖZÜ YÖNETİMİ -->
                 <div class="tab-content hidden space-y-4" id="tab-quotes">
+                    <div class="shift-edit-bar hidden" data-view-mod="quote"></div>
                     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                         <h2 class="text-lg font-bold text-purple-400 flex items-center gap-2"><i class="fa-solid fa-quote-right"></i> Günün Sözü Yönetimi</h2>
                         <span class="text-xs text-slate-400">Sözleri manuel ekleyin veya Excel'den topluca yükleyin. Panoda sırayla veya belirttiğiniz tarihte gösterilir.</span>
@@ -1614,12 +1751,13 @@
 
                 <!-- TAB: BUGÜN DOĞANLAR (DOĞUM GÜNÜ) YÖNETİMİ -->
                 <div class="tab-content hidden space-y-4" id="tab-birthdays">
+                    <div class="shift-edit-bar hidden"></div>
                     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                         <h2 class="text-lg font-bold text-rose-400 flex items-center gap-2"><i class="fa-solid fa-cake-candles"></i> Bugün Doğanlar Yönetimi</h2>
                         <span class="text-xs text-slate-400">Öğrenci doğum günlerini manuel ekleyin/düzenleyin, Excel'den yükleyin ve panodaki görünümünü ayarlayın.</span>
                     </div>
 
-                    <div class="shift-edit-bar hidden"></div>
+                    <div id="birthday-shift-summary" class="bd-summary hidden"></div>
                     <!-- Excel Yükleme Alanı (doğum günleri için) -->
                     <div class="bg-slate-950 border border-rose-500/20 p-4 rounded-xl flex items-center justify-between gap-4">
                         <div>
@@ -1867,7 +2005,7 @@
                             <div class="form-group">
                                 <label class="text-[10px] text-slate-400 block mb-1">Nöbetçi Adı Rengi Modu</label>
                                 <select id="dutystyle-namecolor-mode" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white" onchange="applyDutyStyleFromInputs()">
-                                    <option value="auto">Otomatik (Koyu / Panoya uyumlu)</option>
+                                    <option value="auto">Otomatik (Nöbet Modülü Ayarları'ndaki isim yazı rengi)</option>
                                     <option value="custom">Özel Renk</option>
                                 </select>
                             </div>
@@ -1877,8 +2015,17 @@
                             </div>
                         </div>
 
+                        <div class="pt-2 border-t border-slate-800">
+                            <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-200 font-bold">
+                                <input type="checkbox" id="dutystyle-show-icon" class="accent-cyan-500 w-4 h-4" checked onchange="applyDutyStyleFromInputs()">
+                                Nöbet yeri adının yanında ikon göster
+                            </label>
+                            <p class="text-[10px] text-slate-500 mt-1">Kapatırsanız kartlarda yalnızca nöbet yeri adı yazar (ör. "Bahçe"). Nöbetçinin fotoğrafı veya kadro ikonu bu ayardan etkilenmez.</p>
+                        </div>
+
                         <div class="pt-2 border-t border-slate-800 space-y-2">
                             <label class="text-[11px] text-slate-400 block">Aktif Nöbetçi Hücresi Arka Planı</label>
+                            <p class="text-[10px] text-slate-500">Bu renk, "Nöbet Modülü Ayarları"ndaki kart zemininin üstüne eklenir; ikisi birlikte görünür.</p>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div class="form-group">
                                     <label class="text-[10px] text-slate-400 block mb-1">Arka Plan Rengi</label>
@@ -2169,6 +2316,7 @@
 
                 <!-- TAB: SAAT / GERİ SAYIM BİÇİMLENDİRME -->
                 <div class="tab-content hidden space-y-4" id="tab-clock">
+                    <div class="shift-edit-bar hidden" data-view-mod="clock"></div>
                     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                         <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-hourglass-half"></i> Saat / Geri Sayım: Biçimlendirme</h2>
                         <span class="text-[10px] text-slate-500">Tarih, Saat ve Geri Sayım metinleri birbirinden bağımsız düzenlenir</span>
@@ -2422,6 +2570,7 @@
 
                 <!-- TAB: KAYAN YAZI (MARQUEE) -->
                 <div class="tab-content hidden space-y-6" id="tab-marquee">
+                    <div class="shift-edit-bar hidden" data-view-mod="marquee"></div>
                     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                         <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-align-left"></i> Kayan Yazı Modülü</h2>
                         <span class="text-xs text-slate-400 max-w-md text-right">Panoda yatayda sürekli kayan duyuru/uyarı bandı</span>
@@ -2436,6 +2585,17 @@
                             </div>
                         </div>
                     </div>
+
+        <div class="marq-announce-box">
+            <div class="mab-title"><i class="fa-solid fa-bullhorn"></i> Duyurular alt yazıda gösterilsin mi? <span class="mab-tag">ÖNEMLİ AYAR</span></div>
+            <input type="hidden" id="marq-announce-mode" value="marked">
+            <div class="mab-opts" id="marq-announce-opts">
+                <button type="button" class="mab-opt" data-mode="off" onclick="setMarqAnnounceMode('off')"><i class="fa-solid fa-ban"></i><span>Gösterme<small>Duyurular banda eklenmez</small></span></button>
+                <button type="button" class="mab-opt" data-mode="marked" onclick="setMarqAnnounceMode('marked')"><i class="fa-solid fa-check"></i><span>Sadece işaretliler<small>Duyuru listesinde işaretlediklerim</small></span></button>
+                <button type="button" class="mab-opt" data-mode="all" onclick="setMarqAnnounceMode('all')"><i class="fa-solid fa-list-check"></i><span>Tüm duyurular<small>Hepsi banda eklenir</small></span></button>
+            </div>
+            <span class="text-[10px] text-slate-400">Duyurular, kayan yazı mesajlarının ardından banda eklenir. Duyuruyu "Duyurular" sekmesinden ekleyip işaretleyebilirsiniz.</span>
+        </div>
 
                     <!-- MESAJ LİSTESİ YÖNETİMİ -->
                     <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-4 flex flex-col justify-between">
@@ -2601,6 +2761,7 @@
                         </div>
                     </div>
                     <p class="text-xs text-slate-500">Bu sekme artık yalnızca genel işlemler içindir: yeni modül ekleme ve son değişikliği geri alma. Yerleşik (hazır) modüllerin başlık, ebat, renk, yazı tipi ve yayın (aktif/pasif) ayarları artık kendi menülerine taşındı — örneğin Doğum Günü kartının ayarları "Bugün Doğanlar" sekmesinde, Nöbet kartının ayarları "Nöbet Modülü Ayarları" sekmesindedir.</p>
+                    <div id="pano-acc-studio"></div>
                     <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
                         <h3 class="text-white font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-puzzle-piece text-emerald-400"></i> Özel (Eklenen) Modüller</h3>
                         <p class="text-[11px] text-slate-500">Kendi eklediğiniz özel modüllerin ayrı bir sabit menüsü olmadığı için ayarları burada listelenir.</p>
@@ -2623,6 +2784,55 @@
                         <button class="px-5 py-2.5 bg-cyan-500 hover:bg-cyan-600 text-white font-bold rounded-xl text-sm flex items-center gap-2 whitespace-nowrap shadow-lg shadow-cyan-500/20" onclick="panoStartLiveEditFromAdmin()">
                             <i class="fa-solid fa-pen-ruler"></i> Ekranda Düzenlemeyi Başlat
                         </button>
+                    </div>
+
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3" id="admin-screen-card">
+                        <div class="flex items-center justify-between gap-3">
+                            <h3 class="text-white font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-tv text-cyan-400"></i> TV / Ekran Ayarları</h3>
+                            <button type="button" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold rounded-lg text-xs flex items-center gap-1.5" onclick="panoPreviewOpen()"><i class="fa-solid fa-eye"></i> Önizle</button>
+                        </div>
+                        <p class="text-[11px] text-slate-500">Panonun TV'nin boyutuna nasıl oturacağını belirler. Aşağıdaki ayar varsayılandır; farklı TV'ler için isimli profil kaydedip o TV'de panoyu <span class="font-mono text-slate-400">index.html?ekran=ProfilAdı</span> bağlantısıyla açabilirsiniz.</p>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                            <div><label class="text-[10px] uppercase text-slate-500 font-bold block mb-1">Yerleşim Modu</label>
+                                <select id="scr-mode" onchange="panoScreenFormChanged()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
+                                    <option value="classic">Klasik (en çok 1920×1080)</option>
+                                    <option value="fill">Ekranı tamamen doldur</option>
+                                    <option value="ratio">Sabit en-boy oranı</option>
+                                </select></div>
+                            <div id="scr-ratio-wrap"><label class="text-[10px] uppercase text-slate-500 font-bold block mb-1">Oran (sabit oran modu)</label>
+                                <select id="scr-ratio" onchange="panoScreenFormChanged()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
+                                    <option value="16/9">16:9 (Full HD / 4K TV)</option>
+                                    <option value="16/10">16:10</option>
+                                    <option value="4/3">4:3</option>
+                                    <option value="21/9">21:9 (ultra geniş)</option>
+                                    <option value="32/9">32:9</option>
+                                    <option value="9/16">9:16 (dikey)</option>
+                                    <option value="10/16">10:16 (dikey)</option>
+                                    <option value="3/4">3:4 (dikey)</option>
+                                </select></div>
+                            <div><label class="text-[10px] uppercase text-slate-500 font-bold block mb-1">Güvenli Alan: <span id="scr-overscan-val" class="text-cyan-400">0</span>%</label>
+                                <input type="range" id="scr-overscan" min="0" max="15" value="0" oninput="panoScreenFormChanged()" class="w-full accent-cyan-500">
+                                <p class="text-[9px] text-slate-600">Kenarları kesen TV'ler için boşluk bırakır.</p></div>
+                            <div><label class="text-[10px] uppercase text-slate-500 font-bold block mb-1">Genel Yazı Ölçeği: <span id="scr-uiscale-val" class="text-cyan-400">100</span>%</label>
+                                <input type="range" id="scr-uiscale" min="50" max="200" value="100" oninput="panoScreenFormChanged()" class="w-full accent-cyan-500">
+                                <p class="text-[9px] text-slate-600">Uzaktan okunacak büyük TV'ler için büyütün.</p></div>
+                            <div><label class="text-[10px] uppercase text-slate-500 font-bold block mb-1">Döndür</label>
+                                <select id="scr-rotate" onchange="panoScreenFormChanged()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
+                                    <option value="0">Yok</option>
+                                    <option value="90">90° (saat yönü)</option>
+                                    <option value="270">270° (saat yönü tersi)</option>
+                                </select>
+                                <p class="text-[9px] text-slate-600">Dikey monte edilmiş TV'ler için.</p></div>
+                        </div>
+                        <div class="border-t border-slate-800 pt-3 space-y-2">
+                            <h4 class="text-xs font-bold text-slate-300 flex items-center gap-2"><i class="fa-solid fa-bookmark text-emerald-400"></i> TV Profilleri</h4>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <input type="text" id="scr-profile-name" placeholder="Profil adı (örn: Salon-TV)" class="flex-1 min-w-[160px] bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-emerald-500">
+                                <select id="scr-profile-layout" class="bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs" title="Bu TV'de kullanılacak düzen"></select>
+                                <button type="button" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-sm flex items-center gap-2 whitespace-nowrap" onclick="panoScreenProfileSave()"><i class="fa-solid fa-plus"></i> Profil Kaydet</button>
+                            </div>
+                            <div class="space-y-2" id="scr-profile-list"></div>
+                        </div>
                     </div>
 
                     <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
@@ -2660,6 +2870,7 @@
 
                 <!-- TAB: NÖBET MODÜLÜ AYARLARI (GENİŞLETİLMİŞ) -->
                 <div class="tab-content hidden space-y-5" id="tab-duty-settings">
+                    <div class="shift-edit-bar hidden" data-view-mod="duty"></div>
                     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                         <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Nöbet Modülü Kapsamlı Ayarlar</h2>
                         <span class="text-xs text-slate-400">Tüm değişiklikler anında önizlenir ve LocalStorage'a kaydedilir.</span>
@@ -2746,7 +2957,7 @@
                                 <input type="range" min="0" max="6" id="ds-pill-border-width" value="0" class="w-full accent-cyan-500" oninput="document.getElementById('ds-pill-border-val').innerText=this.value+'px'; dutySettingsLivePreview();">
                             </div>
                         </div>
-                        <p class="text-[10px] text-slate-500 pt-1">İsim pilinin şekli (kare / oval / kart vb.) "Aylık Nöbet Çizelgesi" sekmesindeki <strong>Nöbet Kartı Görsel Özelleştirme</strong> bölümünden seçilir; buradaki ayarlar renk, şeffaflık ve çerçeveyi kontrol eder.</p>
+                        <p class="text-[10px] text-slate-500 pt-1">İsim pilinin şekli (kare / oval / kart vb.), nöbet yeri ikonunun gösterilip gösterilmeyeceği ve aktif nöbetçi hücresinin rengi/vurgusu "Aylık Nöbet Çizelgesi" sekmesindeki <strong>Nöbet Kartı Görsel Özelleştirme</strong> bölümünden seçilir; buradaki ayarlar renk, şeffaflık ve çerçeveyi kontrol eder. Görsel Özelleştirme'de adı rengi <em>Özel Renk</em> seçiliyse "İsim Yazı Rengi" oradan alınır (bu seçici soluk görünür).</p>
                     </div>
 
                     <!-- KENARLIK & GÖLGE -->
@@ -2787,6 +2998,7 @@
                             <div class="form-group">
                                 <label class="text-xs text-slate-400 flex justify-between mb-1">Köşe Yuvarlama <span id="ds-radius-val" class="text-cyan-400 font-mono">6px</span></label>
                                 <input type="range" min="0" max="50" id="ds-border-radius" value="6" class="w-full accent-cyan-500" oninput="document.getElementById('ds-radius-val').innerText=this.value+'px'; dutySettingsLivePreview();">
+                                <p class="text-[10px] text-slate-500 mt-1">Yalnızca kart şekli "Köşeli (hafif yuvarlak)" iken geçerlidir; kare / oval / kart şeklinde köşeyi Görsel Özelleştirme belirler.</p>
                             </div>
                         </div>
                     </div>
@@ -2937,32 +3149,41 @@
 
                     <div class="adm-card space-y-4">
                         <h3 class="text-white font-bold flex items-center gap-2"><i class="fa-solid fa-sliders text-purple-400"></i> Temayı Düzenle (Özel Renkler)</h3>
-                        <p class="text-[11px] text-slate-500">Seçili temanın ana renklerini kendinize göre özelleştirin. Uyguladığınızda "Özel Tema" olarak kaydedilir. Başlık çubuğu renkleri vurgu renginden otomatik türetilir. Açık modda yalnızca vurgu renkleri uygulanır.</p>
+                        <p class="text-[11px] text-slate-500">Renkleri değiştirdikçe pano anında önizlenir; kalıcı yapmak için "Uygula"ya basın. Seçili temanın ana renklerini kendinize göre özelleştirin. Uyguladığınızda "Özel Tema" olarak kaydedilir. Başlık çubuğu renkleri vurgu renginden otomatik türetilir. Açık modda yalnızca vurgu renkleri uygulanır.</p>
                         <div class="grid grid-cols-3 md:grid-cols-6 gap-4">
                             <div class="form-group">
                                 <label class="text-[10px] text-slate-400 block mb-1">Ana Mavi</label>
-                                <input type="color" id="custom-color-blue" value="#00b4d8" class="w-full h-9 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer">
+                                <input type="color" id="custom-color-blue" oninput="applyCustomThemeColors(false)" value="#00b4d8" class="w-full h-9 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer">
                             </div>
                             <div class="form-group">
                                 <label class="text-[10px] text-slate-400 block mb-1">Vurgu Kırmızı</label>
-                                <input type="color" id="custom-color-red" value="#d90429" class="w-full h-9 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer">
+                                <input type="color" id="custom-color-red" oninput="applyCustomThemeColors(false)" value="#d90429" class="w-full h-9 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer">
                             </div>
                             <div class="form-group">
                                 <label class="text-[10px] text-slate-400 block mb-1">Sarı / Altın</label>
-                                <input type="color" id="custom-color-yellow" value="#ffb703" class="w-full h-9 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer">
+                                <input type="color" id="custom-color-yellow" oninput="applyCustomThemeColors(false)" value="#ffb703" class="w-full h-9 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer">
                             </div>
                             <div class="form-group">
                                 <label class="text-[10px] text-slate-400 block mb-1">Yeşil</label>
-                                <input type="color" id="custom-color-green" value="#38b000" class="w-full h-9 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer">
+                                <input type="color" id="custom-color-green" oninput="applyCustomThemeColors(false)" value="#38b000" class="w-full h-9 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer">
                             </div>
                             <div class="form-group">
                                 <label class="text-[10px] text-slate-400 block mb-1">Kart Arkaplan</label>
-                                <input type="color" id="custom-color-cardbg" value="#070b13" class="w-full h-9 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer">
+                                <input type="color" id="custom-color-cardbg" oninput="applyCustomThemeColors(false)" value="#070b13" class="w-full h-9 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer">
                             </div>
                             <div class="form-group">
                                 <label class="text-[10px] text-slate-400 block mb-1">Genel Arkaplan</label>
-                                <input type="color" id="custom-color-bgdark" value="#02040a" class="w-full h-9 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer">
+                                <input type="color" id="custom-color-bgdark" oninput="applyCustomThemeColors(false)" value="#02040a" class="w-full h-9 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer">
                             </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-slate-900/60 border border-slate-800">
+                            <span class="text-[11px] text-slate-300 font-bold"><i class="fa-solid fa-wand-magic-sparkles text-pink-400"></i> Tek renkten uyumlu palet</span>
+                            <input type="color" id="custom-color-base" value="#38bdf8" class="h-9 w-14 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer">
+                            <select id="custom-harmony" class="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-2 py-2">
+                                <option value="komple">Tamamlayıcı</option><option value="uclu">Üçlü</option><option value="benzer">Benzer</option><option value="bolunmus">Bölünmüş</option>
+                            </select>
+                            <button type="button" class="px-3 py-2 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-lg text-xs" onclick="themeGenerateHarmony()">Üret</button>
+                            <span id="theme-contrast-note" class="text-[11px]"></span>
                         </div>
                         <div class="flex gap-2 pt-2 border-t border-slate-800">
                             <button class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg text-xs flex items-center gap-2" onclick="applyCustomThemeColors(true)"><i class="fa-solid fa-check"></i> Özel Temayı Uygula</button>
@@ -2973,7 +3194,47 @@
 
                 <!-- TAB: BULUT & SİSTEM (Supabase bağlantısı, yenileme/zaman aşımı ayarları, yayınlama, log konsolu)
                      Artık yalnızca bu sekmede görünür; diğer sekmelerin altında yer almaz. -->
+                <!-- YEDEKLEME MERKEZİ -->
+                <div class="tab-content hidden space-y-6 adm-nodirty" id="tab-backup">
+                    <div class="cloud-subtabs flex items-center gap-2 flex-wrap bg-slate-950 border border-slate-800 rounded-xl p-2">
+                        <button type="button" data-sub="tab-cloud" onclick="switchTab('tab-cloud')" class="px-3 py-1.5 rounded-lg text-xs font-bold border transition bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800"><i class="fa-solid fa-cloud"></i> Bulut &amp; Sistem</button>
+                        <button type="button" data-sub="tab-excel" onclick="switchTab('tab-excel')" class="px-3 py-1.5 rounded-lg text-xs font-bold border transition bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800"><i class="fa-solid fa-file-excel"></i> Excel Entegrasyonu</button>
+                        <button type="button" data-sub="tab-backup" onclick="switchTab('tab-backup')" class="px-3 py-1.5 rounded-lg text-xs font-bold border transition bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800"><i class="fa-solid fa-vault"></i> Yedekleme Merkezi</button>
+                    </div>
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2 flex-wrap gap-2">
+                        <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-vault"></i> Yedekleme Merkezi</h2>
+                        <span class="text-xs text-slate-400">Seçmeli yedek, şifreli yedek, önizlemeli geri yükleme, geri alma noktaları ve işlem geçmişi.</span>
+                    </div>
+                    <div id="bk-stats"></div>
+
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-3">
+                        <h3 class="text-white font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-download text-cyan-400"></i> Yedek Al <span class="text-[10px] font-normal text-slate-500">hangi bölümlerin dosyaya yazılacağını seçin</span></h3>
+                        <div id="bk-make"></div>
+                    </div>
+
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-3">
+                        <h3 class="text-white font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-rotate-left text-amber-400"></i> Yedekten Geri Yükle <span class="text-[10px] font-normal text-slate-500">dosya önce incelenir, hangi bölümlerin yükleneceğini siz seçersiniz</span></h3>
+                        <div id="bk-restore"></div>
+                    </div>
+
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-3">
+                        <h3 class="text-white font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-camera-rotate text-violet-400"></i> Geri Alma Noktaları (Yerel Anlık Görüntüler)</h3>
+                        <div id="bk-snaps"></div>
+                    </div>
+
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 space-y-3">
+                        <h3 class="text-white font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-list-check text-emerald-400"></i> İşlem Geçmişi</h3>
+                        <div id="bk-hist"></div>
+                    </div>
+                    <p class="text-[10px] text-slate-500">Not: Yedek pano ayarlarını, temayı ve verileri içerir; fotoğrafların kendisi Supabase Storage'da ayrı durur (yedekte yalnızca fotoğraf bağlantıları vardır). Yedek dosyaları öğretmen ve öğrenci bilgileri içerebilir; güvenli saklayın.</p>
+                </div>
+
                 <div class="tab-content hidden space-y-6" id="tab-cloud">
+                    <div class="cloud-subtabs flex items-center gap-2 flex-wrap bg-slate-950 border border-slate-800 rounded-xl p-2">
+                        <button type="button" data-sub="tab-cloud" onclick="switchTab('tab-cloud')" class="px-3 py-1.5 rounded-lg text-xs font-bold border transition bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800"><i class="fa-solid fa-cloud"></i> Bulut &amp; Sistem</button>
+                        <button type="button" data-sub="tab-excel" onclick="switchTab('tab-excel')" class="px-3 py-1.5 rounded-lg text-xs font-bold border transition bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800"><i class="fa-solid fa-file-excel"></i> Excel Entegrasyonu</button>
+                        <button type="button" data-sub="tab-backup" onclick="switchTab('tab-backup')" class="px-3 py-1.5 rounded-lg text-xs font-bold border transition bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800"><i class="fa-solid fa-vault"></i> Yedekleme Merkezi</button>
+                    </div>
                     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                         <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-cloud"></i> Bulut &amp; Sistem</h2>
                     </div>

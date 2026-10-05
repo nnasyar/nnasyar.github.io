@@ -143,7 +143,7 @@
                 achievements: { title: "AYIN ENLERİ", color: "", bgType: "", bgColor1: "", bgColor2: "", titleBgType: "", titleBgColor1: "", titleBgColor2: "", titleColor: "", font: "", size: "normal", active: true, titleActive: true, cellEffect: "none", cellEffectColor: "#00b4d8", cellEffectIntensity: 100, interval: 7 },
                 duty: { title: "BUGÜN GÖREVLİ NÖBETÇİ ÖĞRETMENLER", color: "", bgType: "", bgColor1: "", bgColor2: "", titleBgType: "", titleBgColor1: "", titleBgColor2: "", titleColor: "", font: "", size: "normal", active: true, titleActive: true, cellEffect: "none", cellEffectColor: "#00b4d8", cellEffectIntensity: 100 },
                 media: { title: "", color: "", bgType: "", bgColor1: "", bgColor2: "", titleBgType: "", titleBgColor1: "", titleBgColor2: "", titleColor: "", font: "", size: "normal", active: true, titleActive: true, cellEffect: "none", cellEffectColor: "#00b4d8", cellEffectIntensity: 100, interval: 10 },
-                marquee: { title: "KAYAN YAZI", color: "", bgType: "", bgColor1: "", bgColor2: "", titleBgType: "", titleBgColor1: "", titleBgColor2: "", titleColor: "", font: "", size: "normal", active: true, titleActive: true, cellEffect: "none", cellEffectColor: "#00b4d8", cellEffectIntensity: 100 }
+                marquee: { title: "KAYAN YAZI", color: "", bgType: "", bgColor1: "", bgColor2: "", titleBgType: "", titleBgColor1: "", titleBgColor2: "", titleColor: "", font: "", size: "normal", active: true, titleActive: false, cellEffect: "none", cellEffectColor: "#00b4d8", cellEffectIntensity: 100 }
             },
             /* AYIN ENLERİ: DİNAMİK ALAN (HÜCRE) LİSTESİ
                Her alan; kendi başlığı, ikonu, kayıt listesi (URL veya manuel/dosya yüklenmiş görsel)
@@ -217,7 +217,8 @@
                 italic: false,
                 uppercase: false,
                 glowEnabled: false,
-                glowColor: "#00e5ff"
+                glowColor: "#00e5ff",
+                announceMode: "marked"   // off | marked (sadece işaretli duyurular) | all (tüm duyurular)
             },
             birthdays: [
                 { class: "2/B", name: "Beyza KIZILŞARA", date: "24.11" },
@@ -336,6 +337,7 @@
                 shape: 'rounded',          // rounded | square | oval | card
                 nameColorMode: 'auto',     // auto | custom
                 nameColor: '#02040a',
+                showTitleIcon: true,       // Nöbet yeri adının yanındaki ikon gösterilsin mi?
                 activeBg: {
                     color: '#00b4d8',
                     opacity: 15,           // 0-100
@@ -346,6 +348,7 @@
             /* DERS PROGRAMI (PANO) KUTU BİÇİMLENDİRME AYARLARI */
             scheduleBoardStyle: {
                 columns: 4,           // Bir satırdaki sınıf kutusu sayısı
+                rows: 0,              // Görünür satır sayısı (0 = otomatik). Sığmayan sınıflar sayfa sayfa döner
                 gap: 6,               // Kutular arası boşluk (px)
                 align: 'center',      // (Kullanılmıyor - geriye dönük uyumluluk) 
                 valign: 'between',    // (Kullanılmıyor - geriye dönük uyumluluk, yerini nameValign/lessonValign aldı)
@@ -453,17 +456,18 @@
         // otomatik 2 katına ölçeklenir; görünüm aynı, hassasiyet iki kat artmış olur).
         const PANO_LAYOUT_TEMPLATES = {
             klasik: {
-                birthday:      { c: 1,  cs: 12, r: 1,  rs: 12, fs: 100 },
-                schedule:      { c: 1,  cs: 12, r: 13, rs: 12, fs: 100 },
-                clock:         { c: 1,  cs: 12, r: 25, rs: 8,  fs: 100 },
-                brand:         { c: 13, cs: 24, r: 1,  rs: 4,  fs: 100 },
-                media:         { c: 13, cs: 24, r: 5,  rs: 20, fs: 100 },
-                duty:          { c: 13, cs: 24, r: 25, rs: 8,  fs: 100 },
-                quote:         { c: 37, cs: 12, r: 1,  rs: 6,  fs: 100 },
-                specialday:    { c: 37, cs: 12, r: 7,  rs: 6,  fs: 100 },
-                bellhours:     { c: 37, cs: 12, r: 13, rs: 8,  fs: 100 },
-                announcements: { c: 37, cs: 12, r: 21, rs: 6,  fs: 100 },
-                achievements:  { c: 37, cs: 12, r: 27, rs: 6,  fs: 100 }
+                clock:         { c: 1,  cs: 12, r: 1,  rs: 7,  fs: 125 },
+                schedule:      { c: 1,  cs: 12, r: 8,  rs: 15, fs: 140 },
+                birthday:      { c: 1,  cs: 12, r: 23, rs: 8,  fs: 120 },
+                brand:         { c: 13, cs: 24, r: 1,  rs: 4,  fs: 125 },
+                media:         { c: 13, cs: 24, r: 5,  rs: 19, fs: 100 },
+                duty:          { c: 13, cs: 24, r: 24, rs: 7,  fs: 100 },
+                specialday:    { c: 37, cs: 12, r: 1,  rs: 4,  fs: 105 },
+                quote:         { c: 37, cs: 12, r: 5,  rs: 4,  fs: 100 },
+                bellhours:     { c: 37, cs: 12, r: 9,  rs: 10, fs: 100 },
+                announcements: { c: 37, cs: 12, r: 19, rs: 6,  fs: 105 },
+                achievements:  { c: 37, cs: 12, r: 25, rs: 6,  fs: 110 },
+                marquee:       { c: 1,  cs: 48, r: 31, rs: 2,  fs: 125 }
             },
             duyuru_odakli: {
                 birthday:      { c: 1,  cs: 12, r: 1,  rs: 10, fs: 100 },
@@ -603,7 +607,7 @@
         });
 
         const PANO_TEMPLATE_LABELS = {
-            klasik: { title: 'Klasik', desc: 'Varsayılan dengeli düzen', icon: 'fa-table-columns' },
+            klasik: { title: 'Modern Dengeli', desc: 'Varsayılan: üstte saat, ortada geniş medya, altta kayan yazı bandı', icon: 'fa-table-columns' },
             duyuru_odakli: { title: 'Duyuru Odaklı', desc: 'Duyurular ve nöbet bilgisi öne çıkar', icon: 'fa-bullhorn' },
             ders_programi_odakli: { title: 'Ders Programı Odaklı', desc: 'Ders programı büyük gösterilir', icon: 'fa-calendar-days' },
             medya_odakli: { title: 'Medya Odaklı', desc: 'Görsel/slayt alanı büyütülür', icon: 'fa-photo-film' },
@@ -694,7 +698,60 @@
         }
 
         // Geçerli yerleşimi (kaydedilmiş halini) döndürür; yoksa klasik şablonu kurar.
+        // ---- TV / EKRAN AYARLARI (varsayılan + isimli profiller; profil ?ekran=ad ile seçilir) ----
+        const PANO_SCREEN_DEFAULTS = { mode: 'classic', ratio: '16/9', overscan: 0, uiScale: 100, rotate: 0, layout: '' };
+
+        function panoActiveScreenName() {
+            return (PANO_SCREEN_PARAM && appConfig.screenProfiles && appConfig.screenProfiles[PANO_SCREEN_PARAM]) ? PANO_SCREEN_PARAM : '';
+        }
+
+        function panoGetScreenSettings() {
+            const name = panoActiveScreenName();
+            return { ...PANO_SCREEN_DEFAULTS, ...(appConfig.screenSettings || {}), ...(name ? appConfig.screenProfiles[name] : {}) };
+        }
+
+        // Ekran ayarını gerçek boyutlara uygular (oran kilidi, güvenli alan, döndürme).
+        function panoFitScreen() {
+            const grid = document.getElementById('pano-main-dashboard');
+            if (!grid) return;
+            const st = panoGetScreenSettings();
+            const rot = parseInt(st.rotate, 10) || 0;
+            document.body.style.padding = st.overscan > 0 ? ('calc(10px + ' + st.overscan + 'vmin)') : '';
+            ['width', 'height', 'maxWidth', 'maxHeight', 'transform', 'flex'].forEach(k => grid.style[k] = '');
+            if (st.mode === 'classic' && !rot) return;
+            const cs = getComputedStyle(document.body);
+            const padX = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
+            const padY = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+            let aw = window.innerWidth - padX, ah = window.innerHeight - padY;
+            if (rot) { const t = aw; aw = ah; ah = t; }
+            let w = aw, h = ah;
+            if (st.mode === 'ratio') {
+                const p = String(st.ratio || '16/9').split('/').map(Number);
+                const r = (p[0] / p[1]) || (16 / 9);
+                if (aw / ah > r) { w = ah * r; } else { h = aw / r; }
+            } else if (st.mode === 'classic') {
+                w = Math.min(aw, 1920); h = Math.min(ah, 1080);
+            }
+            grid.style.maxWidth = 'none'; grid.style.maxHeight = 'none';
+            grid.style.width = Math.floor(w) + 'px'; grid.style.height = Math.floor(h) + 'px';
+            grid.style.flex = 'none';
+            if (rot) grid.style.transform = 'rotate(' + rot + 'deg)';
+        }
+
+        function panoApplyScreenSettings() {
+            panoFitScreen();
+            if (typeof applyPanoLayout === 'function') applyPanoLayout(panoEditActive ? panoEditWorkingLayout : undefined);
+        }
+        window.addEventListener('resize', function () { panoFitScreen(); });
+
         function panoGetLayoutState() {
+            const _pn = panoActiveScreenName();
+            if (_pn) {
+                const _ln = appConfig.screenProfiles[_pn].layout;
+                if (_ln && appConfig.savedLayouts && appConfig.savedLayouts[_ln]) {
+                    return panoFillMissingModules(JSON.parse(JSON.stringify(appConfig.savedLayouts[_ln])));
+                }
+            }
             if (!appConfig.panoLayout) appConfig.panoLayout = JSON.parse(JSON.stringify(PANO_LAYOUT_TEMPLATES.klasik));
             return appConfig.panoLayout;
         }
@@ -707,10 +764,21 @@
             m.fs = Math.min(Math.max(40, Math.round(m.fs || 100)), 250);
             if (m.hh) m.hh = Math.min(Math.max(16, Math.round(m.hh)), 120);
             if (m.hfs) m.hfs = Math.min(Math.max(8, Math.round(m.hfs)), 48);
+            if (m.gc) m.gc = Math.min(Math.max(0, Math.round(m.gc)), 12);
+            if (m.gr) m.gr = Math.min(Math.max(0, Math.round(m.gr)), 12);
             return m;
         }
 
         // Yerleşimi gerçek DOM elemanlarına (grid-column/grid-row + yazı ölçeği) uygular.
+        // Sütun/Satır Sayısı verilebilen modüller ve içerik kapsayıcıları.
+        const PANO_GRID_TARGETS = {
+            duty: '#duty-grid-container',
+            schedule: '#class-schedule-container',
+            achievements: '#achievements-container',
+            announcements: '#display-announcements-list',
+            specialday: '#specialday-weather-flex'
+        };
+
         function applyPanoLayout(layout) {
             layout = layout || panoGetLayoutState();
             panoAllModuleIds().forEach(id => {
@@ -724,7 +792,7 @@
                 el.dataset.cs = m.cs;
                 el.dataset.rs = m.rs;
                 el.dataset.fs = m.fs;
-                const scale = m.fs / 100;
+                const scale = (m.fs / 100) * ((panoGetScreenSettings().uiScale || 100) / 100);
                 const header = el.querySelector(':scope > .card-header');
                 const body = el.querySelector(':scope > .card-body');
                 if (header) {
@@ -736,6 +804,25 @@
                     if (m.hcolor) header.style.color = m.hcolor;
                 }
                 if (body) body.style.zoom = scale;
+                // Sütun / satır sayısı (liste içeren modüller). 0/boş = otomatik.
+                const gridSel = PANO_GRID_TARGETS[id];
+                if (gridSel) {
+                    const gridEl = document.querySelector(gridSel);
+                    if (gridEl) {
+                        const gc = m.gc || 0, gr = m.gr || 0;
+                        if (gc > 0 || gr > 0) {
+                            gridEl.classList.add('pano-gridded');
+                            gridEl.style.gridTemplateColumns = gc > 0 ? 'repeat(' + gc + ', minmax(0, 1fr))' : '';
+                            gridEl.style.gridTemplateRows = gr > 0 ? 'repeat(' + gr + ', minmax(0, 1fr))' : '';
+                            gridEl.style.gridAutoFlow = (gc === 0 && gr > 0) ? 'column' : '';
+                        } else {
+                            gridEl.classList.remove('pano-gridded');
+                            gridEl.style.gridTemplateColumns = '';
+                            gridEl.style.gridTemplateRows = '';
+                            gridEl.style.gridAutoFlow = '';
+                        }
+                    }
+                }
                 if (!header && !body) {
                     // card-header/card-body içermeyen modüller (saat kutusu, marka alanı, medya alanı):
                     // etiket/tutamaç dışındaki doğrudan çocuklara ölçek uygula.
@@ -745,6 +832,7 @@
                     });
                 }
             });
+            try { __panoShownLayout = layout; schedulePageIdx = 0; if (typeof renderActiveScheduleGroup === 'function') renderActiveScheduleGroup(); } catch (e) {}
         }
 
         // ============================================================================
@@ -793,8 +881,19 @@
         // ============================================================================
         const ADMIN_EMAIL = "nasyar@cozgen.com";
 
+        // Admin içi "Önizleme" iframe'i (?onizleme=1): buluta bağlanmaz, localStorage'a yazmaz,
+        // ayarları üst pencerenin sessionStorage'a koyduğu kopyadan okur.
+        const PANO_PREVIEW = (window.self !== window.top) && /[?&]onizleme=1/.test(location.search);
+        const PANO_SCREEN_PARAM = (new URLSearchParams(location.search)).get('ekran') || '';
+        if (PANO_PREVIEW) {
+            try {
+                const _origSetItem = Storage.prototype.setItem;
+                Storage.prototype.setItem = function (k, v) { if (k === 'okulPanoDataV8') return; return _origSetItem.apply(this, arguments); };
+            } catch (e) {}
+        }
+
         let supabaseClient = null;
-        if (CLOUD_SYNC_ENABLED) {
+        if (CLOUD_SYNC_ENABLED && !PANO_PREVIEW) {
             if (window.supabase && typeof window.supabase.createClient === 'function') {
                 supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
             } else {
@@ -1611,6 +1710,7 @@
 
         function panoInitLayout() {
             panoSetupOverlays();
+            panoFitScreen();
             applyPanoLayout(panoGetLayoutState());
         }
 
@@ -1619,6 +1719,7 @@
         let panoEditWorkingLayout = null;   // düzenleme başlarken alınan çalışma kopyası
         let panoEditBeforeSnapshot = null;  // vazgeç için orijinal (girişteki) durum
         let panoEditSelectedModule = null;
+        let panoEditModuleSnapshot = null; // vazgeç için modül görünüm ayarlarının yedeği
         let panoDragState = null; // {type:'move'|'resize', moduleId, startX, startY, orig:{c,r,cs,rs}, cellW, cellH}
 
         function panoGridEl() {
@@ -1640,6 +1741,7 @@
         function panoEnterEditMode() {
             panoEditWorkingLayout = JSON.parse(JSON.stringify(panoGetLayoutState()));
             panoEditBeforeSnapshot = JSON.parse(JSON.stringify(panoGetLayoutState()));
+            panoEditModuleSnapshot = JSON.parse(JSON.stringify(appConfig.moduleSettings || {}));
             panoEditActive = true;
             document.body.classList.add('pano-edit-mode');
             document.getElementById('pano-edit-toolbar').classList.add('active');
@@ -1750,6 +1852,84 @@
             panoDragState = null;
         }
 
+        /* ---- Modül Görünümü (canlı düzenleme paneli, açılır kompakt menü) ---- */
+        const PANO_LOOK_RESET = {
+            color: '', titleColor: '', bgType: '', bgColor1: '', bgColor2: '', titleBgType: '', titleBgColor1: '', titleBgColor2: '',
+            font: '', size: 'normal', cellEffect: 'none', cellEffectColor: '#00b4d8', moduleOpacity: 100, effectIntensity: 100, borderWidth: 1, cornerRadius: ''
+        };
+
+        function panoLookSettings(id) {
+            if (!appConfig.moduleSettings) appConfig.moduleSettings = {};
+            if (!appConfig.moduleSettings[id]) appConfig.moduleSettings[id] = { active: true, titleActive: true };
+            return appConfig.moduleSettings[id];
+        }
+
+        function panoLookSet(key, val) {
+            if (!panoEditSelectedModule) return;
+            panoLookSettings(panoEditSelectedModule)[key] = val;
+            applyModuleSettingsToDashboard();
+        }
+
+        function panoLookToggleColor(key, inputId, on) {
+            const inp = document.getElementById(inputId);
+            if (inp) inp.disabled = !on;
+            panoLookSet(key, on && inp ? inp.value : '');
+        }
+
+        function panoLookReset() {
+            if (!panoEditSelectedModule) return;
+            Object.assign(panoLookSettings(panoEditSelectedModule), PANO_LOOK_RESET);
+            applyModuleSettingsToDashboard();
+            panoBuildLookUI(panoEditSelectedModule);
+        }
+
+        function panoBuildLookUI(id) {
+            const body = document.getElementById('pano-panel-look-body');
+            if (!body) return;
+            const def = (typeof moduleDefs !== 'undefined' ? moduleDefs.find(d => d.id === id) : null) || {};
+            const s = panoLookSettings(id);
+            const ht = !!def.hasTitle;
+            const esc = v => String(v == null ? '' : v).replace(/"/g, '&quot;');
+            const sel = (key, opts, cur) => `<select onchange="panoLookSet('${key}', this.value)">${opts.map(o => `<option value="${o[0]}" ${String(cur || '') === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select>`;
+            const clr = (key, cur, dflt, dis) => `<input type="color" value="${esc(cur || dflt)}" oninput="panoLookSet('${key}', this.value)" ${dis ? 'disabled' : ''}>`;
+            const rng = (key, label, min, max, cur, unit) => `<label class="pl-rng"><span>${label}: <b id="pl-v-${key}">${cur}</b>${unit}</span><input type="range" min="${min}" max="${max}" value="${cur}" oninput="document.getElementById('pl-v-${key}').textContent=this.value; panoLookSet('${key}', parseInt(this.value,10))"></label>`;
+            const bgGroup = (typeKey, c1, c2, label, d1, d2, dis) => `
+                <div class="pl-row"><span>${label}</span>
+                    <select ${dis ? 'disabled' : ''} onchange="panoLookSet('${typeKey}', this.value); panoBuildLookUI('${id}')">
+                        <option value="" ${!s[typeKey] ? 'selected' : ''}>Varsayılan</option>
+                        <option value="solid" ${s[typeKey] === 'solid' ? 'selected' : ''}>Düz</option>
+                        <option value="gradient" ${s[typeKey] === 'gradient' ? 'selected' : ''}>Degrade</option>
+                    </select>
+                    ${s[typeKey] ? clr(c1, s[c1], d1) : ''}${s[typeKey] === 'gradient' ? clr(c2, s[c2], d2) : ''}
+                </div>`;
+            const fonts = [['', 'Varsayılan'], ["'Rajdhani', sans-serif", 'Rajdhani'], ["'Roboto', sans-serif", 'Roboto'], ["Arial, sans-serif", 'Arial'], ["Georgia, serif", 'Georgia'], ["'Times New Roman', serif", 'Times'], ["Verdana, sans-serif", 'Verdana']];
+            const _viewRow = (typeof isModDouble === 'function')
+                ? `<div class="pl-row" style="flex-wrap:wrap;gap:6px"><span style="width:100%"><i class="fa-solid fa-layer-group"></i> Öğretim (yalnız bu modül)</span>${shiftModeButtonsHtml(id)}${isModDouble(id) ? `<span style="width:100%;font-size:11px;opacity:.8">Panoda görünsün:</span>${shiftViewButtonsHtml(id)}` : ''}</div>` : '';
+            body.innerHTML = `
+                ${_viewRow}
+                <div class="pl-row pl-checks">
+                    <label><input type="checkbox" ${s.active === false ? '' : 'checked'} onchange="panoLookSet('active', this.checked)"> Modülü göster</label>
+                    <label class="${ht ? '' : 'pl-dis'}"><input type="checkbox" ${s.titleActive === false ? '' : 'checked'} ${ht ? '' : 'disabled'} onchange="panoLookSet('titleActive', this.checked)"> Başlığı göster</label>
+                </div>
+                ${ht ? `<div class="pl-row"><span>Başlık</span><input type="text" value="${esc(s.title)}" oninput="panoLookSet('title', this.value)"></div>` : ''}
+                <div class="pl-row"><span>Boyut</span>${sel('size', [['small', 'Küçük'], ['normal', 'Normal'], ['large', 'Büyük']], s.size || 'normal')}</div>
+                <div class="pl-row"><span>Font</span>${sel('font', fonts, s.font)}</div>
+                <div class="pl-row"><label><input type="checkbox" ${s.color ? 'checked' : ''} onchange="panoLookToggleColor('color','pl-color',this.checked)"> Kenarlık</label>
+                    <input type="color" id="pl-color" value="${esc(s.color || '#00b4d8')}" ${s.color ? '' : 'disabled'} oninput="panoLookSet('color', this.value)"></div>
+                <div class="pl-row"><label class="${ht ? '' : 'pl-dis'}"><input type="checkbox" ${s.titleColor ? 'checked' : ''} ${ht ? '' : 'disabled'} onchange="panoLookToggleColor('titleColor','pl-tcolor',this.checked)"> Başlık yazısı</label>
+                    <input type="color" id="pl-tcolor" value="${esc(s.titleColor || '#ffffff')}" ${(s.titleColor && ht) ? '' : 'disabled'} oninput="panoLookSet('titleColor', this.value)"></div>
+                ${bgGroup('bgType', 'bgColor1', 'bgColor2', 'Arka plan', '#070b13', '#0d1b35', false)}
+                ${bgGroup('titleBgType', 'titleBgColor1', 'titleBgColor2', 'Başlık zemin', '#6b1111', '#300a0a', !ht)}
+                <div class="pl-row"><span>Efekt</span>
+                    ${sel('cellEffect', [['none', 'Yok'], ['glow', 'Parıltı'], ['pulse', 'Nabız'], ['border', 'Yanıp sönen çerçeve'], ['shine', 'Kayan ışık'], ['neon', 'Neon'], ['flicker', 'Titreşim'], ['corner', 'Köşe ışıması']], s.cellEffect || 'none')}
+                    ${clr('cellEffectColor', s.cellEffectColor, '#00b4d8')}</div>
+                ${rng('moduleOpacity', 'Saydamlık', 20, 100, s.moduleOpacity ?? 100, '%')}
+                ${rng('effectIntensity', 'Efekt gücü', 0, 250, s.effectIntensity ?? 100, '%')}
+                ${rng('borderWidth', 'Kenarlık kalınlığı', 0, 20, s.borderWidth ?? 1, 'px')}
+                ${rng('cornerRadius', 'Köşe yuvarlama', 0, 50, s.cornerRadius || 0, 'px')}
+                <button type="button" class="pl-reset" onclick="panoLookReset()"><i class="fa-solid fa-rotate-left"></i> Görünümü sıfırla</button>`;
+        }
+
         function panoSelectModuleForPanel(moduleId) {
             document.querySelectorAll('.pano-module.pano-selected').forEach(e => e.classList.remove('pano-selected'));
             const el = panoModuleEl(moduleId);
@@ -1757,6 +1937,7 @@
             panoEditSelectedModule = moduleId;
             document.getElementById('pano-edit-panel-title').textContent = PANO_MODULE_LABELS[moduleId] || moduleId;
             panoRefreshPanelValues(moduleId);
+            panoBuildLookUI(moduleId);
             document.getElementById('pano-edit-panel').classList.add('active');
         }
 
@@ -1777,6 +1958,18 @@
             document.getElementById('pano-panel-hh-val').textContent = hhVal;
             document.getElementById('pano-panel-hfs').value = hfsVal;
             document.getElementById('pano-panel-hfs-val').textContent = hfsVal;
+            const gridWrap = document.getElementById('pano-panel-grid-wrap');
+            if (gridWrap) {
+                const supportsGrid = !!PANO_GRID_TARGETS[moduleId];
+                gridWrap.style.display = supportsGrid ? 'block' : 'none';
+                if (supportsGrid) {
+                    const gcVal = m.gc || 0, grVal = m.gr || 0;
+                    document.getElementById('pano-panel-gc').value = gcVal;
+                    document.getElementById('pano-panel-gc-val').textContent = gcVal > 0 ? gcVal : 'Otomatik';
+                    document.getElementById('pano-panel-gr').value = grVal;
+                    document.getElementById('pano-panel-gr-val').textContent = grVal > 0 ? grVal : 'Otomatik';
+                }
+            }
         }
 
         function panoPanelUpdate() {
@@ -1792,6 +1985,12 @@
             document.getElementById('pano-panel-fs-val').textContent = m.fs;
             document.getElementById('pano-panel-hh-val').textContent = m.hh;
             document.getElementById('pano-panel-hfs-val').textContent = m.hfs;
+            if (PANO_GRID_TARGETS[panoEditSelectedModule]) {
+                m.gc = parseInt(document.getElementById('pano-panel-gc').value, 10) || 0;
+                m.gr = parseInt(document.getElementById('pano-panel-gr').value, 10) || 0;
+                document.getElementById('pano-panel-gc-val').textContent = m.gc > 0 ? m.gc : 'Otomatik';
+                document.getElementById('pano-panel-gr-val').textContent = m.gr > 0 ? m.gr : 'Otomatik';
+            }
             applyPanoLayout(panoEditWorkingLayout);
         }
 
@@ -1805,16 +2004,33 @@
             if (save) {
                 appConfig.panoLayout = panoEditWorkingLayout;
                 panoPersist();
+                try { if (typeof renderAdminModuleSettings === 'function') renderAdminModuleSettings(); } catch (e) {}
                 applyPanoLayout(appConfig.panoLayout);
                 panoRenderModuleSizeList();
                 showCustomNotification('Düzen Kaydedildi', 'Yeni modül yerleşimi başarıyla kaydedildi.');
             } else {
                 applyPanoLayout(panoEditBeforeSnapshot);
+                if (panoEditModuleSnapshot) {
+                    appConfig.moduleSettings = panoEditModuleSnapshot;
+                    applyModuleSettingsToDashboard();
+                }
+            }
+            panoEditModuleSnapshot = null;
+            if (panoReturnToAdmin) {
+                panoReturnToAdmin = false;
+                const adminPanel = document.getElementById('admin-panel');
+                if (adminPanel) adminPanel.classList.remove('hidden');
             }
         }
 
+        // Canlı düzenleme admin panelinden başlatıldıysa: panel sadece gizlenir (oturum KAPATILMAZ),
+        // düzenleme bitince (Kaydet/Vazgeç) aynı sekmede geri açılır.
+        let panoReturnToAdmin = false;
+
         function panoStartLiveEditFromAdmin() {
-            closeAdminPanelWithoutSaving();
+            const panel = document.getElementById('admin-panel');
+            panoReturnToAdmin = !!panel && !panel.classList.contains('hidden');
+            if (panel) panel.classList.add('hidden');
             panoEnterEditMode();
         }
 
@@ -1839,6 +2055,16 @@
                 const a = tpl[id], b = cur[id];
                 return b && a.c === b.c && a.cs === b.cs && a.r === b.r && a.rs === b.rs;
             });
+        }
+
+        // Bir yerleşim nesnesinden (id -> {c,cs,r,rs}) mini önizleme blokları üretir.
+        function panoLayoutBlocksHtml(layout) {
+            const ids = Object.keys(layout);
+            return ids.map((id, i) => {
+                const m = layout[id] || MARQUEE_DEFAULT_POS;
+                const label = panoModuleLabel(id);
+                return `<div class="lt-block" title="${label}" style="--h:${(i * 47) % 360};left:${((m.c - 1) / 96 * 100).toFixed(2)}%;top:${((m.r - 1) / 64 * 100).toFixed(2)}%;width:${(m.cs / 96 * 100).toFixed(2)}%;height:${(m.rs / 64 * 100).toFixed(2)}%"><span>${label.charAt(0)}</span></div>`;
+            }).join('');
         }
 
         function panoRenderTemplateList() {
@@ -1894,6 +2120,8 @@
             panoPersist();
             applyPanoLayout(appConfig.panoLayout);
             panoRenderModuleSizeList();
+            panoRenderSavedLayoutsList();
+            panoRenderTemplateList();
             writeCMSLog(`"${name}" adlı kayıtlı düzen yüklendi.`);
         }
 
@@ -1906,6 +2134,12 @@
             });
         }
 
+        function panoSavedLayoutIsActive(name) {
+            const sv = appConfig.savedLayouts && appConfig.savedLayouts[name], cur = appConfig.panoLayout;
+            if (!sv || !cur) return false;
+            return Object.keys(sv).every(id => { const x = sv[id], y = cur[id]; return y && x.c === y.c && x.cs === y.cs && x.r === y.r && x.rs === y.rs; });
+        }
+
         function panoRenderSavedLayoutsList() {
             const wrap = document.getElementById('admin-layout-saved-list');
             if (!wrap) return;
@@ -1915,19 +2149,24 @@
                 wrap.innerHTML = '<p class="text-[11px] text-slate-600 italic px-1">Henüz kayıtlı bir düzeniniz yok.</p>';
                 return;
             }
+            wrap.className = 'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4';
             names.forEach(name => {
-                const row = document.createElement('div');
-                row.className = 'flex items-center justify-between bg-slate-900 border border-slate-700 rounded-lg px-3 py-2';
-                row.innerHTML = `
-                    <span class="text-sm text-slate-200 font-bold flex items-center gap-2"><i class="fa-solid fa-bookmark text-emerald-400"></i> ${name}</span>
-                    <span class="flex items-center gap-2">
-                        <button class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-lg">Yükle</button>
-                        <button class="px-3 py-1.5 bg-red-600/80 hover:bg-red-600 text-white text-xs font-bold rounded-lg"><i class="fa-solid fa-trash"></i></button>
-                    </span>
-                `;
-                row.querySelectorAll('button')[0].onclick = () => panoLoadSavedLayout(name);
-                row.querySelectorAll('button')[1].onclick = () => panoDeleteSavedLayout(name);
-                wrap.appendChild(row);
+                const lay = panoFillMissingModules(JSON.parse(JSON.stringify(appConfig.savedLayouts[name])));
+                const active = panoSavedLayoutIsActive(name);
+                const card = document.createElement('div');
+                card.className = 'lt-card' + (active ? ' is-active' : '');
+                card.style.position = 'relative';
+                card.innerHTML = `
+                    <div class="lt-preview">${panoLayoutBlocksHtml(lay)}</div>
+                    <div class="lt-meta">
+                        <div class="lt-title"><i class="fa-solid fa-bookmark"></i> <span class="truncate"></span>${active ? '<em>Aktif</em>' : ''}</div>
+                        <div class="lt-desc">Kayıtlı düzenim — tıklayınca uygulanır</div>
+                    </div>
+                    <button type="button" class="lt-del" title="Düzeni sil"><i class="fa-solid fa-trash"></i></button>`;
+                card.querySelector('.truncate').textContent = name;
+                card.onclick = () => panoLoadSavedLayout(name);
+                card.querySelector('.lt-del').onclick = (e) => { e.stopPropagation(); panoDeleteSavedLayout(name); };
+                wrap.appendChild(card);
             });
         }
 
@@ -1981,17 +2220,19 @@
             });
         }
 
-        let appConfig = JSON.parse(localStorage.getItem('okulPanoDataV8')) || JSON.parse(JSON.stringify(defaultAppConfig));
+        let appConfig = (PANO_PREVIEW && (function () { try { return JSON.parse(sessionStorage.getItem('okulPanoPreviewConfig')); } catch (e) { return null; } })())
+            || JSON.parse(localStorage.getItem('okulPanoDataV8')) || JSON.parse(JSON.stringify(defaultAppConfig));
 
         // ESKİ SÜRÜM UYUMLULUĞU: Duyurular önceden düz metin (string) dizisiydi.
         // Her duyuru için ayrı biçimlendirme desteği eklendiğinde, eski kayıtları
         // varsayılan biçimlendirme değerleriyle nesne (object) formatına dönüştürüyoruz.
         function normalizeAnnouncement(a) {
             if (typeof a === 'string') {
-                return { text: a, color: '', bgColor: '', font: '', fontSize: 11, bold: false };
+                return { text: a, color: '', bgColor: '', font: '', fontSize: 11, bold: false, inMarquee: false };
             }
             return {
                 text: (a && a.text) || '',
+                inMarquee: !!(a && a.inMarquee),
                 color: (a && a.color) || '',
                 bgColor: (a && a.bgColor) || '',
                 font: (a && a.font) || '',
@@ -2061,6 +2302,9 @@
         /* =========================================================================
            İKİLİ ÖĞRETİM (SABAH / ÖĞLE) DESTEĞİ
            -------------------------------------------------------------------------
+           MODÜL BAZLI ANAHTAR: Her modülün kendi "İkili öğretim" kutusu vardır (appConfig.shiftModules[modül]).
+           Kutu yalnızca o modülü etkiler; işaretsiz modüller eskisi gibi tek veriyle çalışır. İkili modüllerin
+           verisi appConfig.doubleShift içinde, ikili olmayanların verisi appConfig.singleModeData içinde tutulur.
            İki mod vardır:
              - "single" (Normal / Tekli): Eski çalışma şekli. Hiçbir veri değişmez.
              - "double" (İkili Öğretim): Aşağıdaki alanlar SABAH ve ÖĞLE için ayrı tutulur:
@@ -2080,7 +2324,25 @@
         ========================================================================= */
         const SHIFT_KEYS = ['morning', 'afternoon'];
         const SHIFT_LABELS = { morning: 'Sabah', afternoon: 'Öğle' };
-        const SHIFT_FIELDS = ['bellHours', 'weeklyClassSchedules', 'aylikNobet', 'weeklyDuties', 'achievementCategories', 'birthdays'];
+        // Her modülün öğretime göre ayrı tutulabilen veri alanları (modül başına ayrı İkili öğretim anahtarı)
+        const SHIFT_MODULE_FIELDS = {
+            bellhours: ['bellHours'],
+            schedule: ['weeklyClassSchedules'],
+            duty: ['aylikNobet', 'weeklyDuties'],
+            achievements: ['achievementCategories'],
+            birthday: ['birthdays'],
+            quote: ['quotes'],
+            specialday: ['specialDays'],
+            announcements: ['announcements'],
+            media: ['mediaPlaylist'],
+            marquee: ['marqueeItems']
+        };
+        const SHIFT_ALL_MODULES = Object.keys(SHIFT_MODULE_FIELDS);
+        const SHIFT_CORE_MODULES = ['bellhours', 'schedule', 'duty', 'achievements', 'birthday'];
+        const SHIFT_CONTENT_FIELDS = ['quotes', 'specialDays', 'announcements', 'mediaPlaylist', 'marqueeItems'];
+        const SHIFT_FIELDS = SHIFT_ALL_MODULES.reduce((a, m) => a.concat(SHIFT_MODULE_FIELDS[m]), []);
+        const SHIFT_FIELD_MOD = {};
+        SHIFT_ALL_MODULES.forEach(m => SHIFT_MODULE_FIELDS[m].forEach(f => { SHIFT_FIELD_MOD[f] = m; }));
         const SHIFT_DEFAULT_BELLS = {
             morning:   [['08:00', '08:40'], ['08:50', '09:30'], ['09:40', '10:20'], ['10:30', '11:10'], ['11:20', '12:00']],
             afternoon: [['12:30', '13:10'], ['13:20', '14:00'], ['14:10', '14:50'], ['15:00', '15:40'], ['15:50', '16:30']]
@@ -2095,8 +2357,23 @@
         let __boundShift = null;            // şu an hangi öğretimin verisine bağlıyız (tekli modda null)
         let shiftAdminEditShift = 'morning'; // yönetim panelinde düzenlenen öğretim
 
+        // Altyapı açık mı? (en az bir modülde İkili öğretim işaretli)
         function isDoubleMode() {
             return !!(appConfig && appConfig.teachingMode === 'double' && appConfig.doubleShift);
+        }
+
+        // Bu modülde İkili öğretim işaretli mi? (her modülün kendi anahtarı vardır; diğer modülleri etkilemez)
+        function isModDouble(mod) {
+            return !!(appConfig && appConfig.teachingMode === 'double' && appConfig.doubleShift && appConfig.shiftModules && appConfig.shiftModules[mod]);
+        }
+
+        // Bir veri alanının boş/varsayılan değeri
+        function shiftDefaultFor(f) {
+            if (f === 'bellHours') return shiftDeepCopy(SHIFT_SINGLE_DEFAULT_BELLS);
+            if (f === 'achievementCategories') return shiftDefaultAch();
+            if (f === 'birthdays') return [];
+            if (SHIFT_CONTENT_FIELDS.indexOf(f) >= 0) return shiftDeepCopy(defaultAppConfig[f] || []);
+            return {};
         }
 
         function shiftDeepCopy(o) { return JSON.parse(JSON.stringify(o === undefined ? null : o)); }
@@ -2127,14 +2404,43 @@
 
         // Doğum günlerini sınıfın bağlı olduğu öğretime göre ayırır (sınıfı bilinmeyenler sabaha gider)
         function shiftSplitBirthdays(list, classShifts, key) {
-            return (Array.isArray(list) ? list : []).filter(b => ((classShifts || {})[b && b.class] || 'morning') === key).map(b => ({ ...b }));
+            return (Array.isArray(list) ? list : []).filter(b => {
+                const n = classNormalizeName(b && b.class);
+                return ((classShifts || {})[n] || (classShifts || {})[b && b.class] || 'morning') === key;
+            }).map(b => ({ ...b }));
+        }
+
+        // Tüm doğum günlerini (sabah+öğle) toplayıp sınıfın BAĞLI OLDUĞU öğretime göre yeniden dağıtır.
+        // Sınıf adı yazım farklarını (3-c, 3 / C ...) düzeltir; sınıfı tanınmayan kayıt bulunduğu listede kalır.
+        // Döndürür: başka öğretim listesine taşınan kayıt sayısı.
+        function shiftRebalanceBirthdays() {
+            const ds = appConfig && appConfig.doubleShift;
+            if (!ds) return 0;
+            const out = { morning: [], afternoon: [] };
+            let moved = 0;
+            SHIFT_KEYS.forEach(from => {
+                ((ds[from] && ds[from].birthdays) || []).forEach(b => {
+                    const n = classNormalizeName(b.class);
+                    const known = classList.includes(n);
+                    const to = known ? (ds.classShifts[n] === 'afternoon' ? 'afternoon' : 'morning') : from;
+                    if (to !== from) moved++;
+                    out[to].push(known ? Object.assign({}, b, { class: n }) : Object.assign({}, b));
+                });
+            });
+            SHIFT_KEYS.forEach(k => { if (ds[k]) ds[k].birthdays = out[k]; });
+            return moved;
+        }
+        // Yönetim paneli çalışma kopyasını (tempBirthdays) bağlı öğretimin güncel listesiyle eşler
+        function birthdaysResyncAdmin() {
+            try { tempBirthdays = [...(appConfig.birthdays || [])]; selectedBirthdayIndices.clear(); } catch (e) {}
         }
 
         // Tekli moddaki mevcut veriden ilk ikili öğretim verisini üretir
-        function shiftSeedFromSingle(single) {
-            const ds = { activeMode: 'auto', classShifts: {}, morning: {}, afternoon: {} };
+        function shiftSeedFromSingle(single, keepClassShifts) {
+            const ds = { activeMode: 'auto', classShifts: {}, seededMods: {}, morning: {}, afternoon: {} };
             // Varsayılan: 3-4. sınıflar sabah, 1-2. sınıflar öğle (yönetim panelinden değiştirilebilir)
             classList.forEach(c => { ds.classShifts[c] = (c.startsWith('3/') || c.startsWith('4/')) ? 'morning' : 'afternoon'; });
+            if (keepClassShifts) ds.classShifts = Object.assign({}, ds.classShifts, keepClassShifts);
             SHIFT_KEYS.forEach(k => {
                 const bells = SHIFT_DEFAULT_BELLS[k].map((b, i) => ({ id: i + 1, start: b[0], end: b[1] }));
                 const sched = {};
@@ -2154,6 +2460,10 @@
                         ? shiftDeepCopy(single.achievementCategories && single.achievementCategories.length ? single.achievementCategories : shiftDefaultAch())
                         : shiftAchStructureOnly(single.achievementCategories && single.achievementCategories.length ? single.achievementCategories : shiftDefaultAch())
                 };
+                // Söz / belirli gün / duyuru / görsel slayt / kayan yazı: her iki öğretim mevcut içerikle başlar
+                SHIFT_CONTENT_FIELDS.forEach(f => {
+                    ds[k][f] = shiftDeepCopy((single[f] !== undefined && single[f] !== null) ? single[f] : shiftDefaultFor(f));
+                });
             });
             return ds;
         }
@@ -2164,6 +2474,12 @@
             const ds = appConfig.doubleShift;
             if (!ds.activeMode) ds.activeMode = 'auto';
             if (!ds.classShifts) ds.classShifts = {};
+            if (!ds.seededMods) { ds.seededMods = {}; SHIFT_CORE_MODULES.forEach(m => { ds.seededMods[m] = true; }); }
+            if (!appConfig.singleModeData || typeof appConfig.singleModeData !== 'object') appConfig.singleModeData = {};
+            SHIFT_FIELDS.forEach(f => {
+                const sv = appConfig.singleModeData[f];
+                if (sv === undefined || sv === null) appConfig.singleModeData[f] = shiftDefaultFor(f);
+            });
             classList.forEach(c => { if (ds.classShifts[c] !== 'morning' && ds.classShifts[c] !== 'afternoon') ds.classShifts[c] = 'morning'; });
             SHIFT_KEYS.forEach(k => {
                 if (!ds[k]) ds[k] = {};
@@ -2180,17 +2496,25 @@
                 if (!Array.isArray(ds[k].achievementCategories)) {
                     ds[k].achievementCategories = (k === 'morning') ? shiftDefaultAch() : shiftAchStructureOnly(shiftDefaultAch());
                 }
+                SHIFT_CONTENT_FIELDS.forEach(f => {
+                    if (!Array.isArray(ds[k][f])) ds[k][f] = shiftDeepCopy(appConfig.singleModeData[f] !== undefined && appConfig.singleModeData[f] !== null ? appConfig.singleModeData[f] : shiftDefaultFor(f));
+                });
             });
         }
 
         function shiftInstallAccessors() {
             const cfg = appConfig;
             SHIFT_FIELDS.forEach(f => {
+                const mod = SHIFT_FIELD_MOD[f];
+                const dbl = () => !!(cfg.teachingMode === 'double' && cfg.doubleShift && cfg.shiftModules && cfg.shiftModules[mod]);
                 Object.defineProperty(cfg, f, {
                     configurable: true,
-                    enumerable: false, // JSON'a yazılmasın; gerçek veri doubleShift içinde
-                    get() { return cfg.doubleShift[__boundShift || 'morning'][f]; },
-                    set(v) { cfg.doubleShift[__boundShift || 'morning'][f] = v; }
+                    enumerable: false, // JSON'a yazılmasın; gerçek veri doubleShift / singleModeData içinde
+                    get() { return dbl() ? cfg.doubleShift[__boundShift || 'morning'][f] : (cfg.singleModeData || {})[f]; },
+                    set(v) {
+                        if (dbl()) cfg.doubleShift[__boundShift || 'morning'][f] = v;
+                        else { if (!cfg.singleModeData) cfg.singleModeData = {}; cfg.singleModeData[f] = v; }
+                    }
                 });
             });
         }
@@ -2309,9 +2633,22 @@
                 if (_ds.morning && !Array.isArray(_ds.morning.achievementCategories)) _ds.morning.achievementCategories = shiftDeepCopy(_legacyAch.value);
                 if (_ds.afternoon && !Array.isArray(_ds.afternoon.achievementCategories)) _ds.afternoon.achievementCategories = shiftAchStructureOnly(_legacyAch.value);
             }
+            // Eski kayıtlar (modül bazlı anahtardan önce): veri modüllerinin hepsi ikiliydi
+            if (!appConfig.shiftModules || typeof appConfig.shiftModules !== 'object') {
+                appConfig.shiftModules = {};
+                SHIFT_CORE_MODULES.forEach(m => { appConfig.shiftModules[m] = true; });
+            }
+            // Düz (tekli) alanlar: ikili olmayan modüller bu değerleri kullanır -> singleModeData içine alınır
+            if (!appConfig.singleModeData || typeof appConfig.singleModeData !== 'object') appConfig.singleModeData = {};
+            SHIFT_FIELDS.forEach(f => {
+                const d = Object.getOwnPropertyDescriptor(appConfig, f);
+                const cur = appConfig.singleModeData[f];
+                if (d && ('value' in d) && d.value !== undefined && d.value !== null && (cur === undefined || cur === null)) appConfig.singleModeData[f] = d.value;
+            });
             // Çift modda düz alanlar (varsa) kaldırılır, yönlendirici özellikler kurulur
             SHIFT_FIELDS.forEach(f => { try { delete appConfig[f]; } catch (e) {} });
             shiftEnsureDoubleData();
+            try { shiftRebalanceBirthdays(); } catch (e) {} // hatalı sabah/öğle dağılımını sınıflara göre düzelt
             shiftInstallAccessors();
             shiftBind(shiftGetActive(new Date()));
         }
@@ -2328,6 +2665,11 @@
         // Otomatik geçiş saati: sabahın son ders çıkışı ile öğlenin ilk ders girişinin tam ortası
         function shiftSwitchMinutes() {
             const ds = appConfig.doubleShift;
+            // Elle ayarlanmış geçiş saati (HH:MM) varsa o kullanılır
+            try {
+                const mt = /^(\d{1,2}):(\d{2})$/.exec((ds && ds.switchTime) || '');
+                if (mt && +mt[1] < 24 && +mt[2] < 60) return (+mt[1]) * 60 + (+mt[2]);
+            } catch (e) {}
             try {
                 const m = ds.morning.bellHours, a = ds.afternoon.bellHours;
                 const mEnd = shiftTimeToMin(m[m.length - 1].end);
@@ -2335,6 +2677,11 @@
                 if (!isNaN(mEnd) && !isNaN(aStart)) return Math.round((mEnd + aStart) / 2);
             } catch (e) {}
             return 12 * 60 + 30;
+        }
+
+        function shiftAutoSwitchMinutes() {
+            const ds = appConfig.doubleShift, keep = ds && ds.switchTime;
+            try { if (ds) ds.switchTime = ''; return shiftSwitchMinutes(); } finally { if (ds) ds.switchTime = keep; }
         }
 
         function shiftMinToTime(min) {
@@ -2348,7 +2695,7 @@
 
         // Yönetim panelindeki ders programı için seçilebilir sınıflar
         function adminClassList() {
-            return (isDoubleMode() && __boundShift) ? shiftClassesOf(__boundShift) : classList;
+            return (isModDouble('schedule') && __boundShift) ? shiftClassesOf(__boundShift) : classList;
         }
 
         // Admin panelindeki giriş alanlarındaki bekleyen değişiklikleri bağlı öğretimin verisine yazar
@@ -2362,6 +2709,11 @@
                 if (isDoubleMode() && _p && !_p.classList.contains('hidden')) {
                     appConfig.achievementCategories = shiftDeepCopy(tempAchievementCategories) || [];
                     appConfig.birthdays = [...tempBirthdays];
+                    appConfig.announcements = [...tempAnnouncements];
+                    if (tempMarqueeItems.length > 0) appConfig.marqueeItems = [...tempMarqueeItems];
+                    if (tempQuotes.length > 0) appConfig.quotes = [...tempQuotes];
+                    appConfig.specialDays = [...tempSpecialDays];
+                    appConfig.mediaPlaylist = [...tempMediaPlaylist];
                 }
             } catch (e) {}
         }
@@ -2376,9 +2728,16 @@
             try { cycleBirthdayWidget(); } catch (e) {}
             achievementActiveIndex = {};
             renderAchievementsCard();
-            (appConfig.achievementCategories || []).filter(c => c.active !== false).forEach(c => cycleAchievementCategory(c.id));
+            achViewEntries().forEach(e => cycleAchievementCategory(e.key));
             startCyclingModuleIntervals();
+            // Duyuru / kayan yazı / söz / belirli gün / görsel slayt: öğretime göre içerik yeniden çizilir
+            try { renderMarqueeWidget(); } catch (e) {}
+            try { renderPanoData(); } catch (e) {}
+            try { cycleQuoteWidget(); } catch (e) {}
+            try { cycleSpecialDayWidget(); } catch (e) {}
+            try { cycleMediaSlides(); } catch (e) {}
             shiftDecorate();
+            try { shiftViewApplyVisibility(); } catch (e) {}
             calculateCountdownAndTableHighlight(new Date());
         }
 
@@ -2396,23 +2755,150 @@
         }
 
         // Pano kartı başlıklarına "SABAH ÖĞRETİMİ / ÖĞLE ÖĞRETİMİ" rozeti ekler
+        const SHIFT_LABEL_MODULES = [['bellhours', 'Zil Saatleri'], ['birthday', 'Bugün Doğanlar'], ['achievements', 'Ayın Enleri'], ['duty', 'Nöbetçi Öğretmenler'], ['schedule', 'Ders Programı']];
+        function shiftLabelOn(key) { const o = (appConfig && appConfig.shiftLabels) || {}; return o[key] !== false; }
+        function shiftLabelSet(key, on) {
+            appConfig.shiftLabels = Object.assign({}, appConfig.shiftLabels || {}, { [key]: !!on });
+            panoPersist();
+            shiftDecorate();
+            try { renderActiveScheduleGroup(); } catch (e) {}
+        }
+        function shiftLabelRenderOptions() {
+            const el = document.getElementById('teach-shift-label-opts'); if (!el) return;
+            el.innerHTML = SHIFT_LABEL_MODULES.map(([k, t]) => `<label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer"><input type="checkbox" ${shiftLabelOn(k) ? 'checked' : ''} onchange="shiftLabelSet('${k}', this.checked)"> ${t}</label>`).join('');
+        }
+        /* ===== MODÜL İÇERİĞİ: ÖĞRETİME GÖRE GÖSTERİM (Sabah / Öğle / Tamamı) =====
+           İkili öğretimde, öğretime göre ayrı tutulan içerik modülleri için pano üzerinde
+           hangi öğretimin içeriğinin görüneceği seçilir:
+             auto      -> Öğretime göre (panoda o an bağlı olan öğretim; saate göre otomatik değişir)
+             morning   -> Her zaman sabah öğretiminin içeriği
+             afternoon -> Her zaman öğle öğretiminin içeriği
+             all       -> Sabah + öğle içeriğinin tamamı birlikte
+           Ayar appConfig.shiftViews[modül] içinde saklanır. Tekli modda hiçbir etkisi yoktur. */
+        // İçeriği öğretime göre ayrı tutulan modüller: seçim, hangi öğretimin İÇERİĞİNİN görüneceğini belirler.
+        // Diğer tüm modüllerde (zil saatleri, ders programı, nöbet, söz, duyuru, medya vb.) seçim,
+        // modülün HANGİ ÖĞRETİM gösterilirken görüneceğini belirler (Sabah: yalnız sabah öğretiminde, vb.).
+        const SHIFT_VIEW_CONTENT = ['achievements', 'birthday', 'quote', 'specialday', 'announcements', 'media', 'marquee'];
+        // Verisi öğretime göre ayrı tutulan modüller (modu, okulun genel öğretim düzenidir)
+        const SHIFT_DATA_MODULES = SHIFT_ALL_MODULES;
+        function shiftIsDataModule(mod) { return SHIFT_DATA_MODULES.indexOf(mod) >= 0; }
+        // TEK KURAL: Normal / İkili seçimi okul geneline aittir (Öğretim Düzeni sekmesi ile aynıdır).
+        // Modül sekmelerindeki çubuk aynı seçimi her yerden değiştirebilmek için vardır.
+        function shiftModEffectiveDouble(mod) { return isModDouble(mod); }
+        function shiftModuleModeSet(mod, mode) { shiftModuleToggle(mod, mode === 'double'); }
+        // Tek kutu: "İkili öğretim" (işaretlenince Sabah / Öğle seçenekleri açılır)
+        function shiftModeButtonsHtml(mod) {
+            const on = shiftModEffectiveDouble(mod);
+            return `<label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border cursor-pointer text-[11px] font-bold transition ${on ? 'bg-cyan-500/15 border-cyan-400 text-cyan-300' : 'bg-slate-900 border-slate-700 text-slate-300 hover:bg-slate-800'}"><input type="checkbox" class="accent-cyan-500 w-4 h-4" ${on ? 'checked' : ''} onchange="shiftModuleModeSet('${mod}', this.checked ? 'double' : 'normal'); try { renderShiftEditBars(); shiftViewRenderOptions(); } catch (e) {}"> <i class="fa-solid fa-circle-half-stroke"></i> İkili öğretim</label>`;
+        }
+        function shiftViewIsContent(mod) { return SHIFT_VIEW_CONTENT.indexOf(mod) >= 0; }
+        function shiftViewModules() {
+            try { return moduleDefs.map(d => [d.id, d.label || d.id]); } catch (e) { return [['achievements', 'Ayın Enleri'], ['birthday', 'Bugün Doğanlar']]; }
+        }
+        // Görünürlük türündeki modül şu an gösterilmeli mi?
+        function shiftViewVisible(mod) {
+            if (shiftViewIsContent(mod) || !isModDouble(mod)) return true; // bu modülde ikili öğretim kapalı: modül hep görünür
+            const m = shiftViewGet(mod);
+            if (m === 'morning' || m === 'afternoon') return shiftGetActive(new Date()) === m;
+            return true;
+        }
+        function shiftViewApplyVisibility() {
+            if (typeof moduleDefs === 'undefined') return;
+            moduleDefs.forEach(def => {
+                if (!def.cardSel || shiftViewIsContent(def.id)) return;
+                const card = document.querySelector(def.cardSel);
+                if (!card) return;
+                const st = (appConfig.moduleSettings && appConfig.moduleSettings[def.id]) || {};
+                const want = (st.active === false || !shiftViewVisible(def.id)) ? 'none' : '';
+                if (card.style.display !== want) card.style.display = want;
+            });
+        }
+        function shiftViewButtonsHtml(mod) {
+            const cur = shiftViewGet(mod);
+            return SHIFT_VIEW_OPTS.map(([v, t, ic]) => `<button type="button" onclick="shiftViewSet('${mod}', '${v}')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold border transition ${cur === v ? 'bg-cyan-500 text-black border-cyan-200 shadow shadow-cyan-500/40' : 'bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800'}"><i class="fa-solid ${ic}"></i> ${t}</button>`).join('');
+        }
+        const SHIFT_VIEW_OPTS = [['auto', 'Otomatik', 'fa-clock'], ['morning', 'Sabah', 'fa-sun'], ['afternoon', 'Öğle', 'fa-cloud-sun'], ['all', 'Tamamı', 'fa-layer-group']];
+        function shiftViewGet(mod) {
+            const v = ((appConfig && appConfig.shiftViews) || {})[mod];
+            return (v === 'morning' || v === 'afternoon' || v === 'all') ? v : 'auto';
+        }
+        // Modülde gösterilecek öğretim anahtarları (tekli modda [null])
+        function shiftViewKeys(mod) {
+            if (!isModDouble(mod)) return [null];
+            const m = shiftViewGet(mod);
+            if (m === 'morning') return ['morning'];
+            if (m === 'afternoon') return ['afternoon'];
+            if (m === 'all') return ['morning', 'afternoon'];
+            return [__boundShift || shiftGetActive(new Date())];
+        }
+        function shiftViewSet(mod, val) {
+            appConfig.shiftViews = Object.assign({}, appConfig.shiftViews || {}, { [mod]: val });
+            panoPersist();
+            try { shiftRefreshDisplay(); } catch (e) {}
+            try { shiftViewApplyVisibility(); } catch (e) {}
+            shiftViewRenderOptions();
+            try { renderShiftEditBars(); } catch (e) {}
+            try { if (typeof panoEditSelectedModule !== 'undefined' && panoEditSelectedModule) panoBuildLookUI(panoEditSelectedModule); } catch (e) {}
+            try { writeCMSLog(`${(shiftViewModules().find(x => x[0] === mod) || [mod, mod])[1]}: gösterim "${(SHIFT_VIEW_OPTS.find(x => x[0] === val) || [0, val])[1]}" olarak ayarlandı.`); } catch (e) {}
+        }
+        function shiftViewRenderOptions() {
+            const el = document.getElementById('teach-shift-view-opts'); if (!el) return;
+            el.innerHTML = shiftViewModules().map(([mod, title]) => {
+                const kind = shiftViewIsContent(mod) ? 'içerik' : 'gösterim';
+                return `<div class="flex items-center gap-3 flex-wrap"><span class="text-xs text-white font-bold w-44">${escapeHtml(title)} <span class="text-[9px] font-normal text-slate-500">(${kind})</span></span><div class="flex flex-wrap gap-2">${shiftViewButtonsHtml(mod)}</div></div>`;
+            }).join('');
+        }
+        // Modülün (duyuru, söz, kayan yazı, belirli gün, görsel slayt) pano görünümüne giren öğretim(ler)in listesi
+        function shiftViewArray(mod, field) {
+            if (!isModDouble(mod)) return appConfig[field] || [];
+            const ds = appConfig.doubleShift, out = [];
+            shiftViewKeys(mod).forEach(k => { out.push(...((ds[k] && ds[k][field]) || [])); });
+            return out;
+        }
+        // Bugün Doğanlar: görünüme giren öğretim(ler)in doğum günü listesi
+        function shiftViewBirthdays() {
+            if (!isModDouble('birthday')) return appConfig.birthdays || [];
+            const ds = appConfig.doubleShift, out = [];
+            shiftViewKeys('birthday').forEach(k => { out.push(...((ds[k] && ds[k].birthdays) || [])); });
+            return out;
+        }
+        // Ayın Enleri: görünüme giren öğretim(ler)in aktif alanları. key: DOM/zamanlayıcı kimliği
+        // (ikili modda iki öğretimde aynı alan kimliği olabileceğinden öğretim öneki eklenir)
+        function achViewEntries() {
+            if (!isModDouble('achievements')) return (appConfig.achievementCategories || []).filter(c => c.active !== false).map(cat => ({ cat, key: cat.id, shift: null }));
+            const ds = appConfig.doubleShift, keys = shiftViewKeys('achievements'), out = [];
+            keys.forEach(k => {
+                ((ds[k] && ds[k].achievementCategories) || []).filter(c => c.active !== false).forEach(cat => out.push({ cat, key: k + '__' + cat.id, shift: k }));
+            });
+            if (keys.length > 1) {
+                // "Tamamı": hiç kaydı olmayan alanlar (ör. henüz doldurulmamış öğle alanları) gösterilmez
+                const filled = out.filter(e => (e.cat.list || []).some(r => r.active !== false));
+                if (filled.length) return filled;
+            }
+            return out;
+        }
+
         function shiftDecorate() {
             document.querySelectorAll('.shift-badge').forEach(e => e.remove());
             if (!isDoubleMode() || !__boundShift) return;
-            const text = SHIFT_LABELS[__boundShift].toUpperCase() + ' ÖĞRETİMİ';
-            const cls = 'shift-badge shift-badge-' + __boundShift;
+            const badgeFor = (mod) => {
+                const keys = shiftViewIsContent(mod) ? shiftViewKeys(mod) : [__boundShift];
+                if (keys.length > 1) return { text: 'SABAH + ÖĞLE ÖĞRETİMİ', cls: 'shift-badge shift-badge-all' };
+                return { text: SHIFT_LABELS[keys[0]].toUpperCase() + ' ÖĞRETİMİ', cls: 'shift-badge shift-badge-' + keys[0] };
+            };
             const targets = [
-                document.getElementById('display-bellhours-title'),
-                document.getElementById('display-birthday-title'),
-                document.getElementById('display-achievements-title'),
-                (document.getElementById('display-duty-title-text') || {}).parentElement
+                ['bellhours', shiftLabelOn('bellhours') ? document.getElementById('display-bellhours-title') : null],
+                ['birthday', shiftLabelOn('birthday') ? document.getElementById('display-birthday-title') : null],
+                ['achievements', shiftLabelOn('achievements') ? document.getElementById('display-achievements-title') : null],
+                ['duty', shiftLabelOn('duty') ? (document.getElementById('display-duty-title-text') || {}).parentElement : null]
             ];
-            targets.forEach(t => {
-                if (!t) return;
-                const s = document.createElement('span');
-                s.className = cls;
-                s.textContent = text;
-                t.appendChild(s);
+            targets.forEach(([mod, t]) => {
+                if (!t || !isModDouble(mod)) return;
+                const b = badgeFor(mod);
+                const sp = document.createElement('span');
+                sp.className = b.cls;
+                sp.textContent = b.text;
+                t.appendChild(sp);
             });
         }
 
@@ -2422,6 +2908,10 @@
                 .shift-badge{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;font-size:.62em;font-weight:700;letter-spacing:.04em;vertical-align:middle;white-space:nowrap}
                 .shift-badge-morning{background:rgba(255,183,3,.18);color:#ffb703;border:1px solid rgba(255,183,3,.5)}
                 .shift-badge-afternoon{background:rgba(99,102,241,.35);color:#e0e7ff;border:1px solid rgba(165,180,252,.8)}
+                .shift-badge-all{background:rgba(34,211,238,.18);color:#67e8f9;border:1px solid rgba(34,211,238,.55)}
+                .ach-shift-tag{display:inline-block;margin-left:6px;padding:0 6px;border-radius:999px;font-size:.62em;font-weight:700;letter-spacing:.04em;vertical-align:middle;white-space:nowrap}
+                .ach-shift-tag-morning{background:rgba(255,183,3,.18);color:#ffb703;border:1px solid rgba(255,183,3,.5)}
+                .ach-shift-tag-afternoon{background:rgba(99,102,241,.35);color:#e0e7ff;border:1px solid rgba(165,180,252,.8)}
             `;
             document.head.appendChild(st);
         })();
@@ -2433,6 +2923,15 @@
         function shiftReloadAchTemp() {
             tempAchievementCategories = shiftDeepCopy(appConfig.achievementCategories || []) || [];
             try { tempBirthdays = [...(appConfig.birthdays || [])]; selectedBirthdayIndices.clear(); } catch (e) {}
+            // Duyuru / kayan yazı / söz / belirli gün / görsel slayt çalışma kopyaları da bağlı öğretimden yenilenir
+            try {
+                tempAnnouncements = (appConfig.announcements || []).map(a => ({ ...a }));
+                tempMarqueeItems = (appConfig.marqueeItems || []).map(a => ({ ...a }));
+                tempQuotes = [...(appConfig.quotes || [])];
+                tempSpecialDays = [...(appConfig.specialDays || [])];
+                tempMediaPlaylist = [...(appConfig.mediaPlaylist || [])];
+                cancelEditAnnouncement(); cancelEditMarqueeItem(); cancelEditQuote(); cancelEditSpecialDay(); cancelEditMediaSlide();
+            } catch (e) {}
             achievementEditing = { catId: null, index: -1 };
             achievementPendingFile = {};
         }
@@ -2459,32 +2958,35 @@
                 renderAdminBirthdays();
                 const _bc = document.getElementById('stat-birthday-count'); if (_bc) _bc.innerText = (appConfig.birthdays || []).length;
             } catch (e) {}
+            try { renderAdminAnnouncements(); renderAdminMarqueeItems(); renderAdminQuotes(); renderAdminSpecialDays(); renderAdminMediaPlaylist(); } catch (e) {}
+            try { buildWeeklyDutiesTable(); } catch (e) {}
             renderShiftEditBars();
             renderTeachingTab();
             shiftRefreshDisplay();
+            try { if (typeof panoEditSelectedModule !== 'undefined' && panoEditSelectedModule) panoBuildLookUI(panoEditSelectedModule); } catch (e) {}
         }
 
         // Ders programı / zil saatleri / nöbet sekmelerinin üstündeki "Sabah | Öğle" seçici
         function renderShiftEditBars() {
-            const dbl = isDoubleMode();
             document.querySelectorAll('.shift-edit-bar').forEach(bar => {
-                if (!dbl) { bar.innerHTML = ''; bar.classList.add('hidden'); return; }
+                const viewMod = bar.getAttribute('data-view-mod') || ({ 'tab-schedule': 'schedule', 'tab-birthdays': 'birthday', 'tab-achievements': 'achievements', 'tab-duties': 'duty', 'tab-hours': 'bellhours' })[(bar.closest('.tab-content') || {}).id];
+                if (!viewMod) { bar.innerHTML = ''; bar.classList.add('hidden'); return; }
                 bar.classList.remove('hidden');
-                const SHIFT_BTN = {
-                    morning:   { on: 'bg-amber-400 text-black border-amber-200 shadow-lg shadow-amber-500/40 ring-2 ring-amber-300/60', off: 'bg-amber-400/10 text-amber-300 border-amber-400/40 hover:bg-amber-400/20' },
-                    afternoon: { on: 'bg-indigo-500 text-white border-indigo-200 shadow-lg shadow-indigo-500/50 ring-2 ring-indigo-300/70', off: 'bg-indigo-400/10 text-indigo-300 border-indigo-400/40 hover:bg-indigo-400/20' }
+                const isData = shiftIsDataModule(viewMod);
+                const on = shiftModEffectiveDouble(viewMod);
+                const SB = {
+                    morning:   { on: 'bg-amber-400 text-black border-amber-200 shadow shadow-amber-500/40', off: 'bg-amber-400/10 text-amber-300 border-amber-400/40 hover:bg-amber-400/20' },
+                    afternoon: { on: 'bg-indigo-500 text-white border-indigo-200 shadow shadow-indigo-500/50', off: 'bg-indigo-400/10 text-indigo-300 border-indigo-400/40 hover:bg-indigo-400/20' }
                 };
-                const mk = (key, icon, color) => {
-                    const on = (__boundShift === key);
-                    return `<button type="button" onclick="adminSwitchEditShift('${key}')" class="px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 border transition ${on ? SHIFT_BTN[key].on : SHIFT_BTN[key].off}"><i class="fa-solid ${icon}"></i> ${SHIFT_LABELS[key]} Öğretimi</button>`;
-                };
-                bar.innerHTML = `
-                    <div class="flex items-center gap-3 flex-wrap bg-slate-950 border border-amber-500/30 rounded-xl p-3">
-                        <span class="text-[11px] text-slate-400 font-bold"><i class="fa-solid fa-pen-to-square text-amber-400"></i> Düzenlenen öğretim:</span>
-                        ${mk('morning', 'fa-sun', 'bg-amber-400')}
-                        ${mk('afternoon', 'fa-cloud-sun', 'bg-indigo-500')}
-                        <span class="text-[10px] text-slate-500">Bu sekmedeki veriler (zil saatleri, ders programı, nöbet, doğum günleri vb.) seçili öğretime aittir.</span>
-                    </div>`;
+                const mk = (key, icon) => `<button type="button" onclick="adminSwitchEditShift('${key}')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold flex items-center gap-1.5 border transition ${__boundShift === key ? SB[key].on : SB[key].off}"><i class="fa-solid ${icon}"></i> ${key === 'morning' ? 'Sabah' : 'Öğle'}</button>`;
+                const lbl = (ic, t) => `<span class="text-[11px] text-slate-400 font-bold"><i class="fa-solid ${ic}"></i> ${t}</span>`;
+                // Düzenle: yalnız verisi öğretime göre ayrı olan modüllerde anlamlı
+                const edit = (on && isData) ? `<div class="flex items-center gap-2" title="Bu sekmede düzenlediğiniz öğretim">${lbl('fa-pen-to-square text-amber-400', 'Düzenle:')}${mk('morning', 'fa-sun')}${mk('afternoon', 'fa-cloud-sun')}</div>` : '';
+                const view = on ? `<div class="flex items-center gap-2 flex-wrap" title="${shiftViewIsContent(viewMod) ? 'Modülde hangi öğretimin içeriği gösterilsin' : 'Modül hangi öğretim gösterilirken görünsün'}">${lbl('fa-tv text-cyan-400', 'Panoda görünsün:')}${shiftViewButtonsHtml(viewMod)}</div>` : '';
+                const hint = on
+                    ? (isData ? '' : `<span class="text-[10px] text-slate-500">Bu modülün içeriği iki öğretimde ortaktır; yalnızca hangi öğretimde görüneceğini seçebilirsiniz.</span>`)
+                    : `<span class="text-[10px] text-slate-500">${isData ? 'Kapalı: bu modül tek öğretim gibi çalışır, diğer modüller etkilenmez.' : 'Modül panoda her zaman görünür.'}</span>`;
+                bar.innerHTML = `<div class="flex items-center gap-x-4 gap-y-2 flex-wrap bg-slate-950 border border-amber-500/30 rounded-xl p-3">${shiftModeButtonsHtml(viewMod)}${edit}${view}${hint}</div>`;
             });
         }
 
@@ -2500,17 +3002,24 @@
             writeCMSLog(`Düzenlenen öğretim: ${SHIFT_LABELS[key]}`);
         }
 
-        function shiftEnableDouble() {
-            if (isDoubleMode()) return;
-            shiftCommitInputs();
-            const single = {};
-            SHIFT_FIELDS.forEach(f => { single[f] = appConfig[f]; });
-            appConfig.singleModeData = single;               // yedek: normal moda dönüşte geri gelir
-            if (!appConfig.doubleShift) appConfig.doubleShift = shiftSeedFromSingle(single);
-            SHIFT_FIELDS.forEach(f => { delete appConfig[f]; });
-            appConfig.teachingMode = 'double';
+        function shiftEnableDouble(mods) {
+            mods = (mods && mods.length) ? mods : SHIFT_ALL_MODULES;
+            if (!isDoubleMode()) {
+                shiftCommitInputs();
+                const single = {};
+                SHIFT_FIELDS.forEach(f => { single[f] = (appConfig[f] !== undefined && appConfig[f] !== null) ? appConfig[f] : shiftDefaultFor(f); });
+                appConfig.singleModeData = single;               // yedek + ikili olmayan modüllerin verisi
+                if (!appConfig.doubleShift) appConfig.doubleShift = shiftSeedFromSingle(single);
+                SHIFT_FIELDS.forEach(f => { delete appConfig[f]; });
+                appConfig.teachingMode = 'double';
+                appConfig.shiftModules = {};
+                shiftEnsureDoubleData();
+                shiftInstallAccessors();
+            }
+            if (!appConfig.shiftModules) appConfig.shiftModules = {};
+            mods.forEach(m => { appConfig.shiftModules[m] = true; });
             shiftEnsureDoubleData();
-            shiftInstallAccessors();
+            mods.forEach(m => { try { shiftSeedModule(m); } catch (e) {} });
             shiftAdminEditShift = shiftGetActive(new Date());
             shiftBind(shiftAdminEditShift);
             shiftReloadAchTemp();
@@ -2518,24 +3027,86 @@
             if (cls.length) activeAdminEditClass = cls[0];
         }
 
+        // Bir modül ilk kez ikili yapıldığında, o modülün mevcut (tekli) verisinden sabah/öğle verisini üretir
+        function shiftSeedModule(mod) {
+            const ds = appConfig.doubleShift;
+            if (!ds || !SHIFT_MODULE_FIELDS[mod]) return;
+            if (!ds.seededMods) ds.seededMods = {};
+            if (ds.seededMods[mod]) return;
+            const single = appConfig.singleModeData || {};
+            const tmp = shiftSeedFromSingle(single, ds.classShifts);
+            SHIFT_KEYS.forEach(k => {
+                if (!ds[k]) ds[k] = {};
+                SHIFT_MODULE_FIELDS[mod].forEach(f => { ds[k][f] = shiftDeepCopy(tmp[k][f]); });
+            });
+            if (mod === 'schedule') {
+                SHIFT_KEYS.forEach(k => {
+                    const len = (appConfig.shiftModules && appConfig.shiftModules.bellhours)
+                        ? (ds[k].bellHours || []).length : (single.bellHours || []).length;
+                    const sched = {};
+                    classList.filter(c => (ds.classShifts[c] || 'morning') === k).forEach(c => {
+                        const src = (single.weeklyClassSchedules || {})[c];
+                        if (src) sched[c] = shiftNormalizeClassWeek(src, len || 5);
+                    });
+                    ds[k].weeklyClassSchedules = sched;
+                });
+            }
+            ds.seededMods[mod] = true;
+        }
+
+        // İki öğretimin doğum günlerini tek listede birleştirip tekli veriye yazar (modül kapatılırken)
+        function shiftMergeBirthdaysToSingle() {
+            const ds = appConfig.doubleShift;
+            if (!ds) return;
+            const seen = new Set(), merged = [];
+            SHIFT_KEYS.forEach(k => ((ds[k] || {}).birthdays || []).forEach(b => {
+                const id = [b.class, b.name, b.date].join('|');
+                if (!seen.has(id)) { seen.add(id); merged.push({ ...b }); }
+            }));
+            if (!appConfig.singleModeData) appConfig.singleModeData = {};
+            appConfig.singleModeData.birthdays = merged;
+            if (ds.seededMods) ds.seededMods.birthday = false;
+        }
+
+        // TEK MODÜL için İkili öğretim aç/kapat: yalnızca o modülü etkiler, diğer modüllere dokunmaz
+        function shiftModuleToggle(mod, on) {
+            on = !!on;
+            if (on === isModDouble(mod)) return;
+            if (isDoubleMode()) shiftCommitInputs();
+            if (on) {
+                if (!isDoubleMode()) shiftEnableDouble([mod]);
+                else {
+                    appConfig.shiftModules[mod] = true;
+                    shiftSeedModule(mod);
+                }
+            } else {
+                if (mod === 'birthday') shiftMergeBirthdaysToSingle();
+                appConfig.shiftModules[mod] = false;
+                if (!Object.keys(appConfig.shiftModules).some(m => appConfig.shiftModules[m])) shiftDisableDouble();
+            }
+            shiftReloadAchTemp();
+            if (isDoubleMode()) {
+                const cls = adminClassList();
+                if (cls.length && !cls.includes(activeAdminEditClass)) activeAdminEditClass = cls[0];
+            }
+            const nm = (shiftViewModules().find(x => x[0] === mod) || [mod, mod])[1];
+            shiftRefreshAdmin();
+            try { writeCMSLog(`${nm}: ikili öğretim ${on ? 'açıldı' : 'kapatıldı'} (yalnız bu modül). Kaydetmeyi unutmayın.`); } catch (e) {}
+        }
+
         function shiftDisableDouble() {
             if (!isDoubleMode()) return;
             shiftCommitInputs();
             const back = appConfig.singleModeData || {};
-            const _seen = new Set();
-            const _mergedB = [];
-            SHIFT_KEYS.forEach(k => ((appConfig.doubleShift[k] || {}).birthdays || []).forEach(b => {
-                const id = [b.class, b.name, b.date].join('|');
-                if (!_seen.has(id)) { _seen.add(id); _mergedB.push({ ...b }); }
-            }));
+            if (appConfig.shiftModules && appConfig.shiftModules.birthday) shiftMergeBirthdaysToSingle();
             shiftRemoveAccessors();
             SHIFT_FIELDS.forEach(f => {
                 if (back[f] !== undefined && back[f] !== null) appConfig[f] = back[f];
-                else appConfig[f] = (f === 'bellHours') ? shiftDeepCopy(SHIFT_SINGLE_DEFAULT_BELLS) : (f === 'achievementCategories' ? shiftDefaultAch() : {});
+                else appConfig[f] = shiftDefaultFor(f);
             });
-            appConfig.birthdays = _mergedB;
             delete appConfig.singleModeData;
             appConfig.teachingMode = 'single';
+            appConfig.shiftModules = {};
             __boundShift = null;
             bellHours = appConfig.bellHours;
             if (!classList.includes(activeAdminEditClass)) activeAdminEditClass = classList[0];
@@ -2543,21 +3114,35 @@
         }
 
         function teachingModeSet(mode) {
-            const current = isDoubleMode() ? 'double' : 'single';
-            if (mode === current) return;
+            const flags = appConfig.shiftModules || {};
+            const allOn = isDoubleMode() && SHIFT_ALL_MODULES.every(m => flags[m]);
+            if (mode === 'double' && allOn) return;
+            if (mode !== 'double' && !isDoubleMode()) return;
             if (mode === 'double') {
                 askCustomConfirmation(
-                    'İkili Öğretime Geç',
-                    'Zil saatleri, ders programı ve nöbet çizelgesi SABAH ve ÖĞLE için ayrı tutulacak. İlk geçişte mevcut ders programınız sınıflara göre iki öğretime dağıtılır ve örnek zil saatleri yüklenir (sonra düzenleyebilirsiniz). Normal moda dönerseniz eski verileriniz aynen geri gelir. Devam edilsin mi?',
-                    function () { shiftEnableDouble(); shiftRefreshAdmin(); writeCMSLog('İkili öğretim moduna geçildi. Kaydetmeyi unutmayın.'); }
+                    'Tüm Modüllerde İkili Öğretim',
+                    'Zil saatleri, ders programı, nöbet, doğum günleri, Ayın Enleri, günün sözü, belirli günler, duyurular, kayan yazı ve görsel slayt SABAH ve ÖĞLE için ayrı tutulacak. İlk geçişte mevcut verileriniz iki öğretime kopyalanır/dağıtılır. Not: her modülün kendi sekmesindeki "İkili öğretim" kutusuyla yalnızca o modülü de açıp kapatabilirsiniz. Devam edilsin mi?',
+                    function () { shiftEnableDouble(SHIFT_ALL_MODULES); shiftRefreshAdmin(); writeCMSLog('Tüm modüllerde ikili öğretim açıldı. Kaydetmeyi unutmayın.'); }
                 );
             } else {
                 askCustomConfirmation(
                     'Normal (Tekli) Öğretime Dön',
-                    'Pano tekrar tek öğretim düzenine dönecek ve ikili öğretime geçmeden önceki zil saatleri, ders programı ve nöbet verileriniz geri yüklenecek. Sabah/öğle verileriniz silinmez; ikili moda tekrar geçerseniz karşınıza çıkar. Devam edilsin mi?',
-                    function () { shiftDisableDouble(); shiftRefreshAdmin(); writeCMSLog('Normal (tekli) öğretim moduna dönüldü. Kaydetmeyi unutmayın.'); }
+                    'Tüm modüllerde ikili öğretim kapatılacak; her modül, ikili öğretime geçmeden önceki tekli verisine döner. Sabah/öğle verileriniz silinmez; modülü tekrar ikili yaparsanız karşınıza çıkar. Devam edilsin mi?',
+                    function () { shiftDisableDouble(); shiftRefreshAdmin(); writeCMSLog('Normal (tekli) öğretime dönüldü. Kaydetmeyi unutmayın.'); }
                 );
             }
+        }
+
+        // Otomatik modda sabah -> öğle geçiş saati ('' = bell saatlerinden otomatik hesapla)
+        function shiftSetSwitchTime(val) {
+            if (!isDoubleMode()) return;
+            val = String(val || '').trim();
+            const mt = /^(\d{1,2}):(\d{2})$/.exec(val);
+            appConfig.doubleShift.switchTime = (mt && +mt[1] < 24 && +mt[2] < 60) ? shiftMinToTime((+mt[1]) * 60 + (+mt[2])) : '';
+            try { panoPersist(); } catch (e) {}
+            renderTeachingTab();
+            try { shiftSyncBinding(); shiftRefreshDisplay(); } catch (e) {}
+            writeCMSLog(appConfig.doubleShift.switchTime ? `Öğretim geçiş saati ${appConfig.doubleShift.switchTime} olarak ayarlandı.` : 'Öğretim geçiş saati otomatik hesaplamaya döndü.');
         }
 
         function shiftSetActiveMode(val) {
@@ -2576,6 +3161,7 @@
             if (src && !ds[to].weeklyClassSchedules[cls]) {
                 ds[to].weeklyClassSchedules[cls] = shiftNormalizeClassWeek(src, ds[to].bellHours.length);
             }
+            shiftRebalanceBirthdays(); // sınıfın doğum günleri de yeni öğretime geçer
         }
 
         function shiftToggleClass(cls) {
@@ -2583,6 +3169,7 @@
             shiftCommitInputs();
             const cur = appConfig.doubleShift.classShifts[cls] || 'morning';
             shiftMoveClass(cls, cur === 'morning' ? 'afternoon' : 'morning');
+            birthdaysResyncAdmin();
             shiftRefreshAdmin();
         }
 
@@ -2596,6 +3183,7 @@
                     const ds = appConfig.doubleShift;
                     const moves = classList.map(c => [c, ds.classShifts[c] === 'afternoon' ? 'morning' : 'afternoon']);
                     moves.forEach(([c, to]) => shiftMoveClass(c, to));
+                    birthdaysResyncAdmin();
                     shiftRefreshAdmin();
                     writeCMSLog('Sabah/öğle sınıf grupları yer değiştirdi. Kaydetmeyi unutmayın.');
                 }
@@ -2622,14 +3210,25 @@
             const sel = document.getElementById('teach-active-mode');
             if (sel) sel.value = ds.activeMode || 'auto';
 
+            const isAuto = (ds.activeMode === 'auto' || !ds.activeMode);
+            const tbox = document.getElementById('teach-switch-time-box');
+            if (tbox) {
+                tbox.classList.toggle('hidden', !isAuto);
+                const ti = document.getElementById('teach-switch-time'); if (ti) ti.value = shiftMinToTime(shiftSwitchMinutes());
+                const tn = document.getElementById('teach-switch-time-note');
+                if (tn) tn.textContent = ds.switchTime ? 'Elle ayarlı' : `Otomatik hesaplanıyor (${shiftMinToTime(shiftAutoSwitchMinutes())})`;
+                const tr = document.getElementById('teach-switch-time-reset'); if (tr) tr.classList.toggle('hidden', !ds.switchTime);
+            }
             const info = document.getElementById('teach-switch-info');
             if (info) {
                 const now = shiftGetActive(new Date());
                 info.innerHTML = (ds.activeMode === 'auto' || !ds.activeMode)
-                    ? `Otomatik: <b class="text-yellow-400">${shiftMinToTime(shiftSwitchMinutes())}</b> öncesinde <b>Sabah</b>, sonrasında <b>Öğle</b> öğretimi gösterilir (sabahın son ders çıkışı ile öğlenin ilk ders girişinin ortası). Şu an panoda: <b class="text-cyan-400">${SHIFT_LABELS[now]} Öğretimi</b>.`
+                    ? `Otomatik: <b class="text-yellow-400">${shiftMinToTime(shiftSwitchMinutes())}</b> öncesinde <b>Sabah</b>, sonrasında <b>Öğle</b> öğretimi gösterilir (${ds.switchTime ? 'elle ayarladığınız geçiş saati' : 'sabahın son ders çıkışı ile öğlenin ilk ders girişinin ortası'}). Şu an panoda: <b class="text-cyan-400">${SHIFT_LABELS[now]} Öğretimi</b>.`
                     : `Pano sabit olarak <b class="text-cyan-400">${SHIFT_LABELS[ds.activeMode]} Öğretimi</b> verisini gösteriyor (otomatik geçiş kapalı).`;
             }
 
+            shiftLabelRenderOptions();
+            shiftViewRenderOptions();
             const grid = document.getElementById('teach-class-grid');
             if (grid) {
                 grid.innerHTML = classList.map(c => {
@@ -2677,6 +3276,31 @@
         appConfig.clockStyle = { ...JSON.parse(JSON.stringify(defaultAppConfig.clockStyle)), ...(appConfig.clockStyle || {}) };
         if (!appConfig.panoLayout) appConfig.panoLayout = panoFillMissingModules(JSON.parse(JSON.stringify(PANO_LAYOUT_TEMPLATES['klasik'])));
         else appConfig.panoLayout = panoFillMissingModules(appConfig.panoLayout);
+
+        /* TASARIM SÜRÜMÜ 2 (yeni arayüz): Kullanıcı yerleşimi hiç değiştirmemiş ve eski "Klasik"
+           düzeni kullanıyorsa, yeni dengeli düzene (kayan yazı bandı dahil) otomatik geçilir.
+           Özelleştirilmiş yerleşimlere dokunulmaz; yeni düzen Şablonlar'dan seçilebilir. */
+        const PANO_DESIGN_VERSION = 2;
+        if ((appConfig.panoDesignVersion || 1) < PANO_DESIGN_VERSION) {
+            const oldKlasik = {
+                birthday: [1, 24, 1, 24], schedule: [1, 24, 25, 24], clock: [1, 24, 49, 16],
+                brand: [25, 48, 1, 8], media: [25, 48, 9, 40], duty: [25, 48, 49, 16],
+                quote: [73, 24, 1, 12], specialday: [73, 24, 13, 12], bellhours: [73, 24, 25, 16],
+                announcements: [73, 24, 41, 12], achievements: [73, 24, 53, 12]
+            };
+            const cur = appConfig.panoLayout || {};
+            const sameAsOld = Object.keys(oldKlasik).every(id => {
+                const o = oldKlasik[id], m = cur[id];
+                return m && m.c === o[0] && m.cs === o[1] && m.r === o[2] && m.rs === o[3];
+            });
+            if (sameAsOld) {
+                appConfig.panoLayout = panoFillMissingModules(JSON.parse(JSON.stringify(PANO_LAYOUT_TEMPLATES.klasik)));
+                const mq = appConfig.moduleSettings && appConfig.moduleSettings.marquee;
+                if (mq && mq.titleActive !== false && mq.title === 'KAYAN YAZI') mq.titleActive = false;
+            }
+            appConfig.panoDesignVersion = PANO_DESIGN_VERSION;
+            panoPersist();
+        }
         if (!appConfig.savedLayouts) appConfig.savedLayouts = {};
         if (!appConfig.quotes || appConfig.quotes.length === 0) {
             appConfig.quotes = [{ text: appConfig.quote || defaultAppConfig.quote, author: appConfig.quoteAuthor || defaultAppConfig.quoteAuthor, date: "" }];
@@ -2760,6 +3384,7 @@
             SHIFT_KEYS.forEach(k => {
                 appConfig.doubleShift[k].achievementCategories = normalizeAchievementCats(appConfig.doubleShift[k].achievementCategories);
             });
+            if (appConfig.singleModeData) appConfig.singleModeData.achievementCategories = normalizeAchievementCats(appConfig.singleModeData.achievementCategories);
         } else {
             appConfig.achievementCategories = normalizeAchievementCats(appConfig.achievementCategories);
         }
@@ -2960,6 +3585,7 @@
         let editingMediaSlideIndex = -1;
         let cyclingIntervalTimers = {}; // Süreli (döngüsel) modüllerin setInterval id'lerini tutar
 
+        let schedulePageIdx = 0, schedulePageCount = 1, scheduleChunkCount = 1;
         let activeScheduleGroup = 1; 
         let birthdayCycleIndex = 0;
         let quoteCycleIndex = 0;
@@ -3027,20 +3653,23 @@
             panoInitLayout();
             panoRenderTemplateList();
             panoRenderSavedLayoutsList();
+            panoRenderScreenAdmin();
             panoRenderModuleSizeList();
 
-            requestRealFullscreen();
-            armFullscreenPersistent();
+            if (!PANO_PREVIEW) {
+                requestRealFullscreen();
+                armFullscreenPersistent();
+            }
 
             // BULUT SENKRONİZASYONU: önce mevcut yerel veriyle yukarıda ANINDA çizim yapıldı;
             // SUPABASE_CONFIG doldurulmuşsa, arka planda buluttan daha güncel bir kayıt olup
             // olmadığı kontrol edilir ve gerçek zamanlı dinleyici başlatılır.
-            if (CLOUD_SYNC_ENABLED) {
+            if (CLOUD_SYNC_ENABLED && !PANO_PREVIEW) {
                 writeCMSLog("Bulut senkronizasyonu etkin, buluttaki veriler kontrol ediliyor...");
                 cloudSyncPullOnce();
                 cloudSyncStartListening();
             }
-            adminRestoreAfterReload(); // yenileme sonrası yönetim paneli açıksa geri aç
+            if (!PANO_PREVIEW) adminRestoreAfterReload(); // yenileme sonrası yönetim paneli açıksa geri aç
 
             document.addEventListener('keydown', function(e) {
                 if (IS_DISPLAY_MODE) return; // TV/kiosk modunda yönetim paneli tuşla açılamaz
@@ -3190,13 +3819,38 @@
             });
         }
 
+        function setMarqAnnounceMode(mode) {
+            const inp = document.getElementById('marq-announce-mode');
+            if (inp) inp.value = mode;
+            syncMarqAnnounceButtons();
+            updateMarqueeLivePreview();
+        }
+        function syncMarqAnnounceButtons() {
+            const inp = document.getElementById('marq-announce-mode');
+            const cur = (inp && inp.value) || 'marked';
+            document.querySelectorAll('#marq-announce-opts .mab-opt').forEach(b => b.classList.toggle('is-active', b.dataset.mode === cur));
+        }
+
+        // Kayan yazı mesajlarına, ayara göre duyuruları da ekler.
+        // mode: 'off' = hiç ekleme | 'marked' = sadece "alt yazıda göster" işaretli | 'all' = tümü
+        function getMarqueeDisplayItems(marqItems, announcements, mode) {
+            const base = (marqItems || []).slice();
+            if (mode === 'off') return base;
+            const extra = (announcements || [])
+                .filter(a => a && a.text && (mode === 'all' || a.inMarquee))
+                .map(a => ({ text: a.text, color: a.color || '', bold: !!a.bold, italic: false, icon: 'fa-bullhorn' }));
+            return base.concat(extra);
+        }
+
         // Panodaki gerçek Kayan Yazı kartını, appConfig'teki güncel veriyle çizer.
         function renderMarqueeWidget() {
             const track = document.getElementById('marquee-track');
             const viewport = document.getElementById('marquee-viewport');
             if (!track) return;
             const mw = appConfig.marqueeWidget || defaultAppConfig.marqueeWidget;
-            const items = (appConfig.marqueeItems && appConfig.marqueeItems.length > 0) ? appConfig.marqueeItems : defaultAppConfig.marqueeItems;
+            const _mqAll = shiftViewArray('marquee', 'marqueeItems');
+            const baseItems = (_mqAll && _mqAll.length > 0) ? _mqAll : defaultAppConfig.marqueeItems;
+            const items = getMarqueeDisplayItems(baseItems, shiftViewArray('announcements', 'announcements'), mw.announceMode || 'marked');
             buildMarqueeTrack(track, viewport, items, mw);
         }
 
@@ -3232,13 +3886,14 @@
                 logoBox.classList.remove('has-image');
             }
             renderAchievementsCard();
-            (appConfig.achievementCategories || []).filter(cat => cat.active !== false).forEach(cat => cycleAchievementCategory(cat.id));
+            achViewEntries().forEach(e => cycleAchievementCategory(e.key));
             cycleMediaSlides();
             renderActiveDuties();
 
             const annListContainer = document.getElementById('display-announcements-list');
             annListContainer.innerHTML = '';
-            const anns = appConfig.announcements && appConfig.announcements.length > 0 ? appConfig.announcements : [{ text: 'Duyuru bulunmamaktadır.', color: '', bgColor: '', font: '', fontSize: 11, bold: false }];
+            const _annAll = shiftViewArray('announcements', 'announcements');
+            const anns = _annAll && _annAll.length > 0 ? _annAll : [{ text: 'Duyuru bulunmamaktadır.', color: '', bgColor: '', font: '', fontSize: 11, bold: false }];
             anns.slice(0, 4).forEach(ann => {
                 const item = document.createElement('div');
                 item.className = 'ann-item';
@@ -3287,8 +3942,15 @@
             if (!elements.length) return;
 
             const borderStyle = cfg.brandBorderStyle || 'solid';
-            const borderColor = cfg.brandBorderColor || '#00b4d8';
-            const borderWidthNum = (cfg.brandBorderWidth !== undefined && cfg.brandBorderWidth !== null) ? parseInt(cfg.brandBorderWidth, 10) : 2;
+            let borderColor = cfg.brandBorderColor || '#00b4d8';
+            let borderWidthNum = (cfg.brandBorderWidth !== undefined && cfg.brandBorderWidth !== null) ? parseInt(cfg.brandBorderWidth, 10) : 2;
+
+            // Marka alanı hiç özelleştirilmediyse (eski varsayılan renkler) seçili renk temasına uyum sağlar.
+            const brandIsThemeDefault = String(borderColor).toLowerCase() === '#00b4d8'
+                && String(cfg.brandBgColor1 || '#09101f').toLowerCase() === '#09101f'
+                && String(cfg.brandBgColor2 || '#0d1b35').toLowerCase() === '#0d1b35'
+                && (cfg.brandBgType || 'gradient') === 'gradient'
+                && (cfg.brandEffect || 'glow') === 'glow';
 
             const bgType = cfg.brandBgType || 'gradient';
             const bgColor1 = cfg.brandBgColor1 || '#09101f';
@@ -3323,6 +3985,14 @@
             } else { // glow (varsayılan)
                 shadow = `0 0 15px ${hexToRgba(borderColor, 0.3)}`;
                 shadowHover = `0 0 25px ${hexToRgba(borderColor, 0.5)}`;
+            }
+
+            if (brandIsThemeDefault) {
+                borderColor = 'color-mix(in srgb, var(--neon-blue) 45%, var(--card-border))';
+                borderWidthNum = 1;
+                bg = 'linear-gradient(115deg, color-mix(in srgb, var(--neon-blue) 18%, var(--card-bg)) 0%, var(--card-bg) 55%, color-mix(in srgb, var(--neon-red) 16%, var(--card-bg)) 100%)';
+                shadow = '0 12px 32px -14px color-mix(in srgb, var(--neon-blue) 55%, transparent)';
+                shadowHover = '0 14px 36px -12px color-mix(in srgb, var(--neon-blue) 70%, transparent)';
             }
 
             elements.forEach(el => {
@@ -3518,12 +4188,14 @@
                 : `border-color:${pos.color}33;`;
             const nameStyle = style.nameColorMode === 'custom' ? `color:${style.nameColor || '#02040a'};` : '';
             const avatarHtml = getRosterAvatarHtml(name, buildFallbackAvatarHtml(pos));
+            // Nöbet yeri adının yanındaki ikon (Görsel Özelleştirme > "ikon göster" tercihi)
+            const titleIconHtml = style.showTitleIcon === false ? '' : `<i class="fa-solid ${pos.icon || 'fa-user-shield'}"></i> `;
 
             return `
                 <div class="duty-card-box ${shapeClass} ${stateClass}" style="${boxStyle}">
                     <div class="duty-avatar-box ${shapeClass}" style="border-color:${pos.color};">${avatarHtml}</div>
                     <div class="duty-info-box">
-                        <div class="duty-title" style="color:${pos.color};"><i class="fa-solid ${pos.icon || 'fa-user-shield'}"></i> ${escapeHtml(pos.label)}</div>
+                        <div class="duty-title" style="color:${pos.color};">${titleIconHtml}${escapeHtml(pos.label)}</div>
                         <div class="duty-name-pill ${shapeClass}" style="${nameStyle}">${escapeHtml(hasName ? name : 'Nöbet Yok')}</div>
                     </div>
                 </div>`;
@@ -3752,7 +4424,7 @@
             if (!appConfig.teacherRoster) appConfig.teacherRoster = {};
             const found = new Set();
 
-            const _dutySources = isDoubleMode()
+            const _dutySources = isModDouble('duty')
                 ? SHIFT_KEYS.map(k => ({ w: appConfig.doubleShift[k].weeklyDuties || {}, a: appConfig.doubleShift[k].aylikNobet || {} }))
                 : [{ w: appConfig.weeklyDuties || {}, a: appConfig.aylikNobet || {} }];
             _dutySources.forEach(src => Object.values(src.w).forEach(d => {
@@ -3980,7 +4652,10 @@
         function applyDutyTemplate(key) {
             const tpl = DUTY_STYLE_TEMPLATES[key];
             if (!tpl) return;
+            // Şablon yalnızca şekil/renk/vurgu belirler; "ikon göster" tercihi korunur
+            const keepIcon = tempDutyStyle ? tempDutyStyle.showTitleIcon : undefined;
             tempDutyStyle = JSON.parse(JSON.stringify(tpl.style));
+            if (keepIcon !== undefined) tempDutyStyle.showTitleIcon = keepIcon;
             loadDutyStyleIntoInputs();
             renderDutyTemplateList();
             renderDutyLivePreview();
@@ -3991,6 +4666,8 @@
             document.getElementById('dutystyle-shape').value = s.shape || 'rounded';
             document.getElementById('dutystyle-namecolor-mode').value = s.nameColorMode || 'auto';
             document.getElementById('dutystyle-namecolor').value = s.nameColor || '#02040a';
+            const iconChk = document.getElementById('dutystyle-show-icon');
+            if (iconChk) iconChk.checked = s.showTitleIcon !== false;
             document.getElementById('dutystyle-bgcolor').value = (s.activeBg && s.activeBg.color) || '#00b4d8';
             const opacityVal = (s.activeBg && typeof s.activeBg.opacity === 'number') ? s.activeBg.opacity : 15;
             document.getElementById('dutystyle-opacity').value = opacityVal;
@@ -4004,6 +4681,7 @@
                 shape: document.getElementById('dutystyle-shape').value,
                 nameColorMode: document.getElementById('dutystyle-namecolor-mode').value,
                 nameColor: document.getElementById('dutystyle-namecolor').value,
+                showTitleIcon: (document.getElementById('dutystyle-show-icon') || { checked: true }).checked,
                 activeBg: {
                     color: document.getElementById('dutystyle-bgcolor').value,
                     opacity: parseInt(document.getElementById('dutystyle-opacity').value, 10) || 0,
@@ -4026,6 +4704,12 @@
             grid.innerHTML = tempDutyPositions.map((pos, i) => buildDutyCardHtml(pos, sampleNames[i % sampleNames.length])).join('');
             appConfig.dutyStyle = savedStyle;
             appConfig.dutyPositions = savedPositions;
+            // Panoda olduğu gibi: kaydedilmiş Kapsamlı Ayarlar varsa önizlemeye de uygula
+            if (appConfig.dutyAdvancedSettings) {
+                applyDutyAdvancedStyleToGrid(grid, tempDutyPositions, getDutyAdvanced(), tempDutyStyle || appConfig.dutyStyle);
+            }
+            // Kapsamlı Ayarlar sekmesindeki önizleme de aynı geçici stille güncel kalsın
+            if (typeof dutySettingsLivePreview === 'function') dutySettingsLivePreview();
         }
 
         /* =========================================================================
@@ -4146,6 +4830,30 @@
             };
         }
 
+        // Kartın arka planını katmanlar halinde üretir: [aktif hücre rengi] + [desen/gradient] + [zemin rengi]
+        function dutyBuildCardBackground(s, tintRgba) {
+            const alpha = s.cardOpacity / 100;
+            const c1 = hexToRgba(s.cardBgColor, alpha);
+            const c2 = hexToRgba(s.bgColor2, alpha);
+            const layers = [], sizes = [];
+            const push = (img, size) => { layers.push(img); sizes.push(size || 'auto'); };
+            if (tintRgba) push(`linear-gradient(${tintRgba}, ${tintRgba})`);
+            let color = c1;
+            switch (s.bgType) {
+                case 'gradient-lr':   push(`linear-gradient(to right, ${c1}, ${c2})`); color = ''; break;
+                case 'gradient-tb':   push(`linear-gradient(to bottom, ${c1}, ${c2})`); color = ''; break;
+                case 'gradient-diag': push(`linear-gradient(135deg, ${c1}, ${c2})`); color = ''; break;
+                case 'pattern-dots':
+                    push('radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px)', '12px 12px'); break;
+                case 'pattern-lines':
+                    push('repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 10px)'); break;
+                case 'pattern-grid':
+                    push('repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 16px)');
+                    push('repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 16px)'); break;
+            }
+            return { color, image: layers.length ? layers.join(', ') : 'none', size: sizes.length ? sizes.join(', ') : 'auto' };
+        }
+
         // Gelişmiş ayarları pano duty kartlarına uygula (CSS değişkenleri + sınıflar + inline stiller)
         function applyDutyAdvancedStyleToGrid(gridEl, positions, advSettings, dutyStyle) {
             if (!gridEl) return;
@@ -4162,58 +4870,66 @@
             gridEl.style.setProperty('--duty-anim-dur', animDurSec);
             gridEl.style.setProperty('--duty-transition', s.transition);
 
-            // Apply each card
+            // Öncelik kuralları (iki sekme çakışmasın diye):
+            //  • Şekil (kare/oval/kart) ve köşe: "Görsel Özelleştirme" şekli belirler; "Köşe Yuvarlama"
+            //    yalnızca "Köşeli (hafif yuvarlak)" şeklinde geçerlidir.
+            //  • Aktif nöbetçi hücresi rengi/opaklığı ve vurgu şekli: "Görsel Özelleştirme"; kartın kendi
+            //    zemini/gradient/deseni "Kapsamlı Ayarlar" — ikisi üst üste biner, biri diğerini silmez.
+            //  • İsim yazı rengi: "Özel Renk" seçiliyse Görsel Özelleştirme, değilse Kapsamlı Ayarlar.
+            const shape = ds.shape || 'rounded';
+            const hlType = (ds.activeBg && ds.activeBg.highlight) || 'none';
+            const hlColor = (ds.activeBg && ds.activeBg.color) || '#00b4d8';
+            const tintOpacity = (ds.activeBg && typeof ds.activeBg.opacity === 'number') ? ds.activeBg.opacity : 15;
+
             const cards = gridEl.querySelectorAll('.duty-card-box');
             cards.forEach((card, i) => {
-                // Background
-                let bg = '';
-                const bgAlpha = s.cardOpacity / 100;
-                const c1 = hexToRgba(s.cardBgColor, bgAlpha);
-                const c2 = hexToRgba(s.bgColor2, bgAlpha);
-                if (s.bgType === 'solid') {
-                    bg = c1;
-                    card.style.backgroundImage = 'none';
-                    card.style.backgroundColor = c1;
-                } else if (s.bgType === 'gradient-lr') {
-                    card.style.backgroundImage = `linear-gradient(to right, ${c1}, ${c2})`;
-                    card.style.backgroundColor = '';
-                } else if (s.bgType === 'gradient-tb') {
-                    card.style.backgroundImage = `linear-gradient(to bottom, ${c1}, ${c2})`;
-                    card.style.backgroundColor = '';
-                } else if (s.bgType === 'gradient-diag') {
-                    card.style.backgroundImage = `linear-gradient(135deg, ${c1}, ${c2})`;
-                    card.style.backgroundColor = '';
-                } else {
-                    card.style.backgroundColor = c1;
-                    card.style.backgroundImage = 'none';
-                }
+                const isActive = card.classList.contains('duty-active');
 
-                // Patterns via class
+                // Arka plan: Kapsamlı Ayarlar zemini + (aktif kartta) Görsel Özelleştirme rengi üst katman
+                const tint = (isActive && tintOpacity > 0) ? hexToRgba(hlColor, tintOpacity / 100) : '';
+                const bgSpec = dutyBuildCardBackground(s, tint);
+                card.style.backgroundColor = bgSpec.color;
+                card.style.backgroundImage = bgSpec.image;
+                card.style.backgroundSize = bgSpec.size;
                 card.classList.remove('duty-bg-pattern-dots','duty-bg-pattern-lines','duty-bg-pattern-grid');
-                if (s.bgType === 'pattern-dots') card.classList.add('duty-bg-pattern-dots');
-                if (s.bgType === 'pattern-lines') card.classList.add('duty-bg-pattern-lines');
-                if (s.bgType === 'pattern-grid') card.classList.add('duty-bg-pattern-grid');
 
-                // Border
+                // Kenarlık
                 card.style.borderWidth = s.borderWidth + 'px';
                 card.style.borderColor = s.borderColor;
                 card.style.borderStyle = s.borderStyle;
-                card.style.borderRadius = s.borderRadius + 'px';
+                // Köşe: şekil "hafif yuvarlak" ise Kapsamlı Ayarlar'daki değer, diğerlerinde şeklin kendi CSS'i
+                card.style.borderRadius = (shape === 'rounded') ? (s.borderRadius + 'px') : '';
 
-                // Shadow
+                // Aktif hücre vurgusu (Görsel Özelleştirme) — inline kenarlık/gölge CSS vurgusunu ezmesin
+                let hlShadow = '';
+                if (isActive) {
+                    if (hlType === 'border') {
+                        card.style.borderWidth = Math.max(s.borderWidth, 2) + 'px';
+                        if (card.style.borderStyle === 'none') card.style.borderStyle = 'solid';
+                        hlShadow = `inset 0 0 0 1px ${hlColor}`;
+                    } else if (hlType === 'glow') {
+                        hlShadow = `0 0 14px 1px ${hlColor}`;
+                    } else if (hlType === 'left-bar') {
+                        card.style.borderLeft = `4px solid ${hlColor}`;
+                    } else if (hlType === 'underline') {
+                        card.style.borderBottom = `3px solid ${hlColor}`;
+                    }
+                }
+
+                // Gölge (Kapsamlı Ayarlar) + vurgu gölgesi birlikte
                 let shadow = '';
                 const sc = s.shadowColor || '#00b4d8';
                 if (s.shadowType === 'sm')   shadow = `0 2px 6px rgba(0,0,0,0.3)`;
                 if (s.shadowType === 'md')   shadow = `0 4px 16px rgba(0,0,0,0.4)`;
                 if (s.shadowType === 'lg')   shadow = `0 8px 32px rgba(0,0,0,0.5)`;
                 if (s.shadowType === 'neon') shadow = `0 0 14px 2px ${hexToRgba(sc, 0.55)}`;
-                card.style.boxShadow = card.style.boxShadow || shadow; // don't overwrite glow highlight
-                if (!card.classList.contains('duty-highlight-glow') && !card.classList.contains('duty-highlight-border')) {
-                    card.style.boxShadow = shadow;
-                }
+                card.style.boxShadow = [shadow, hlShadow].filter(Boolean).join(', ');
 
-                // Padding
-                card.style.padding = s.padding + 'px ' + (s.padding * 2) + 'px';
+                // İç dolgu: oval ve kart şekillerinin kendi yapısı korunur (varsayılan 6px'te CSS ile aynı sonuç)
+                const padV = s.padding, padH = s.padding * 2;
+                if (shape === 'card')      card.style.padding = (s.padding * 2) + 'px ' + (s.padding + 2) + 'px';
+                else if (shape === 'oval') card.style.padding = padV + 'px ' + Math.max(padH, 16) + 'px';
+                else                       card.style.padding = padV + 'px ' + padH + 'px';
 
                 // Hover
                 card.classList.remove('duty-hover-lift','duty-hover-glow','duty-hover-scale');
@@ -4234,8 +4950,9 @@
                 // Avatar
                 const avatar = card.querySelector('.duty-avatar-box');
                 if (avatar) {
-                    avatar.style.width = s.avatarSize + 'px';
-                    avatar.style.height = s.avatarSize + 'px';
+                    const avSize = s.avatarSize + (shape === 'card' ? 8 : 0); // kart şeklinde CSS varsayılanı 52px
+                    avatar.style.width = avSize + 'px';
+                    avatar.style.height = avSize + 'px';
                     avatar.style.background = s.avatarBgColor;
                 }
 
@@ -4252,7 +4969,7 @@
                 if (pill) {
                     const pillAlpha = (typeof s.pillOpacity === 'number' ? s.pillOpacity : 100) / 100;
                     pill.style.background = hexToRgba(s.pillBgColor, pillAlpha);
-                    pill.style.color = s.pillTextColor;
+                    pill.style.color = (ds.nameColorMode === 'custom') ? (ds.nameColor || '#02040a') : s.pillTextColor;
                     pill.style.fontFamily = s.fontFamily;
                     const pillBorderW = (typeof s.pillBorderWidth === 'number' ? s.pillBorderWidth : 0);
                     pill.style.borderWidth = pillBorderW + 'px';
@@ -4269,6 +4986,21 @@
             const s = collectDutyAdvancedFromForm();
             const savedStyle = appConfig.dutyStyle;
             const savedPositions = appConfig.dutyPositions;
+
+            // Görsel Özelleştirme'nin belirlediği değerler burada etkisizse kontrolü soluk göster
+            const curStyle = tempDutyStyle || appConfig.dutyStyle || defaultAppConfig.dutyStyle;
+            const pillTxt = document.getElementById('ds-pill-text-color');
+            if (pillTxt) {
+                const custom = curStyle.nameColorMode === 'custom';
+                pillTxt.disabled = custom; pillTxt.style.opacity = custom ? '0.4' : '1';
+                pillTxt.title = custom ? 'Görsel Özelleştirme\'de "Özel Renk" seçili; isim rengi oradan alınıyor.' : '';
+            }
+            const radiusEl = document.getElementById('ds-border-radius');
+            if (radiusEl) {
+                const notRounded = (curStyle.shape || 'rounded') !== 'rounded';
+                radiusEl.disabled = notRounded; radiusEl.style.opacity = notRounded ? '0.4' : '1';
+                radiusEl.title = notRounded ? 'Görsel Özelleştirme\'de seçili kart şekli köşeleri belirliyor.' : '';
+            }
 
             appConfig.dutyStyle = tempDutyStyle || appConfig.dutyStyle;
             const sampleNames = ['Ayşe Yılmaz', 'Mehmet Kaya', '', 'Elif Demir'];
@@ -4295,6 +5027,7 @@
             if (liveGrid) applyDutyAdvancedStyleToGrid(liveGrid, appConfig.dutyPositions, appConfig.dutyAdvancedSettings, appConfig.dutyStyle);
             const titleEl = document.getElementById('display-duty-title-text');
             if (titleEl) titleEl.innerText = moduleTitle;
+            if (typeof renderDutyLivePreview === 'function') renderDutyLivePreview();
             showCustomNotification('Başarılı', 'Nöbet modülü görsel ayarları kaydedildi ve uygulandı.');
             writeCMSLog('Nöbet Modülü Ayarları kaydedildi.');
         }
@@ -4303,6 +5036,7 @@
         function dutySettingsReset() {
             appConfig.dutyAdvancedSettings = Object.assign({}, DEFAULT_DUTY_ADVANCED);
             loadDutyAdvancedSettingsIntoForm();
+            if (typeof renderDutyLivePreview === 'function') renderDutyLivePreview();
             writeCMSLog('Nöbet Modülü Ayarları varsayılana sıfırlandı.');
         }
 
@@ -4385,6 +5119,7 @@
             const justifyMap = { top: 'flex-start', center: 'center', bottom: 'flex-end', between: 'space-between' };
             const vars = {
                 '--sch-columns': s.columns || 4,
+                '--sch-tpl-rows': (parseInt(s.rows, 10) > 0) ? `repeat(${parseInt(s.rows, 10)}, minmax(0, 1fr))` : 'none',
                 '--sch-gap': `${s.gap ?? 6}px`,
                 '--sch-name-justify': justifyMap[s.nameValign] || 'flex-start',
                 '--sch-lesson-justify': justifyMap[s.lessonValign] || 'flex-end',
@@ -4429,6 +5164,7 @@
             const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = val; };
 
             set('sbs-columns', s.columns);
+            set('sbs-rows', s.rows || 0);
             set('sbs-gap', s.gap);
             set('sbs-name-align', s.nameAlign || 'center');
             set('sbs-name-valign', s.nameValign || 'top');
@@ -4466,7 +5202,8 @@
             const val = (id, fallback) => (g(id) ? g(id).value : fallback);
             const chk = id => !!(g(id) && g(id).checked);
             return {
-                columns: parseInt(val('sbs-columns', 4), 10) || 4,
+                columns: Math.max(1, parseInt(val('sbs-columns', 4), 10) || 4),
+                rows: Math.max(0, parseInt(val('sbs-rows', 0), 10) || 0),
                 gap: parseInt(val('sbs-gap', 6), 10) || 0,
                 nameAlign: val('sbs-name-align', 'center') || 'center',
                 nameValign: val('sbs-name-valign', 'top') || 'top',
@@ -4702,25 +5439,54 @@
             writeCMSLog('Saat / Geri Sayım biçimlendirme ayarları varsayılana sıfırlandı (henüz kaydedilmedi).');
         }
 
+        // Ders programı modülünün aynı anda gösterebileceği kutu sayısı (0 = sınırsız).
+        // Öncelik: Modül düzeni panelindeki "Sütun/Satır Sayısı" (gc/gr) > Ders Programı biçim ayarları.
+        let __panoShownLayout = null;
+        function scheduleCapacity() {
+            let gc = 0, gr = 0;
+            try { const m = ((__panoShownLayout || panoGetLayoutState()) || {}).schedule || {}; gc = parseInt(m.gc, 10) || 0; gr = parseInt(m.gr, 10) || 0; } catch (e) {}
+            const st = getScheduleBoardStyle();
+            if (!gc) gc = Math.max(1, parseInt(st.columns, 10) || 4);
+            if (!gr) gr = parseInt(st.rows, 10) || 0;
+            return gr > 0 ? gr * gc : 0;
+        }
+
         function renderActiveScheduleGroup() {
             const container = document.getElementById('class-schedule-container');
             const titleEl = document.getElementById('display-schedule-group-title');
             container.innerHTML = '';
+            applyScheduleBoardStyle(); // sütun/satır değişkenleri her çizimde güncel kalsın (bulut senkronu, TV vb.)
+            const __per = scheduleCapacity();
 
             let filteredClasses = [];
-            if (isDoubleMode()) {
+            if (isModDouble('schedule')) {
                 const allCls = shiftClassesOf(__boundShift || 'morning');
                 const chunks = [];
-                for (let i = 0; i < allCls.length; i += 8) chunks.push(allCls.slice(i, i + 8));
+                const __size = __per || 8;
+                for (let i = 0; i < allCls.length; i += __size) chunks.push(allCls.slice(i, i + __size));
+                scheduleChunkCount = Math.max(1, chunks.length);
                 const gi = chunks.length ? (((activeScheduleGroup - 1) % chunks.length) + chunks.length) % chunks.length : 0;
                 filteredClasses = chunks[gi] || [];
-                titleEl.innerText = 'DERS PROGRAMI · ' + SHIFT_LABELS[__boundShift || 'morning'].toUpperCase() + ' ÖĞRETİMİ' + (chunks.length > 1 ? ` (${gi + 1}/${chunks.length})` : '');
+                titleEl.innerText = 'DERS PROGRAMI' + (shiftLabelOn('schedule') ? ' · ' + SHIFT_LABELS[__boundShift || 'morning'].toUpperCase() + ' ÖĞRETİMİ' : '') + (chunks.length > 1 ? ` (${gi + 1}/${chunks.length})` : '');
+            } else if (__per) {
+                // Satır × sütun sınırı varsa tüm sınıflar sırayla (1/A, 1/B ...) sayfa sayfa gösterilir
+                titleEl.innerText = 'DERS PROGRAMI';
+                filteredClasses = classList.slice();
             } else if (activeScheduleGroup === 1) {
                 titleEl.innerText = "DERS PROGRAMI (3. VE 4. SINIFLAR)";
                 filteredClasses = classList.filter(c => !(c.startsWith('1/') || c.startsWith('2/')));
             } else {
                 titleEl.innerText = "DERS PROGRAMI (1. VE 2. SINIFLAR)";
                 filteredClasses = classList.filter(c => c.startsWith('1/') || c.startsWith('2/'));
+            }
+
+            // Satır x Sütun sınırı: sığmayan sınıflar sayfalara bölünür (0 satır = sınırsız/otomatik)
+            const __perPage = __per;
+            schedulePageCount = (__perPage && !isModDouble('schedule')) ? Math.max(1, Math.ceil(filteredClasses.length / __perPage)) : 1;
+            if (schedulePageIdx >= schedulePageCount) schedulePageIdx = 0;
+            if (__perPage && !isModDouble('schedule')) {
+                filteredClasses = filteredClasses.slice(schedulePageIdx * __perPage, (schedulePageIdx + 1) * __perPage);
+                if (schedulePageCount > 1) titleEl.innerText += ` · Sayfa ${schedulePageIdx + 1}/${schedulePageCount}`;
             }
 
             const now = new Date();
@@ -4786,7 +5552,7 @@
         function cycleMediaSlides() {
             const displayImg = document.getElementById('display-media-img');
             const displayCaption = document.getElementById('display-media-caption');
-            const playlist = appConfig.mediaPlaylist || [];
+            const playlist = shiftViewArray('media', 'mediaPlaylist');
 
             if (playlist.length === 0) {
                 displayImg.src = 'https://placehold.co/800x450/070b13/fff?text=Medya';
@@ -5003,7 +5769,8 @@
         function renderAchievementsCard() {
             const container = document.getElementById('achievements-container');
             if (!container) return;
-            const cats = (appConfig.achievementCategories || []).filter(c => c.active !== false);
+            const entries = achViewEntries();
+            const showTag = isModDouble('achievements') && shiftViewKeys('achievements').length > 1;
             const aw = appConfig.achievementWidget || defaultAppConfig.achievementWidget;
 
             // "Yan Yana" (row) düzeninde, kullanıcı satır başına gösterilecek hücre sayısını
@@ -5023,19 +5790,20 @@
                 container.classList.add(aw.layout === 'row' ? 'ach-layout-row' : 'ach-layout-column');
             }
 
-            cats.forEach((cat, idx) => {
+            entries.forEach((entry, idx) => {
+                const cat = entry.cat;
                 // Izgara (grid) modunda ayırıcı öğeler sütun hizasını bozacağından eklenmez;
                 // hücreler arasındaki boşluk (gap) görsel ayrım için yeterlidir.
                 if (!useGrid && idx > 0) container.appendChild(buildAchievementSeparator(aw));
 
                 const slider = document.createElement('div');
                 slider.className = 'achievement-slider';
-                slider.dataset.catId = cat.id;
+                slider.dataset.catId = entry.key;
                 slider.innerHTML = `
-                    <img src="" class="achievement-img" id="ach-img-${cat.id}" alt="${escapeHtml(cat.title || '')}">
+                    <img src="" class="achievement-img" id="ach-img-${entry.key}" alt="${escapeHtml(cat.title || '')}">
                     <div class="achievement-details">
-                        <h4 id="ach-title-${cat.id}">Açıklanmadı</h4>
-                        <p><i class="fa-solid ${cat.icon || 'fa-star'}"></i> <span id="ach-label-${cat.id}">${escapeHtml(cat.title || '')}</span></p>
+                        <h4 id="ach-title-${entry.key}">Açıklanmadı</h4>
+                        <p><i class="fa-solid ${cat.icon || 'fa-star'}"></i> <span id="ach-label-${entry.key}">${escapeHtml(cat.title || '')}</span>${showTag ? `<span class="ach-shift-tag ach-shift-tag-${entry.shift}">${SHIFT_LABELS[entry.shift].toUpperCase()}</span>` : ''}</p>
                     </div>
                 `;
                 container.appendChild(slider);
@@ -5045,7 +5813,8 @@
 
         // AYIN ENLERİ: belirli bir kategori (alan) için sıradaki aktif kaydı ekrana getirir (slayt döngüsü)
         function cycleAchievementCategory(catId) {
-            const cat = (appConfig.achievementCategories || []).find(c => c.id === catId);
+            const _entry = achViewEntries().find(e => e.key === catId);
+            const cat = _entry && _entry.cat;
             const titleEl = document.getElementById('ach-title-' + catId);
             const imgEl = document.getElementById('ach-img-' + catId);
             if (!cat || !titleEl || !imgEl) return;
@@ -5100,6 +5869,7 @@
                 document.getElementById('display-clock-time').innerText = timeString;
 
                 if (typeof shiftSyncBinding === 'function') shiftSyncBinding();
+                if (typeof shiftViewApplyVisibility === 'function') shiftViewApplyVisibility();
                 calculateCountdownAndTableHighlight(now);
             }, 1000);
 
@@ -5121,7 +5891,10 @@
             cyclingIntervalTimers = {};
 
             cyclingIntervalTimers.schedule = setInterval(() => {
-                activeScheduleGroup = activeScheduleGroup === 1 ? 2 : 1;
+                // Önce mevcut grubun kalan sayfaları gösterilir, bitince diğer gruba geçilir
+                if (isModDouble('schedule')) activeScheduleGroup = (activeScheduleGroup % Math.max(1, scheduleChunkCount)) + 1;
+                else if (schedulePageIdx + 1 < schedulePageCount) schedulePageIdx++;
+                else { schedulePageIdx = 0; activeScheduleGroup = activeScheduleGroup === 1 ? 2 : 1; }
                 renderActiveScheduleGroup();
             }, getModuleIntervalMs('schedule'));
 
@@ -5129,8 +5902,8 @@
             cyclingIntervalTimers.quote = setInterval(cycleQuoteWidget, getModuleIntervalMs('quote'));
             cyclingIntervalTimers.specialday = setInterval(cycleSpecialDayWidget, getModuleIntervalMs('specialday'));
             cyclingIntervalTimers.media = setInterval(cycleMediaSlides, getModuleIntervalMs('media'));
-            (appConfig.achievementCategories || []).filter(cat => cat.active !== false).forEach(cat => {
-                cyclingIntervalTimers['ach_' + cat.id] = setInterval(() => cycleAchievementCategory(cat.id), getModuleIntervalMs('achievements'));
+            achViewEntries().forEach(e => {
+                cyclingIntervalTimers['ach_' + e.key] = setInterval(() => cycleAchievementCategory(e.key), getModuleIntervalMs('achievements'));
             });
         }
 
@@ -5289,7 +6062,7 @@
             const settings = appConfig.birthdayWidget || defaultAppConfig.birthdayWidget;
             applyBirthdayWidgetChrome();
 
-            const birthdays = appConfig.birthdays || [];
+            const birthdays = shiftViewBirthdays();
             const now = new Date();
             const todayStr = `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth() + 1).toString().padStart(2, '0')}`;
             const todaysBirthdays = birthdays.filter(b => b.date === todayStr);
@@ -5373,8 +6146,9 @@
             const authorEl = document.getElementById('display-quote-author');
             if (!quoteEl || !authorEl) return;
 
-            const quotes = (appConfig.quotes && appConfig.quotes.length > 0)
-                ? appConfig.quotes
+            const _qAll = shiftViewArray('quote', 'quotes');
+            const quotes = (_qAll && _qAll.length > 0)
+                ? _qAll
                 : [{ text: defaultAppConfig.quote, author: defaultAppConfig.quoteAuthor, date: "" }];
 
             const now = new Date();
@@ -5442,7 +6216,7 @@
             const displayEl = document.getElementById('display-special-day');
             const imgEl = document.getElementById('display-special-day-img');
             const sdwSettings = appConfig.specialDayWidget || defaultAppConfig.specialDayWidget;
-            const specials = appConfig.specialDays || [];
+            const specials = shiftViewArray('specialday', 'specialDays');
 
             // Sadece BUGÜN aktif olan tarihli kayıtlar; yoksa tarihsiz (her zaman geçerli) genel kayıtlar.
             // İkisi de yoksa (bugün için hiçbir belirli gün/hafta yoksa) "boşken gösterilecek içerik" devreye girer
@@ -5584,7 +6358,7 @@
                 const dflt = panoModuleDefaultAppearance[def.id] || { borderColor: '', cardBg: '', headerBg: '', headerColor: '' };
 
                 // Yayında / Yayın Dışı
-                card.style.display = (s.active === false) ? 'none' : '';
+                card.style.display = (s.active === false || !shiftViewVisible(def.id)) ? 'none' : '';
 
                 // Ebat (Kart İçeriği Ölçeklendirme)
                 card.style.zoom = zoomMap[s.size] || 1;
@@ -5673,6 +6447,7 @@
                 }
             });
 
+            try { panoApplyModuleAccents(); } catch (e) {}
             applyModuleFontOverrides();
             if (typeof shiftDecorate === 'function') shiftDecorate();
         }
@@ -5680,6 +6455,134 @@
         // Her modül için seçilen fontu, o modülün TÜM içeriğine (başlık + gövde)
         // FontAwesome ikonları hariç tutarak !important ile zorunlu kılan dinamik
         // bir <style> etiketi oluşturur/günceller.
+        /* ===== MODÜL RENK & ÇERÇEVE STÜDYOSU: her pano modülüne ayrı vurgu rengi + çerçeve stili ===== */
+        const PANO_ACC_SCHEMES = {
+            vivid: ['#00b4d8', '#f43f5e', '#f59e0b', '#10b981', '#a855f7', '#3b82f6', '#ec4899', '#14b8a6', '#f97316', '#84cc16', '#6366f1', '#eab308'],
+            pastel: ['#7dd3fc', '#fda4af', '#fcd34d', '#6ee7b7', '#d8b4fe', '#93c5fd', '#f9a8d4', '#5eead4', '#fdba74', '#bef264', '#a5b4fc', '#fde68a'],
+            corporate: ['#3b82f6', '#64748b', '#0ea5e9', '#6366f1', '#14b8a6', '#8b5cf6', '#475569', '#0284c7', '#4f46e5', '#0d9488', '#7c3aed', '#334155'],
+            neon: ['#00f5ff', '#ff2d95', '#faff00', '#39ff14', '#bf00ff', '#ff6a00', '#00ffa3', '#4d6bff', '#ff3131', '#00e5ff', '#ff00e5', '#c6ff00'],
+            school: ['#d90429', '#ffb703', '#00b4d8', '#38b000', '#9d4edd', '#ff6b35', '#2a9d8f', '#e63946', '#457b9d', '#f4a261', '#8338ec', '#06d6a0']
+        };
+        const PANO_FRAMES = [['line', 'Çizgi'], ['double', 'Çift çizgi'], ['top', 'Üst şerit'], ['left', 'Sol şerit'], ['corner', 'Köşe işaretli'], ['neon', 'Neon'], ['glass', 'Cam'], ['none', 'Çerçevesiz']];
+        // Başlık yanındaki dikey vurgu çizgisi (işaretçi) seçenekleri
+        const PANO_MARKERS = [['bar', 'Dikey çizgi'], ['double', 'Çift çizgi'], ['block', 'Kalın blok'], ['dot', 'Nokta'], ['diamond', 'Elmas'], ['arrow', 'Ok'], ['pill', 'Yatay hap'], ['underline', 'Alt çizgi'], ['none', 'Yok (kaldır)']];
+        const PANO_MK_SIZES = [['0.7', 'Küçük'], ['1', 'Normal'], ['1.5', 'Büyük'], ['2', 'Çok büyük']];
+        const PANO_RADII = [['', 'Mevcut'], ['0', 'Keskin'], ['8', 'Hafif'], ['16', 'Yuvarlak'], ['26', 'Çok yuvarlak']];
+        const PANO_SHADOWS = [['default', 'Varsayılan'], ['none', 'Yok'], ['soft', 'Yumuşak'], ['deep', 'Derin'], ['glow', 'Işıma']];
+        const PANO_HALIGN = [['left', 'Sola'], ['center', 'Ortaya'], ['right', 'Sağa']];
+        const PANO_HSIZE = [['compact', 'Kompakt'], ['normal', 'Normal'], ['large', 'Büyük']];
+        const PANO_PRESETS = [
+            { id: 'kurumsal', name: 'Kurumsal Temiz', icon: 'fa-building', cfg: { scheme: 'corporate', frame: 'line', tint: false, hover: false, marker: 'bar', markerColor: 'module', markerSize: '1', radius: '8', shadow: 'soft', hAlign: 'left', hSize: 'normal' } },
+            { id: 'cam', name: 'Modern Cam', icon: 'fa-gem', cfg: { scheme: 'pastel', frame: 'glass', tint: true, hover: true, marker: 'dot', markerColor: 'module', markerSize: '1.5', radius: '26', shadow: 'deep', hAlign: 'left', hSize: 'normal' } },
+            { id: 'neon', name: 'Neon Okul', icon: 'fa-bolt', cfg: { scheme: 'neon', frame: 'neon', tint: true, hover: true, marker: 'bar', markerColor: 'module', markerSize: '1.5', radius: '16', shadow: 'glow', hAlign: 'left', hSize: 'normal' } },
+            { id: 'minimal', name: 'Minimal', icon: 'fa-minus', cfg: { scheme: 'corporate', frame: 'line', tint: false, hover: false, marker: 'underline', markerColor: 'module', markerSize: '1', radius: '12', shadow: 'none', hAlign: 'left', hSize: 'compact' } },
+            { id: 'klasik', name: 'Klasik Okul', icon: 'fa-graduation-cap', cfg: { scheme: 'school', frame: 'top', tint: true, hover: true, marker: 'double', markerColor: 'module', markerSize: '1', radius: '10', shadow: 'soft', hAlign: 'center', hSize: 'large' } },
+            { id: 'duz', name: 'Çizgisiz Sade', icon: 'fa-eraser', cfg: { scheme: 'vivid', frame: 'none', tint: true, hover: false, marker: 'none', markerColor: 'default', markerSize: '1', radius: '16', shadow: 'soft', hAlign: 'left', hSize: 'normal' } }
+        ];
+        const PANO_ACC_DEFAULT = { scheme: 'vivid', frame: 'top', tint: true, hover: true, marker: 'bar', markerColor: 'default', markerSize: '1', radius: '', shadow: 'default', hAlign: 'left', hSize: 'normal' };
+        function panoAccCfg() {
+            const raw = (appConfig && appConfig.moduleAccents) || {};
+            return Object.assign({}, PANO_ACC_DEFAULT, raw, { per: raw.per || {} });
+        }
+        function panoAccColorOf(cfg, id, idx) {
+            const per = cfg.per[id] || {}, pal = PANO_ACC_SCHEMES[cfg.scheme];
+            return per.color || (pal ? pal[idx % pal.length] : '#00b4d8');
+        }
+        function panoApplyModuleAccents() {
+            if (typeof appConfig === 'undefined') return;
+            const cfg = panoAccCfg();
+            panoAllModuleIds().forEach((id, i) => {
+                const el = panoModuleEl(id); if (!el) return;
+                [...el.classList].filter(c => /^pano-(fr|acc|mk|mkc|mks|rad|sh|ha|hs)-/.test(c)).forEach(c => el.classList.remove(c));
+                const per0 = cfg.per[id] || {};
+                // Düzen / işaretçi / gölge sınıfları (renk şeması kapalı olsa da uygulanır)
+                const mk = per0.marker || cfg.marker || 'bar';
+                el.classList.add('pano-mk-' + mk, 'pano-mkc-' + (cfg.markerColor === 'module' ? 'module' : 'default'), 'pano-ha-' + (cfg.hAlign || 'left'), 'pano-hs-' + (cfg.hSize || 'normal'));
+                el.style.setProperty('--mk-scale', String(cfg.markerSize || '1'));
+                if (cfg.shadow && cfg.shadow !== 'default') el.classList.add('pano-sh-' + cfg.shadow);
+                if (cfg.radius !== '' && cfg.radius != null) el.style.setProperty('--pano-rad', cfg.radius + 'px'); else el.style.removeProperty('--pano-rad');
+                if (cfg.radius !== '' && cfg.radius != null) el.classList.add('pano-rad-on');
+                if (cfg.scheme === 'off' && !(cfg.per[id] && cfg.per[id].color)) { el.style.removeProperty('--mod-accent'); return; }
+                el.style.setProperty('--mod-accent', panoAccColorOf(cfg, id, i));
+                el.classList.add('pano-acc-on', 'pano-fr-' + ((cfg.per[id] && cfg.per[id].frame) || cfg.frame));
+                if (cfg.tint) el.classList.add('pano-acc-tint');
+                if (cfg.hover) el.classList.add('pano-acc-hover');
+            });
+        }
+        function panoAccSet(k, v) {
+            const raw = Object.assign({}, (appConfig.moduleAccents || {}));
+            raw[k] = v; raw.per = raw.per || {};
+            appConfig.moduleAccents = raw;
+            panoPersist(); panoApplyModuleAccents(); panoAccRender();
+        }
+        function panoAccSetPer(id, k, v) {
+            const raw = Object.assign({}, (appConfig.moduleAccents || {}));
+            raw.per = Object.assign({}, raw.per || {});
+            raw.per[id] = Object.assign({}, raw.per[id] || {}, { [k]: v });
+            if (!raw.per[id][k]) delete raw.per[id][k];
+            appConfig.moduleAccents = raw;
+            panoPersist(); panoApplyModuleAccents(); panoAccRender();
+        }
+        function panoAccPreset(pid) {
+            const pr = PANO_PRESETS.find(x => x.id === pid); if (!pr) return;
+            appConfig.moduleAccents = Object.assign({}, pr.cfg, { per: {} });
+            panoPersist(); panoApplyModuleAccents(); panoAccRender();
+        }
+        function panoAccReset() {
+            askCustomConfirmation('Modül Renklerini Sıfırla', 'Tüm modüllerin vurgu rengi ve çerçeve seçimleri varsayılana (Canlı renkler + Üst şerit) döner. Devam edilsin mi?', function () {
+                appConfig.moduleAccents = undefined; delete appConfig.moduleAccents;
+                panoPersist(); panoApplyModuleAccents(); panoAccRender();
+            });
+        }
+        function panoAccRender() {
+            const box = document.getElementById('pano-acc-studio'); if (!box) return;
+            const cfg = panoAccCfg();
+            const schemes = [['vivid', 'Canlı'], ['pastel', 'Pastel'], ['corporate', 'Kurumsal'], ['neon', 'Neon'], ['school', 'Okul renkleri'], ['off', 'Kapalı']];
+            const dots = id => (PANO_ACC_SCHEMES[id] || ['#475569', '#64748b', '#94a3b8']).slice(0, 6).map(c => `<i style="background:${c}"></i>`).join('');
+            const chip = (k, v, t, on) => `<button type="button" class="adm-chip-btn${on ? ' is-active' : ''}" onclick="panoAccSet('${k}',${typeof v === 'boolean' ? v : `'${v}'`})">${t}</button>`;
+            const chips = (k, list, cur) => `<div class="flex flex-wrap gap-2">${list.map(f => chip(k, f[0], f[1], String(cur) === String(f[0]))).join('')}</div>`;
+            // Canlı önizleme: aynı pano sınıflarıyla küçük bir kart
+            const prevCol = panoAccColorOf(cfg, 'preview', 0);
+            const prevCls = ['pano-acc-on', 'pano-fr-' + cfg.frame, 'pano-mk-' + cfg.marker, 'pano-mkc-' + (cfg.markerColor === 'module' ? 'module' : 'default'), 'pano-ha-' + cfg.hAlign, 'pano-hs-' + cfg.hSize].concat(cfg.tint ? ['pano-acc-tint'] : [], (cfg.shadow && cfg.shadow !== 'default') ? ['pano-sh-' + cfg.shadow] : [], (cfg.radius !== '' && cfg.radius != null) ? ['pano-rad-on'] : []).join(' ');
+            const prevStyle = `--mod-accent:${prevCol};--mk-scale:${cfg.markerSize || 1};` + ((cfg.radius !== '' && cfg.radius != null) ? `--pano-rad:${cfg.radius}px;` : '');
+            const preview = `<div class="pa-preview-wrap"><div class="dashboard-card pa-preview ${prevCls}" style="${prevStyle}"><div class="card-header">ÖRNEK MODÜL BAŞLIĞI</div><div class="card-body"><span>Önizleme: seçtiğiniz çerçeve, çizgi, köşe ve gölge ayarları burada anında görünür.</span></div></div></div>`;
+            const presets = PANO_PRESETS.map(p => `<button type="button" class="pa-preset" onclick="panoAccPreset('${p.id}')"><i class="fa-solid ${p.icon}"></i><b>${p.name}</b></button>`).join('');
+            const rows = panoAllModuleIds().map((id, i) => {
+                const per = cfg.per[id] || {}, col = panoAccColorOf(cfg, id, i);
+                const opts = `<option value="">Genel (${(PANO_FRAMES.find(f => f[0] === cfg.frame) || [])[1]})</option>` + PANO_FRAMES.map(f => `<option value="${f[0]}"${per.frame === f[0] ? ' selected' : ''}>${f[1]}</option>`).join('');
+                const mopts = `<option value="">Çizgi: Genel</option>` + PANO_MARKERS.map(f => `<option value="${f[0]}"${per.marker === f[0] ? ' selected' : ''}>${f[1]}</option>`).join('');
+                return `<div class="pa-row" style="--pc:${col}"><span class="pa-name"><i></i>${escapeHtml(panoModuleLabel(id))}</span><input type="color" value="${col}" title="Vurgu rengi" onchange="panoAccSetPer('${id}','color',this.value)"><select title="Çerçeve" onchange="panoAccSetPer('${id}','frame',this.value)">${opts}</select><select title="Başlık yanındaki çizgi" onchange="panoAccSetPer('${id}','marker',this.value)">${mopts}</select><button type="button" title="Bu modülü genel ayara döndür" onclick="panoAccSetPer('${id}','color','');panoAccSetPer('${id}','frame','');panoAccSetPer('${id}','marker','')"><i class="fa-solid fa-rotate-left"></i></button></div>`;
+            }).join('');
+            box.innerHTML = `<div class="adm-sec pa-wrap">
+                <h3><i class="fa-solid fa-swatchbook"></i> Modül Görünüm Stüdyosu <small class="pa-sub">Renk, çerçeve, başlık çizgisi, köşe ve gölge — değişiklikler panoya anında uygulanır</small></h3>
+                <div class="pa-top">
+                    <div class="pa-top-main">
+                        <div class="pa-label">Hazır profesyonel temalar <small>(tek tıkla tüm ayarları belirler; sonra ince ayar yapabilirsiniz)</small></div>
+                        <div class="pa-presets">${presets}</div>
+                    </div>
+                    ${preview}
+                </div>
+                <div class="pa-label">Renk şeması <small>(modüllere sırayla dağıtılır)</small></div>
+                <div class="pa-schemes">${schemes.map(([id, t]) => `<button type="button" class="pa-scheme${cfg.scheme === id ? ' is-active' : ''}" onclick="panoAccSet('scheme','${id}')"><span>${dots(id)}</span><b>${t}</b></button>`).join('')}</div>
+                <div class="pa-label">Çerçeve stili <small>(tüm modüller için; aşağıdan modül bazında değiştirebilirsiniz)</small></div>
+                ${chips('frame', PANO_FRAMES, cfg.frame)}
+                <div class="pa-label"><i class="fa-solid fa-grip-lines-vertical"></i> Başlık yanındaki çizgi / işaretçi <small>(modül başlığının solundaki dikey çizgi — değiştirin ya da tamamen kaldırın)</small></div>
+                ${chips('marker', PANO_MARKERS, cfg.marker)}
+                <div class="pa-grid">
+                    <div><div class="pa-label">Çizgi rengi</div>${chips('markerColor', [['default', 'Varsayılan (mavi-kırmızı)'], ['module', 'Modül rengi']], cfg.markerColor)}</div>
+                    <div><div class="pa-label">Çizgi kalınlığı / boyutu</div>${chips('markerSize', PANO_MK_SIZES, cfg.markerSize)}</div>
+                    <div><div class="pa-label">Köşe yuvarlaklığı</div>${chips('radius', PANO_RADII, cfg.radius == null ? '' : cfg.radius)}</div>
+                    <div><div class="pa-label">Gölge / derinlik</div>${chips('shadow', PANO_SHADOWS, cfg.shadow)}</div>
+                    <div><div class="pa-label">Başlık hizası</div>${chips('hAlign', PANO_HALIGN, cfg.hAlign)}</div>
+                    <div><div class="pa-label">Başlık yüksekliği</div>${chips('hSize', PANO_HSIZE, cfg.hSize)}</div>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-3">${chip('tint', !cfg.tint, (cfg.tint ? '✓ ' : '') + 'Başlık çubuğu modül renginde', cfg.tint)}${chip('hover', !cfg.hover, (cfg.hover ? '✓ ' : '') + 'Üzerine gelince parlama', cfg.hover)}<button type="button" class="adm-chip-btn" onclick="panoAccReset()"><i class="fa-solid fa-rotate-left"></i> Varsayılana dön</button></div>
+                <div class="pa-label">Modül bazında renk, çerçeve ve başlık çizgisi</div>
+                <div class="pa-rows">${rows}</div>
+                <p class="pa-note">Not: Kart renklerini elle belirlediyseniz (modülün kendi “Kart Görünüm” ayarları) elle seçtiğiniz kenarlık rengi ve köşe yuvarlaklığı önceliklidir. Üst bölümdeki okul/marka alanında "Yok" seçilirse soldaki kenar çizgisi de kalkar.</p>
+            </div>`;
+        }
+
         function applyModuleFontOverrides() {
             let css = '';
             moduleDefs.forEach(def => {
@@ -5990,8 +6893,18 @@
                 `;
                 const embedTargetId = MODULE_SETTINGS_EMBED_TARGETS[def.id];
                 const target = (embedTargetId && document.getElementById(embedTargetId)) || fallback;
+                // "Düzenlenen öğretim / Panoda görünsün" çubuğu yerleşik modüllerde ilgili sekmenin EN ÜSTÜNDE
+                // (index.html'de .shift-edit-bar), "Kart Görünüm & Yayın Ayarları"nın içinde değildir.
+                // Kendi sekmesi olmayan özel modüllerde ise modül satırının en üstüne eklenir.
+                if (!def.builtIn) {
+                    const _bar = document.createElement('div');
+                    _bar.className = 'shift-edit-bar hidden';
+                    _bar.setAttribute('data-view-mod', def.id);
+                    row.insertBefore(_bar, row.firstChild);
+                }
                 target.appendChild(row);
             });
+            try { renderShiftEditBars(); } catch (e) {}
         }
 
         // Herhangi bir modül ayarı değiştiğinde çağrılır: otomatik kaydeder ve panoyu günceller
@@ -6208,44 +7121,54 @@
            4) Tema seçimi kalıcı olarak kaydedilmiyordu (yalnızca "Kaydet"e basılırsa saklanıyordu).
            5) Özel renk tanımlıyken hazır tema seçmek görsel olarak hiçbir şey değiştirmiyordu. */
         const PANO_THEME_PRESETS = {
-            standard: { title: 'Muş Melikşah Klasik', desc: 'Orijinal mavi ve koyu kırmızı neon kombinasyonu', vars: {
-                '--bg-dark': '#02040a', '--card-bg': '#070b13', '--card-border': '#111b2d',
-                '--neon-blue': '#00b4d8', '--neon-red': '#d90429', '--neon-yellow': '#ffb703', '--neon-green': '#38b000',
-                '--title-gradient-start': '#6b1111', '--title-gradient-end': '#300a0a',
-                '--dash-grad-start': '#091122', '--dash-grad-end': '#02040a' } },
-            cyberpunk: { title: 'Neon Cyberpunk', desc: 'Çarpıcı yeşil ve pembe siber ışıklar', vars: {
-                '--bg-dark': '#05000d', '--card-bg': '#0d0221', '--card-border': '#3b0f6b',
-                '--neon-blue': '#ff007f', '--neon-red': '#39ff14', '--neon-yellow': '#f5ed12', '--neon-green': '#00f5d4',
-                '--title-gradient-start': '#11001c', '--title-gradient-end': '#2d004d',
-                '--dash-grad-start': '#1a0536', '--dash-grad-end': '#05000d' } },
-            emerald: { title: 'Doğa Zümrüt', desc: 'Sakin yeşil ve gold detaylar', vars: {
-                '--bg-dark': '#01100b', '--card-bg': '#04201a', '--card-border': '#0f4a39',
-                '--neon-blue': '#06d6a0', '--neon-red': '#118ab2', '--neon-yellow': '#ffd166', '--neon-green': '#52b788',
-                '--title-gradient-start': '#064e3b', '--title-gradient-end': '#022c22',
-                '--dash-grad-start': '#06281f', '--dash-grad-end': '#01100b' } },
+            standard: { title: 'Çözgen Modern', desc: 'Gece mavisi zemin, gök mavisi ve indigo vurgular (önerilen)', vars: {
+                '--bg-dark': '#060a14', '--card-bg': '#0e1525', '--card-border': '#1f2d4a',
+                '--neon-blue': '#38bdf8', '--neon-red': '#818cf8', '--neon-yellow': '#fbbf24', '--neon-green': '#34d399',
+                '--title-gradient-start': '#16335f', '--title-gradient-end': '#0d1a33',
+                '--dash-grad-start': '#0d1830', '--dash-grad-end': '#050811' } },
+            okul: { title: 'Okul Turkuazı', desc: 'Ferah turkuaz ve sıcak turuncu; gün boyu rahat okunur', vars: {
+                '--bg-dark': '#041416', '--card-bg': '#0a1f23', '--card-border': '#16474d',
+                '--neon-blue': '#2dd4bf', '--neon-red': '#fb923c', '--neon-yellow': '#fde047', '--neon-green': '#86efac',
+                '--title-gradient-start': '#0f5b5f', '--title-gradient-end': '#0a2d31',
+                '--dash-grad-start': '#0a2a2e', '--dash-grad-end': '#031012' } },
+            mercan: { title: 'Mercan & Lacivert', desc: 'Derin lacivert üzerinde mercan ve altın dokunuşlar', vars: {
+                '--bg-dark': '#070b1a', '--card-bg': '#0f1530', '--card-border': '#27305e',
+                '--neon-blue': '#fb7185', '--neon-red': '#60a5fa', '--neon-yellow': '#fcd34d', '--neon-green': '#4ade80',
+                '--title-gradient-start': '#3b1d4f', '--title-gradient-end': '#161a40',
+                '--dash-grad-start': '#141a3d', '--dash-grad-end': '#060914' } },
+            cyberpunk: { title: 'Neon Siber', desc: 'Canlı pembe, yeşil ve mor siber ışıklar', vars: {
+                '--bg-dark': '#07010f', '--card-bg': '#10052a', '--card-border': '#41127a',
+                '--neon-blue': '#f0abfc', '--neon-red': '#22d3ee', '--neon-yellow': '#fde047', '--neon-green': '#4ade80',
+                '--title-gradient-start': '#4a0e7a', '--title-gradient-end': '#1d0540',
+                '--dash-grad-start': '#1d0840', '--dash-grad-end': '#07010f' } },
+            emerald: { title: 'Doğa Zümrüt', desc: 'Sakin yeşil tonlar ve altın detaylar', vars: {
+                '--bg-dark': '#03110c', '--card-bg': '#08201a', '--card-border': '#145242',
+                '--neon-blue': '#34d399', '--neon-red': '#38bdf8', '--neon-yellow': '#fcd34d', '--neon-green': '#86efac',
+                '--title-gradient-start': '#0b5b44', '--title-gradient-end': '#06291f',
+                '--dash-grad-start': '#08291f', '--dash-grad-end': '#02100b' } },
             purple: { title: 'Galaksi Moru', desc: 'Uzay moru ve pembe geçişleri', vars: {
-                '--bg-dark': '#0a0618', '--card-bg': '#120a2b', '--card-border': '#2e1f66',
-                '--neon-blue': '#a855f7', '--neon-red': '#ec4899', '--neon-yellow': '#eab308', '--neon-green': '#34d399',
-                '--title-gradient-start': '#3b0764', '--title-gradient-end': '#1e1b4b',
+                '--bg-dark': '#0a0618', '--card-bg': '#130b2e', '--card-border': '#33236f',
+                '--neon-blue': '#c084fc', '--neon-red': '#f472b6', '--neon-yellow': '#facc15', '--neon-green': '#34d399',
+                '--title-gradient-start': '#4c1d95', '--title-gradient-end': '#1e1b4b',
                 '--dash-grad-start': '#1e1b4b', '--dash-grad-end': '#0a0618' } },
             ocean: { title: 'Derin Okyanus', desc: 'Turkuaz ve mavi, serin ve ferah', vars: {
-                '--bg-dark': '#00101f', '--card-bg': '#021b33', '--card-border': '#0b4a7a',
-                '--neon-blue': '#22d3ee', '--neon-red': '#3b82f6', '--neon-yellow': '#fde047', '--neon-green': '#34d399',
-                '--title-gradient-start': '#0c4a6e', '--title-gradient-end': '#082f49',
-                '--dash-grad-start': '#0a2a4a', '--dash-grad-end': '#00101f' } },
+                '--bg-dark': '#00111f', '--card-bg': '#04203a', '--card-border': '#0e4f80',
+                '--neon-blue': '#22d3ee', '--neon-red': '#60a5fa', '--neon-yellow': '#fde047', '--neon-green': '#34d399',
+                '--title-gradient-start': '#0c4a7a', '--title-gradient-end': '#082f49',
+                '--dash-grad-start': '#0a2d4f', '--dash-grad-end': '#00111f' } },
             sunset: { title: 'Gün Batımı', desc: 'Turuncu, kırmızı ve amber sıcaklığı', vars: {
-                '--bg-dark': '#140805', '--card-bg': '#22100a', '--card-border': '#5a2a16',
-                '--neon-blue': '#fb923c', '--neon-red': '#ef4444', '--neon-yellow': '#fbbf24', '--neon-green': '#a3e635',
-                '--title-gradient-start': '#7c2d12', '--title-gradient-end': '#431407',
-                '--dash-grad-start': '#2a1209', '--dash-grad-end': '#140805' } },
+                '--bg-dark': '#150905', '--card-bg': '#24120b', '--card-border': '#613018',
+                '--neon-blue': '#fb923c', '--neon-red': '#f87171', '--neon-yellow': '#fbbf24', '--neon-green': '#a3e635',
+                '--title-gradient-start': '#8a3412', '--title-gradient-end': '#451a07',
+                '--dash-grad-start': '#2c1409', '--dash-grad-end': '#150905' } },
             graphite: { title: 'Grafit', desc: 'Sade, nötr gri tonlar; gözü yormaz', vars: {
                 '--bg-dark': '#0b0d10', '--card-bg': '#14181d', '--card-border': '#2d353f',
-                '--neon-blue': '#94a3b8', '--neon-red': '#64748b', '--neon-yellow': '#e2e8f0', '--neon-green': '#86efac',
-                '--title-gradient-start': '#1f2937', '--title-gradient-end': '#111827',
+                '--neon-blue': '#cbd5e1', '--neon-red': '#94a3b8', '--neon-yellow': '#f1f5f9', '--neon-green': '#86efac',
+                '--title-gradient-start': '#2a3441', '--title-gradient-end': '#151b23',
                 '--dash-grad-start': '#181c22', '--dash-grad-end': '#0b0d10' } },
             royal: { title: 'Lacivert & Altın', desc: 'Kurumsal lacivert zemin, altın vurgular', vars: {
-                '--bg-dark': '#030712', '--card-bg': '#0a1226', '--card-border': '#1e3a8a',
-                '--neon-blue': '#fbbf24', '--neon-red': '#1d4ed8', '--neon-yellow': '#fde68a', '--neon-green': '#4ade80',
+                '--bg-dark': '#030712', '--card-bg': '#0a1226', '--card-border': '#233f94',
+                '--neon-blue': '#fbbf24', '--neon-red': '#3b82f6', '--neon-yellow': '#fde68a', '--neon-green': '#4ade80',
                 '--title-gradient-start': '#1e3a8a', '--title-gradient-end': '#0b1437',
                 '--dash-grad-start': '#0f1b3d', '--dash-grad-end': '#030712' } }
         };
@@ -6355,6 +7278,7 @@
             };
             appConfig.customColors = colors;
             applyCustomColorVars(colors);
+            themeContrastNote();
             panoUpdateThemeUi(appConfig.theme || 'standard', appConfig.themeMode === 'light' ? 'light' : 'dark');
             if (fromUserClick) {
                 panoPersist();
@@ -6363,6 +7287,43 @@
             }
         }
 
+
+        // ===== Tema Stüdyosu: tek renkten uyumlu palet üretimi + kontrast denetimi =====
+        function panoHexToHsl(hex) {
+            const n = parseInt(hex.slice(1), 16), r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+            const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+            let h = 0, s = 0;
+            if (d) { s = d / (1 - Math.abs(2 * l - 1)); h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h = (h * 60 + 360) % 360; }
+            return [h, s, l];
+        }
+        function panoHslToHex(h, s, l) {
+            h = ((h % 360) + 360) % 360; const a = s * Math.min(l, 1 - l);
+            const f = n => { const k = (n + h / 30) % 12; return Math.round(255 * (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)))).toString(16).padStart(2, '0'); };
+            return '#' + f(0) + f(8) + f(4);
+        }
+        function panoLum(hex) { const n = parseInt(hex.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255].map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }).reduce((s, v, i) => s + v * [.2126, .7152, .0722][i], 0); }
+        function panoContrast(a, b) { const x = panoLum(a), y = panoLum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); }
+        const PANO_HARMONY = { komple: [180, 45, -60], uclu: [120, 240, 60], benzer: [35, -35, 70], bolunmus: [150, 210, 60] };
+        function themeGenerateHarmony() {
+            const base = document.getElementById('custom-color-base').value;
+            const kind = document.getElementById('custom-harmony').value;
+            const [h] = panoHexToHsl(base), off = PANO_HARMONY[kind] || PANO_HARMONY.komple;
+            const acc = hh => panoHslToHex(hh, .78, .64);
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+            set('custom-color-blue', acc(h)); set('custom-color-red', acc(h + off[0]));
+            set('custom-color-yellow', acc(h + off[1])); set('custom-color-green', acc(h + off[2]));
+            set('custom-color-cardbg', panoHslToHex(h, .45, .095)); set('custom-color-bgdark', panoHslToHex(h, .55, .05));
+            applyCustomThemeColors(false);
+        }
+        function themeContrastNote() {
+            const el = document.getElementById('theme-contrast-note'); if (!el) return;
+            const v = id => document.getElementById(id).value;
+            const light = appConfig.themeMode === 'light';
+            const bg = light ? '#ffffff' : v('custom-color-cardbg');
+            const bad = [['Mavi', 'custom-color-blue'], ['Kırmızı', 'custom-color-red'], ['Sarı', 'custom-color-yellow'], ['Yeşil', 'custom-color-green']].filter(([, id]) => panoContrast(v(id), bg) < 3).map(([n]) => n);
+            el.className = 'text-[11px] ' + (bad.length ? 'text-amber-400' : 'text-emerald-400');
+            el.innerHTML = (bad.length ? `<i class="fa-solid fa-triangle-exclamation"></i> Kart zemininde okunurluğu düşük: ${bad.join(', ')} (TV'de zor seçilir)` : '<i class="fa-solid fa-circle-check"></i> Vurgu renkleri kart zemininde yeterince okunaklı') + (light ? ' · Açık modda zemin renkleri modun kendi paletinden gelir.' : '');
+        }
         function resetCustomThemeColors() {
             appConfig.customColors = null;
             clearCustomColorVars();
@@ -6390,6 +7351,7 @@
             set('custom-color-green', colors.green || defaults.green);
             set('custom-color-cardbg', colors.cardbg || defaults.cardbg);
             set('custom-color-bgdark', colors.bgdark || defaults.bgdark);
+            try { themeContrastNote(); } catch (e) {}
         }
 
         // Admin: mod düğmeleri, aktif tema adı ve tema şablon galerisini günceller
@@ -6830,6 +7792,7 @@
         }
 
         function saveAdminChanges() {
+            try { bkAutoOnSave(); } catch (e) {}
             saveWeeklyScheduleMatrix();
             saveWeeklyDutiesTable();
             nobetAyiKaydet(); // Aylık nöbet verilerini kaydet
@@ -6999,6 +7962,16 @@
         }
 
         function switchTab(tabId, el) {
+            // Bulut, Excel ve Yedekleme tek menüdür: kenar çubuğunda tek düğme (Bulut) etkin görünür
+            if (tabId === 'tab-cloud' || tabId === 'tab-excel' || tabId === 'tab-backup') {
+                const _nb = document.querySelector('#cms-sidebar-links .cms-nav-btn[data-tab="tab-cloud"]');
+                if (_nb) el = _nb;
+            }
+            document.querySelectorAll('.cloud-subtabs button').forEach(b => {
+                const on = b.getAttribute('data-sub') === tabId;
+                b.classList.toggle('bg-cyan-500', on); b.classList.toggle('text-black', on); b.classList.toggle('border-cyan-200', on);
+                b.classList.toggle('bg-slate-900', !on); b.classList.toggle('text-slate-300', !on); b.classList.toggle('border-slate-700', !on);
+            });
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             const target = document.getElementById(tabId);
             if (target) target.classList.remove('hidden');
@@ -7010,6 +7983,8 @@
             // Sekme değişince içerik alanını en üste kaydır
             const vp = document.getElementById('cms-content-viewport');
             if (vp) vp.scrollTop = 0;
+            if (tabId === 'tab-modules') { try { panoAccRender(); } catch (e) {} }
+            if (tabId === 'tab-backup') { try { renderBackupTab(); } catch (e) { console.warn(e); } }
             writeCMSLog(`Sekme değiştirildi: ${tabId}`);
         }
 
@@ -7137,7 +8112,7 @@
             panel.classList.add('adm-skin-' + name);
             panel.querySelectorAll('.adm-skin-dot').forEach(d => d.classList.toggle('is-active', d.getAttribute('data-skin') === name));
             try { localStorage.setItem(ADMIN_SKIN_KEY, name); } catch (e) {}
-            try { if (admUi.accent) { admUi.accent = ''; admUiApply(); } } catch (e) {}
+            try { if (admUi.accent) admUi.accent = ''; admUiApply(); } catch (e) {}
         }
         (function admInitSkin() {
             let skin = 'ocean';
@@ -7148,7 +8123,7 @@
 
         // ===== Yönetim paneli arayüz düzeni & stil (yalnızca bu cihazda hatırlanır) =====
         const ADMIN_UI_KEY = 'panoAdminUi';
-        const ADM_UI_DEFAULT = { layout: 'classic', palette: 'night', accent: '', radius: 'round', surface: 'solid', scale: '100', sidew: 'normal', motion: 'on', density: 'normal', menu: '', menu2: '', mgrad: 'solid' };
+        const ADM_UI_DEFAULT = { layout: 'classic', palette: 'night', accent: '', radius: 'round', surface: 'solid', scale: '100', sidew: 'normal', motion: 'on', density: 'normal', menu: '', menu2: '', mgrad: 'solid', tx: '', tx2: '', menutx: '', font: '', mfont: '', navstyle: 'bar', navsz: 'normal', navicon: 'show', autocon: 'on', hov: '', hovfx: 'tint', elev: 'soft', speed: 'normal', navcol: 'group' };
         // [id, ad, açıklama, dikdörtgenler: topbar | menü | içerik]
         const ADM_LAYOUTS = [
             ['classic', 'Klasik', 'Üst başlık + sol menü', [2,2,76,7, 2,12,18,38, 23,12,55,38]],
@@ -7179,6 +8154,12 @@
             ['Gün Batımı', { layout: 'left', menu: '#7f1d1d', menu2: '#f97316', mgrad: 'v', accent: '#f97316', palette: 'wine' }],
             ['Orman Sakin', { layout: 'floattop', palette: 'forest', accent: '#10b981', radius: 'pill' }],
             ['Kâğıt', { layout: 'left', palette: 'lightwarm', accent: '#f97316', surface: 'flat' }],
+            ['Yüksek Okunurluk', { layout: 'left', palette: 'black', tx: '#ffffff', tx2: '#e2e8f0', menutx: '#ffffff', font: 'inter', scale: '115' }],
+            ['Koyu Menü · Açık Tema', { layout: 'left', palette: 'light', menu: '#0f172a', menu2: '#1e3a5f', mgrad: 'v', accent: '#0ea5e9' }],
+            ['Kitap Okuma', { layout: 'top', palette: 'lightwarm', accent: '#b45309', tx: '#3b2f1e', font: 'merriweather', navstyle: 'line' }],
+            ['Teknik Terminal', { layout: 'compact', palette: 'graphite', accent: '#22c55e', font: 'firacode', radius: 'sharp', navstyle: 'block' }],
+            ['Kurumsal Profesyonel', { layout: 'left', palette: 'graphite', accent: '#3b82f6', hov: '#60a5fa', hovfx: 'bar', elev: 'soft', font: 'inter' }],
+            ['Canlı Işıltı', { layout: 'floating', palette: 'plum', accent: '#d946ef', hovfx: 'glow', elev: 'deep', surface: 'glass', radius: 'pill' }],
             ['Mor Dock', { layout: 'dock', palette: 'violet', accent: '#a855f7', surface: 'glass', radius: 'pill' }]
         ];
         const ADM_ROWS = [
@@ -7188,21 +8169,66 @@
             ['mgrad', 'Menü degradesi', [['solid', 'Düz'], ['v', 'Dikey'], ['d', 'Çapraz'], ['h', 'Yatay'], ['radial', 'Radyal']]],
             ['scale', 'Boyut', [['85', '%85'], ['100', '%100'], ['115', '%115'], ['130', '%130']]],
             ['sidew', 'Menü genişliği', [['narrow', 'Dar'], ['normal', 'Normal'], ['wide', 'Geniş']]],
-            ['motion', 'Animasyon', [['on', 'Açık'], ['off', 'Kapalı']]]
+            ['motion', 'Animasyon', [['on', 'Açık'], ['off', 'Kapalı']]],
+            ['navstyle', 'Menü öğe stili', [['bar', 'Çubuk'], ['pill', 'Hap'], ['line', 'Alt çizgi'], ['block', 'Dolgulu']]],
+            ['navsz', 'Menü yazı boyutu', [['small', 'Küçük'], ['normal', 'Normal'], ['large', 'Büyük']]],
+            ['navicon', 'Menü simgeleri', [['show', 'Göster'], ['hide', 'Gizle']]],
+            ['autocon', 'Okunurluk koruması', [['on', 'Otomatik'], ['off', 'Kapalı']]],
+            ['navcol', 'Menü simge renkleri', [['group', 'Gruba göre renkli'], ['single', 'Tek renk']]],
+            ['hovfx', 'Üzerine gelince', [['tint', 'Renk dolgusu'], ['lift', 'Yükselme'], ['glow', 'Parlama'], ['bar', 'Vurgu şeridi']]],
+            ['elev', 'Kart gölgesi', [['none', 'Yok'], ['soft', 'Hafif'], ['deep', 'Belirgin']]],
+            ['speed', 'Geçiş hızı', [['fast', 'Hızlı'], ['normal', 'Normal'], ['slow', 'Yavaş']]]
+        ];
+        const ADM_ROW_FX = ['hovfx', 'elev', 'speed'];
+        const ADM_ROW_MENU = ['navstyle', 'navsz', 'navicon', 'navcol'], ADM_ROW_SKIP = ['mgrad', 'navstyle', 'navsz', 'navicon', 'navcol', 'autocon', 'hovfx', 'elev', 'speed'];
+        const ADM_TX = ['#ffffff','#f8fafc','#e2e8f0','#cbd5e1','#fde68a','#a7f3d0','#bae6fd','#fbcfe8','#0f172a','#1e293b','#334155','#1c1917','#14532d','#1e3a8a','#7c2d12','#581c87'];
+        const ADM_FONTS = [
+            ['', 'Varsayılan', 'Panelin kendi yazı tipi', ''],
+            ['inter', 'Inter', 'Modern, sade', "'Inter',sans-serif"],
+            ['poppins', 'Poppins', 'Yuvarlak, geniş', "'Poppins',sans-serif"],
+            ['roboto', 'Roboto', 'Nötr, okunaklı', "'Roboto',sans-serif"],
+            ['montserrat', 'Montserrat', 'Geometrik', "'Montserrat',sans-serif"],
+            ['nunito', 'Nunito', 'Yumuşak hatlı', "'Nunito',sans-serif"],
+            ['lato', 'Lato', 'Dengeli', "'Lato',sans-serif"],
+            ['rajdhani', 'Rajdhani', 'Teknolojik', "'Rajdhani',sans-serif"],
+            ['oswald', 'Oswald', 'Dar ve güçlü', "'Oswald',sans-serif"],
+            ['merriweather', 'Merriweather', 'Serif, kitap', "'Merriweather',serif"],
+            ['georgia', 'Georgia', 'Klasik serif', "Georgia,'Times New Roman',serif"],
+            ['firacode', 'Fira Code', 'Kod yazısı', "'Fira Code',monospace"],
+            ['system', 'Sistem', 'Cihazın yazı tipi', "system-ui,-apple-system,'Segoe UI',sans-serif"]
         ];
         // [id, ad, önizleme, arka plan değişkenleri (bg1,bg2,yüzey,yüzey2,kenar) | null, açık mı]
-        const _PV = { navy: ['#020b1f','#06143a','#0b1f4d','#071538','#173269'], violet: ['#0a0615','#140c2b','#1a1236','#110a26','#2b1f55'], forest: ['#02100b','#061f16','#0b2a1e','#071c14','#14442f'], wine: ['#14040a','#260a14','#32101d','#1f0811','#4d1a2c'], coffee: ['#120d08','#201710','#2a1f15','#1a130c','#40301f'], gray: ['#0a0a0a','#121212','#1a1a1a','#0e0e0e','#2e2e2e'] };
+        // [id, ad, grup, [bg1, bg2, yüzey, yüzey2, kenar] | null (= varsayılan gece), açık mı]
+        // Açık paletler gerçek açık renklerdir (ters çevirme filtresi KULLANILMAZ); yazı/alan renkleri CSS'te .adm-light ile uyarlanır.
+        const ADM_PAL_NIGHT = ['#020617', '#0b1426', '#0f172a', '#0b1222', '#1e293b'];
         const ADM_PALETTES = [
-            ['night', 'Gece', '#0f172a', null, false], ['black', 'Siyah', '#000', ['#000','#000','#070707','#000','#1c1c1c'], false],
-            ['graphite', 'Antrasit', '#1c2027', ['#0f1115','#171a20','#1c2027','#14171c','#2a2f38'], false], ['navy', 'Lacivert', '#0b1f4d', _PV.navy, false],
-            ['violet', 'Mor Gece', '#1a1236', _PV.violet, false], ['forest', 'Orman', '#0b2a1e', _PV.forest, false],
-            ['wine', 'Bordo', '#32101d', _PV.wine, false], ['coffee', 'Kahve', '#2a1f15', _PV.coffee, false],
-            ['light', 'Açık Mavi', '#eef3fa', ['#020617','#0b1426','#0f172a','#0b1222','#1e293b'], true], ['lightgray', 'Açık Gri', '#f2f2f2', _PV.gray, true],
-            ['lightgreen', 'Açık Yeşil', '#eaf7f0', _PV.forest, true], ['lightviolet', 'Açık Mor', '#f1ecfa', _PV.violet, true],
-            ['lightwarm', 'Krem', '#f8f1e6', _PV.coffee, true], ['lightrose', 'Açık Gül', '#fbecef', _PV.wine, true]
+            ['night', 'Gece', null, false],
+            ['black', 'Siyah', ['#000000', '#000000', '#070707', '#000000', '#1c1c1c'], false],
+            ['graphite', 'Antrasit', ['#0f1115', '#171a20', '#1c2027', '#14171c', '#2a2f38'], false],
+            ['navy', 'Lacivert', ['#020b1f', '#06143a', '#0b1f4d', '#071538', '#173269'], false],
+            ['violet', 'Mor Gece', ['#0a0615', '#140c2b', '#1a1236', '#110a26', '#2b1f55'], false],
+            ['forest', 'Orman', ['#02100b', '#061f16', '#0b2a1e', '#071c14', '#14442f'], false],
+            ['wine', 'Bordo', ['#14040a', '#260a14', '#32101d', '#1f0811', '#4d1a2c'], false],
+            ['coffee', 'Kahve', ['#120d08', '#201710', '#2a1f15', '#1a130c', '#40301f'], false],
+            ['light', 'Açık Mavi', ['#e6edf8', '#f3f6fc', '#ffffff', '#eef3fa', '#d3ddec'], true],
+            ['lightgray', 'Açık Gri', ['#e8e8eb', '#f5f5f7', '#ffffff', '#f2f2f5', '#dadade'], true],
+            ['lightgreen', 'Açık Yeşil', ['#e1f2e9', '#f1faf5', '#ffffff', '#ecf7f1', '#cce5d7'], true],
+            ['lightviolet', 'Açık Mor', ['#ebe5f8', '#f6f2fc', '#ffffff', '#f2edfb', '#dacdf0'], true],
+            ['lightwarm', 'Krem', ['#f1e8d6', '#faf5ea', '#fffdf8', '#f7f0e1', '#e5d8bd'], true],
+            ['lightrose', 'Açık Gül', ['#f7e3e8', '#fcf1f4', '#ffffff', '#fbedf0', '#eecfd7'], true],
+            ['ocean', 'Okyanus', ['#02121a', '#041f2c', '#082b3b', '#051a25', '#0f4157'], false],
+            ['plum', 'Erik', ['#12061a', '#220b2e', '#2e1040', '#1c0926', '#4a1b63'], false],
+            ['olive', 'Zeytin', ['#0f1104', '#1a1d07', '#23280b', '#171a06', '#3b4414'], false],
+            ['rust', 'Pas', ['#150a05', '#26120a', '#33190d', '#210f08', '#55301a'], false],
+            ['lightsky', 'Açık Gök', ['#dff1fb', '#eef9fe', '#ffffff', '#e8f6fd', '#c5e2f2'], true],
+            ['lightpeach', 'Şeftali', ['#fbe9df', '#fff5ef', '#ffffff', '#fdf0e8', '#f1d3c0'], true]
         ];
-        const ADM_ACCENTS = ['#06b6d4','#0ea5e9','#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899','#f43f5e','#f97316','#f59e0b','#84cc16','#10b981','#14b8a6','#94a3b8'];
-        const ADM_MENUCOLORS = ['#0f172a','#1e3a5f','#134e4a','#14532d','#3b0764','#7f1d1d','#78350f','#1f2937','#000000','#f1f5f9','#dbeafe','#dcfce7','#fef3c7','#fce7f3','#0ea5e9','#8b5cf6','#f43f5e','#f97316'];
+        const admPalResolve = id => {
+            if (id === 'auto') { try { id = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'night'; } catch (e) { id = 'night'; } }
+            return ADM_PALETTES.find(x => x[0] === id) || ADM_PALETTES[0];
+        };
+        const ADM_ACCENTS = ['#06b6d4','#0ea5e9','#3b82f6','#6366f1','#8b5cf6','#a855f7','#d946ef','#ec4899','#f43f5e','#ef4444','#f97316','#f59e0b','#eab308','#84cc16','#22c55e','#10b981','#14b8a6','#0d9488','#64748b','#94a3b8'];
+        const ADM_MENUCOLORS = ['#0f172a','#1e3a5f','#0b3b5c','#134e4a','#14532d','#3b0764','#4c1d95','#7f1d1d','#78350f','#1f2937','#000000','#1c1917','#f1f5f9','#dbeafe','#dcfce7','#fef3c7','#fce7f3','#ede9fe','#0ea5e9','#06b6d4','#10b981','#8b5cf6','#f43f5e','#f97316'];
         function admRgb(h) { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
         let admUi = Object.assign({}, ADM_UI_DEFAULT);
         try { Object.assign(admUi, JSON.parse(localStorage.getItem(ADMIN_UI_KEY) || '{}')); } catch (e) {}
@@ -7211,21 +8237,22 @@
         function admUiApply() {
             const p = document.getElementById('admin-panel');
             if (!p) return;
-            [...p.classList].filter(c => /^adm-(lay|mode|rad|surf|scale|sw|den)-/.test(c) || c === 'adm-nomotion' || c === 'adm-drawer-open').forEach(c => p.classList.remove(c));
+            [...p.classList].filter(c => /^adm-(lay|mode|rad|surf|scale|sw|den|ns|nz|ni|hf|el|sp|nc)-/.test(c) || c === 'adm-nomotion' || c === 'adm-drawer-open').forEach(c => p.classList.remove(c));
             const u = admUi;
-            p.classList.add('adm-lay-' + u.layout, 'adm-rad-' + u.radius, 'adm-surf-' + u.surface, 'adm-scale-' + u.scale, 'adm-sw-' + u.sidew, 'adm-den-' + u.density);
+            p.classList.add('adm-lay-' + u.layout, 'adm-rad-' + u.radius, 'adm-surf-' + u.surface, 'adm-scale-' + u.scale, 'adm-sw-' + u.sidew, 'adm-den-' + u.density, 'adm-ns-' + u.navstyle, 'adm-nz-' + u.navsz, 'adm-ni-' + u.navicon, 'adm-hf-' + u.hovfx, 'adm-el-' + u.elev, 'adm-sp-' + u.speed, 'adm-nc-' + u.navcol);
+            p.style.setProperty('--adm-hov', u.hov || 'var(--adm-accent)');
             if (u.motion === 'off') p.classList.add('adm-nomotion');
-            const P = ADM_PALETTES.find(x => x[0] === u.palette) || ADM_PALETTES[0];
-            ['--adm-bg1', '--adm-bg2', '--adm-surface', '--adm-surface-2', '--adm-border'].forEach((n, i) => { if (P[3]) p.style.setProperty(n, P[3][i]); else p.style.removeProperty(n); });
-            p.classList.toggle('adm-mode-light', !!P[4]);
+            const P = admPalResolve(u.palette);
+            ['--adm-bg1', '--adm-bg2', '--adm-surface', '--adm-surface-2', '--adm-border'].forEach((n, i) => { if (P[2]) p.style.setProperty(n, P[2][i]); else p.style.removeProperty(n); });
+            p.classList.toggle('adm-light', !!P[3]);
             if (u.accent) {
                 const [r, g, b] = admRgb(u.accent);
                 p.style.setProperty('--adm-accent', u.accent);
                 p.style.setProperty('--adm-accent-2', `rgb(${Math.round(r * .8)},${Math.round(g * .8)},${Math.round(b * .8)})`);
                 p.style.setProperty('--adm-accent-soft', `rgba(${r},${g},${b},.16)`);
             } else ['--adm-accent', '--adm-accent-2', '--adm-accent-soft'].forEach(n => p.style.removeProperty(n));
-            document.querySelectorAll('#adm-ui-rows .adm-pal').forEach(b => b.classList.toggle('is-active', b.dataset.pal === u.palette));
-            document.querySelectorAll('#adm-ui-rows .adm-sw').forEach(b => b.classList.toggle('is-active', b.dataset.acc !== undefined && b.dataset.acc === u.accent));
+            document.querySelectorAll('#tab-adminui .adm-pal').forEach(b => b.classList.toggle('is-active', b.dataset.pal === u.palette));
+            document.querySelectorAll('#tab-adminui .adm-sw').forEach(b => b.classList.toggle('is-active', b.dataset.acc !== undefined && b.dataset.acc === u.accent));
             // Menü rengi / degrade
             p.classList.toggle('adm-has-menu', !!u.menu);
             if (u.menu) {
@@ -7236,11 +8263,118 @@
                 const lum = (u.mgrad === 'solid' ? c1 : c1.map((v, i) => (v + c2[i]) / 2)).reduce((s, v, i) => s + v * [.299, .587, .114][i], 0) / 255;
                 p.classList.toggle('adm-menu-light', lum > .6);
             } else { p.style.removeProperty('--adm-menu-bg'); p.classList.remove('adm-menu-light'); }
-            document.querySelectorAll('#adm-ui-rows .adm-sw[data-menu]').forEach(b => b.classList.toggle('is-active', b.dataset.menu === u.menu));
-            document.querySelectorAll('#adm-ui-rows .adm-sw[data-menu2]').forEach(b => b.classList.toggle('is-active', b.dataset.menu2 === u.menu2));
+            document.querySelectorAll('#tab-adminui .adm-sw[data-menu]').forEach(b => b.classList.toggle('is-active', b.dataset.menu === u.menu));
+            document.querySelectorAll('#tab-adminui .adm-sw[data-menu2]').forEach(b => b.classList.toggle('is-active', b.dataset.menu2 === u.menu2));
             document.querySelectorAll('#adm-ui-layouts .adm-lay-card').forEach(b => b.classList.toggle('is-active', b.dataset.id === u.layout));
-            document.querySelectorAll('#adm-ui-rows .adm-segment button').forEach(b => b.classList.toggle('is-active', admUi[b.dataset.k] === b.dataset.v));
+            document.querySelectorAll('#tab-adminui .adm-segment button').forEach(b => b.classList.toggle('is-active', admUi[b.dataset.k] === b.dataset.v));
+            // Vurgu üzerindeki yazı rengi (açık vurgularda koyu yazı) + özel renk kutuları + önizleme
+            const onAcc = c => (panoContrast(c, '#ffffff') >= panoContrast(c, '#0b1220') ? '#ffffff' : '#0b1220');
+            { const accNow = u.accent || (getComputedStyle(p).getPropertyValue('--adm-accent') || '#06b6d4').trim(); p.style.setProperty('--adm-on-accent', /^#[0-9a-f]{6}$/i.test(accNow) ? onAcc(accNow) : '#ffffff'); }
+            const admW = [];
+            const isHex = h => /^#[0-9a-f]{6}$/i.test(h || '');
+            const lumOf = h => { const c = admRgb(h); return (c[0] * .299 + c[1] * .587 + c[2] * .114) / 255; };
+            const okC = (c, bg) => u.autocon === 'off' || panoContrast(c, bg) >= 3.5;
+            { // Yazı renkleri, font ve okunurluk koruması
+                let surf = (getComputedStyle(p).getPropertyValue('--adm-surface') || '').trim(); if (!isHex(surf)) surf = P[3] ? '#ffffff' : '#0f172a';
+                const lightC = lumOf(surf) > .55, au = lightC ? ['#0f172a', '#334155', '#64748b'] : ['#f1f5f9', '#cbd5e1', '#94a3b8'];
+                let tx = u.tx, tx2 = u.tx2;
+                if (tx && !(isHex(tx) && okC(tx, surf))) { admW.push('Ana yazı rengi zemine göre okunmuyor; otomatik renk kullanıldı.'); tx = ''; }
+                if (tx2 && !(isHex(tx2) && okC(tx2, surf))) { admW.push('İkincil yazı rengi zemine göre okunmuyor; otomatik renk kullanıldı.'); tx2 = ''; }
+                p.style.setProperty('--adm-tx', tx || au[0]); p.style.setProperty('--adm-tx2', tx2 || au[1]); p.style.setProperty('--adm-tx3', au[2]);
+                p.classList.toggle('adm-has-tx', !!(tx || tx2));
+                if (!tx && tx2) p.style.setProperty('--adm-tx', au[0]);
+                const mBgs = u.menu ? [u.menu].concat(u.mgrad !== 'solid' && u.menu2 ? [u.menu2] : []) : [surf];
+                const mL = u.menu ? (u.mgrad === 'solid' || !u.menu2 ? lumOf(u.menu) * (u.mgrad === 'solid' ? 1 : .75) : (lumOf(u.menu) + lumOf(u.menu2)) / 2) : lumOf(surf);
+                let mf = u.menutx;
+                if (mf && !(isHex(mf) && mBgs.every(b => okC(mf, b)))) { admW.push('Menü yazı rengi menü zemininde okunmuyor; otomatik renk kullanıldı.'); mf = ''; }
+                if (mf) { const [r, g, b] = admRgb(mf); p.style.setProperty('--adm-mfg', mf); p.style.setProperty('--adm-mfg2', `rgba(${r},${g},${b},.72)`); }
+                else { p.style.setProperty('--adm-mfg', mL > .55 ? '#0f172a' : '#e2e8f0'); p.style.setProperty('--adm-mfg2', mL > .55 ? '#475569' : '#94a3b8'); }
+                const fs = id => (ADM_FONTS.find(f => f[0] === id) || [])[3] || '';
+                const f1 = fs(u.font), f2 = fs(u.mfont) || f1;
+                if (f1) p.style.setProperty('--adm-font', f1); else p.style.removeProperty('--adm-font');
+                if (f2) p.style.setProperty('--adm-mfont', f2); else p.style.removeProperty('--adm-mfont');
+                p.classList.toggle('adm-has-font', !!f1); p.classList.toggle('adm-has-mfont', !!f2);
+                document.querySelectorAll('#tab-adminui .adm-font').forEach(b => b.classList.toggle('is-active', u[b.dataset.fk] === b.dataset.fv));
+                ['tx', 'tx2', 'menutx', 'hov'].forEach(k => document.querySelectorAll('#tab-adminui .adm-sw[data-' + k + ']').forEach(b => b.classList.toggle('is-active', b.dataset[k] === u[k])));
+            }
+            const ADM_CK = { accent: ['acc', ADM_ACCENTS], menu: ['menu', ADM_MENUCOLORS], menu2: ['menu2', ADM_MENUCOLORS], tx: ['tx', ADM_TX], tx2: ['tx2', ADM_TX], menutx: ['menutx', ADM_TX], hov: ['hov', ADM_ACCENTS] };
+            Object.keys(ADM_CK).forEach(k => {
+                const el = document.getElementById('adm-c-' + k); if (!el) return;
+                const preset = ADM_CK[k][1];
+                if (u[k]) el.value = u[k];
+                el.parentElement.classList.toggle('is-active', !!u[k] && !preset.includes(u[k]));
+            });
+            const mini = document.getElementById('adm-ui-mini');
+            if (mini) {
+                const ps = getComputedStyle(p);
+                mini.style.setProperty('--m-bg', ps.getPropertyValue('--adm-bg1') || '#0f172a');
+                mini.style.setProperty('--m-menu', u.menu ? p.style.getPropertyValue('--adm-menu-bg') : (ps.getPropertyValue('--adm-surface') || '#1e293b'));
+                mini.style.setProperty('--m-acc', u.accent || ps.getPropertyValue('--adm-accent') || '#06b6d4');
+                mini.style.setProperty('--m-on', p.style.getPropertyValue('--adm-on-accent') || '#fff');
+            }
+            const note = document.getElementById('adm-ui-note');
+            if (note) {
+                const w = [...admW];
+                if (u.menu && u.menu2 && u.mgrad === 'solid') w.push('Degrade sonu seçili ama menü degradesi "Düz"; etkisi görünmez.');
+                if (u.menu && !u.menu2 && u.mgrad !== 'solid') w.push('Degrade sonu seçilmedi; menü rengi otomatik koyulaştırılır.');
+                if (u.surface === 'outline' && P[3]) w.push('Açık palet + "Hat" yüzeyi okunurluğu düşürebilir.');
+                note.innerHTML = w.length ? w.map(t => `<i class="fa-solid fa-triangle-exclamation"></i> ${t}`).join('<br>') : '<i class="fa-solid fa-circle-check"></i> Renk kombinasyonu uyumlu.';
+                note.classList.toggle('is-warn', w.length > 0);
+            }
+            const sm = document.getElementById('adm-ui-summary');
+            if (sm) {
+                const lab = (k) => { const r = ADM_ROWS.find(x => x[0] === k); const o = r && r[2].find(x => x[0] === u[k]); return o ? o[1] : ''; };
+                const lay = (ADM_LAYOUTS.find(l => l[0] === u.layout) || [])[1] || '';
+                sm.innerHTML = [['fa-table-columns', lay], ['fa-palette', P[1]], ['fa-vector-square', lab('radius')], ['fa-layer-group', lab('surface')], ['fa-text-height', '%' + u.scale]].map(([ic, t]) => `<span><i class="fa-solid ${ic}"></i> ${t}</span>`).join('');
+            }
             try { localStorage.setItem(ADMIN_UI_KEY, JSON.stringify(u)); } catch (e) {}
+        }
+
+        function admStTab(id) {
+            document.querySelectorAll('#adm-st-nav button').forEach(b => b.classList.toggle('is-active', b.dataset.pane === id));
+            document.querySelectorAll('#tab-adminui .adm-st-pane').forEach(s => s.classList.toggle('is-active', s.dataset.pane === id));
+        }
+        (function admTabColors() {
+            const map = { cyan: '#22d3ee', rose: '#fb7185', emerald: '#34d399', amber: '#fbbf24', yellow: '#facc15', purple: '#c084fc', pink: '#f472b6', green: '#4ade80', red: '#f87171', blue: '#60a5fa', indigo: '#818cf8', teal: '#2dd4bf', orange: '#fb923c', sky: '#38bdf8', violet: '#a78bfa' };
+            document.querySelectorAll('#admin-panel .tab-content').forEach(t => {
+                const h = t.querySelector('h2'); const m = h && (h.className + ' ' + (h.firstElementChild ? h.firstElementChild.className : '')).match(/text-(\w+)-[345]00/);
+                if (m && map[m[1]]) t.style.setProperty('--tab-c', map[m[1]]);
+            });
+        })();
+        const ADM_LAY_GROUPS = [['all', 'Tümü'], ['side', 'Yan menü'], ['top', 'Üst menü'], ['bottom', 'Alt menü'], ['float', 'Yüzen'], ['hidden', 'Gizlenebilir']];
+        const ADM_LAY_MAP = { side: ['classic', 'left', 'right', 'rail', 'accordion', 'compact'], top: ['top', 'gridtop', 'floattop'], bottom: ['bottom', 'dock'], float: ['floating', 'floatrail', 'floattop', 'dock'], hidden: ['drawer', 'focus'] };
+        function admLayFilterSet(g) {
+            document.querySelectorAll('#adm-ui-layouts .adm-lay-card').forEach(c => { c.style.display = (g === 'all' || (ADM_LAY_MAP[g] || []).includes(c.dataset.id)) ? '' : 'none'; });
+            document.querySelectorAll('#adm-ui-lay-filter .adm-chip-btn').forEach(b => b.classList.toggle('is-active', b.dataset.g === g));
+        }
+        // Kullanıcının kendi kayıtlı stilleri (bu cihazda)
+        const ADMIN_UI_MINE_KEY = 'panoAdminUiMine';
+        function admUiMineGet() { try { const a = JSON.parse(localStorage.getItem(ADMIN_UI_MINE_KEY) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+        function admUiMineRender() {
+            const el = document.getElementById('adm-ui-mine'); if (!el) return;
+            el.innerHTML = admUiMineGet().map((m, i) => `<span class="adm-mine"><button type="button" onclick="admUiMineApply(${i})"><i class="fa-solid fa-bookmark"></i> ${String(m.n).replace(/[<>&"]/g, '')}</button><button type="button" title="Sil" onclick="admUiMineDel(${i})"><i class="fa-solid fa-xmark"></i></button></span>`).join('');
+        }
+        function admUiSaveMine() {
+            const n = (prompt('Bu stile bir ad verin:', 'Stilim ' + (admUiMineGet().length + 1)) || '').trim().slice(0, 24);
+            if (!n) return;
+            const a = admUiMineGet(); a.push({ n, u: Object.assign({}, admUi) });
+            try { localStorage.setItem(ADMIN_UI_MINE_KEY, JSON.stringify(a.slice(-12))); } catch (e) {}
+            admUiMineRender();
+        }
+        function admUiMineApply(i) { const m = admUiMineGet()[i]; if (m) { admUi = Object.assign({}, ADM_UI_DEFAULT, m.u); admUiApply(); } }
+        function admUiMineDel(i) { const a = admUiMineGet(); a.splice(i, 1); try { localStorage.setItem(ADMIN_UI_MINE_KEY, JSON.stringify(a)); } catch (e) {} admUiMineRender(); }
+        function admUiExport() {
+            const txt = JSON.stringify(admUi);
+            (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(() => showCustomNotification('Stil kopyalandı', 'Stil kodu panoya kopyalandı; başka cihazda "İçe Aktar" ile yapıştırabilirsiniz.'), () => prompt('Stil kodunu kopyalayın:', txt));
+        }
+        function admUiImport() {
+            const t = prompt('Stil kodunu yapıştırın:'); if (!t) return;
+            try {
+                const o = JSON.parse(t), clean = {};
+                Object.keys(ADM_UI_DEFAULT).forEach(k => { if (typeof o[k] === 'string' && o[k].length < 20) clean[k] = o[k]; });
+                if (!ADM_LAYOUTS.some(l => l[0] === clean.layout)) throw 0;
+                admUi = Object.assign({}, ADM_UI_DEFAULT, clean); admUiApply();
+            } catch (e) { showCustomNotification('Geçersiz kod', 'Yapıştırılan stil kodu okunamadı.'); }
         }
         function admUiSet(k, v) { admUi[k] = v; admUiApply(); }
         function admUiReset() { admUi = Object.assign({}, ADM_UI_DEFAULT); admUiApply(); }
@@ -7256,18 +8390,46 @@
                 const box = (i, f, o) => `<rect x="${r[i]}" y="${r[i+1]}" width="${r[i+2]}" height="${r[i+3]}" rx="${id.startsWith('float') ? 3 : 1.5}" fill="${f}" opacity="${o}"/>`;
                 return `<button type="button" class="adm-lay-card" data-id="${id}" onclick="admUiSet('layout','${id}')"><svg viewBox="0 0 80 52">${box(8, '#334155', .55)}${box(0, '#64748b', .8)}${box(4, 'var(--adm-accent)', .9)}</svg><b>${name}</b><span>${desc}</span></button>`;
             }).join('');
-            document.getElementById('adm-ui-presets').innerHTML = ADM_PRESETS.map((p, i) => `<button type="button" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg text-xs" onclick="admUiPreset(${i})">${p[0]}</button>`).join('');
-            document.getElementById('adm-ui-rows').innerHTML = ADM_ROWS.map(([k, label, opts]) =>
-                `<div class="adm-ui-row"><label>${label}</label><div class="adm-segment" style="--n:${opts.length}">${opts.map(([v, t]) => `<button type="button" data-k="${k}" data-v="${v}" onclick="admUiSet('${k}','${v}')">${t}</button>`).join('')}</div></div>`).join('');
+            const presetCard = (p, i) => {
+                const u = p[1], pal = ADM_PALETTES.find(x => x[0] === (u.palette || 'night')) || ADM_PALETTES[0], v = pal[2] || ADM_PAL_NIGHT;
+                const acc = u.accent || '#06b6d4', menu = u.menu ? (u.menu2 ? `linear-gradient(135deg,${u.menu},${u.menu2})` : u.menu) : v[2];
+                const lay = (ADM_LAYOUTS.find(l => l[0] === (u.layout || 'classic')) || [])[1] || '';
+                return `<button type="button" class="adm-st-preset" onclick="admUiPreset(${i})"><span class="pv" style="background:${v[0]};border-color:${v[4]}"><i style="background:${menu}"></i><b style="background:${acc}"></b></span><strong>${p[0]}</strong><small>${lay}</small></button>`;
+            };
+            document.getElementById('adm-ui-presets').innerHTML = ADM_PRESETS.map(presetCard).join('');
+            admUiMineRender();
+            document.getElementById('adm-ui-lay-filter').innerHTML = ADM_LAY_GROUPS.map(([id, t]) => `<button type="button" class="adm-chip-btn${id === 'all' ? ' is-active' : ''}" data-g="${id}" onclick="admLayFilterSet('${id}')">${t}</button>`).join('');
+            const segRow = ([k, label, opts]) => `<div class="adm-ui-row"><label>${label}</label><div class="adm-segment" style="--n:${opts.length}">${opts.map(([v, t]) => `<button type="button" data-k="${k}" data-v="${v}" onclick="admUiSet('${k}','${v}')">${t}</button>`).join('')}</div></div>`;
+            document.getElementById('adm-ui-rows').innerHTML = ADM_ROWS.filter(r => !ADM_ROW_SKIP.includes(r[0])).map(segRow).join('');
             // Simge çubuğu için ipuçları + akordeon grup başlıkları
             document.querySelectorAll('#cms-sidebar-links .cms-nav-btn').forEach(b => { b.title = b.textContent.trim(); });
             document.querySelectorAll('#cms-sidebar-links .adm-nav-title').forEach(t => t.addEventListener('click', () => {
                 if (document.getElementById('admin-panel').classList.contains('adm-lay-accordion')) t.parentElement.classList.toggle('is-collapsed');
             }));
-            document.getElementById('adm-ui-rows').insertAdjacentHTML('afterbegin',
-                `<div class="adm-ui-row"><label>Renk paleti<br><small style="font-weight:400;color:#64748b">Koyu ve açık</small></label><div class="adm-pal-grid">${ADM_PALETTES.map(p => `<button type="button" class="adm-pal" data-pal="${p[0]}" onclick="admUiSet('palette','${p[0]}')"><i style="background:${p[2]}"></i><span>${p[1]}</span></button>`).join('')}</div></div>` +
-                `<div class="adm-ui-row"><label>Vurgu rengi</label><div class="adm-acc-grid"><button type="button" class="adm-sw" data-acc="" style="--c:linear-gradient(135deg,#06b6d4,#f43f5e)" title="Üst çubuktaki renk" onclick="admUiSet('accent','')"></button>${ADM_ACCENTS.map(h => `<button type="button" class="adm-sw" data-acc="${h}" style="--c:${h}" onclick="admUiSet('accent','${h}')"></button>`).join('')}</div></div>` +
-                [['menu', 'Menü rengi', 'Tema ile aynı'], ['menu2', 'Degrade sonu', 'Otomatik (koyulaşır)']].map(([k, t, d]) => `<div class="adm-ui-row"><label>${t}</label><div class="adm-acc-grid"><button type="button" class="adm-sw" data-${k}="" style="--c:linear-gradient(135deg,#334155,#94a3b8)" title="${d}" onclick="admUiSet('${k}','')"></button>${ADM_MENUCOLORS.map(h => `<button type="button" class="adm-sw" data-${k}="${h}" style="--c:${h}" onclick="admUiSet('${k}','${h}')"></button>`).join('')}</div></div>`).join(''));
+            const swRow = (k, attr, label, hint, list, auto) => `<div class="adm-ui-row"><label>${label}<br><small>${hint}</small></label><div class="adm-acc-grid"><button type="button" class="adm-sw" data-${attr}="" style="--c:${auto[1]}" title="${auto[0]}" onclick="admUiSet('${k}','')"></button>${list.map(h => `<button type="button" class="adm-sw" data-${attr}="${h}" style="--c:${h}" onclick="admUiSet('${k}','${h}')"></button>`).join('')}<label class="adm-custom" title="Özel renk seç"><input type="color" id="adm-c-${k}" value="#06b6d4" oninput="admUiSet('${k}',this.value)"><span>Özel</span></label></div></div>`;
+            const palBtn = id => {
+                const p = id === 'auto' ? ['auto', 'Sistemi izle', null, false] : ADM_PALETTES.find(x => x[0] === id), v = p[2] || ADM_PAL_NIGHT;
+                const bg = id === 'auto' ? 'linear-gradient(135deg,#0f172a 50%,#f3f6fc 50%)' : `linear-gradient(135deg,${v[0]} 0 50%,${v[2]} 50% 100%)`;
+                return `<button type="button" class="adm-pal" data-pal="${id}" onclick="admUiSet('palette','${id}')"><i style="background:${bg};border-color:${v[4]}"></i><span>${p[1]}</span></button>`;
+            };
+            const palGroup = (g, ids) => `<div class="adm-pal-group"><b>${g}</b><div class="adm-pal-grid">${ids.map(palBtn).join('')}</div></div>`;
+            document.getElementById('adm-ui-pal').innerHTML = palGroup('Otomatik', ['auto']) + palGroup('Koyu', ADM_PALETTES.filter(x => !x[3]).map(x => x[0])) + palGroup('Açık', ADM_PALETTES.filter(x => x[3]).map(x => x[0]));
+            document.getElementById('adm-ui-accent').innerHTML = swRow('accent', 'acc', 'Vurgu rengi', 'Hazır renkler veya özel', ADM_ACCENTS, ['Üst çubuktaki renk', 'linear-gradient(135deg,#06b6d4,#f43f5e)']);
+            document.getElementById('adm-ui-menucol').innerHTML =
+                swRow('menu', 'menu', 'Menü rengi', 'Kenar çubuğu zemini', ADM_MENUCOLORS, ['Tema ile aynı', 'linear-gradient(135deg,#334155,#94a3b8)']) +
+                swRow('menu2', 'menu2', 'Degrade sonu', 'İkinci renk', ADM_MENUCOLORS, ['Otomatik (koyulaşır)', 'linear-gradient(135deg,#334155,#94a3b8)']) +
+                segRow(ADM_ROWS.find(r => r[0] === 'mgrad'));
+            document.getElementById('adm-ui-menuopts').innerHTML = ADM_ROW_MENU.map(k => segRow(ADM_ROWS.find(r => r[0] === k))).join('');
+            document.getElementById('adm-ui-txcol').innerHTML =
+                swRow('tx', 'tx', 'Ana yazı rengi', 'Başlık ve düz metin', ADM_TX, ['Otomatik (temaya göre)', 'linear-gradient(135deg,#f1f5f9 50%,#0f172a 50%)']) +
+                swRow('tx2', 'tx2', 'İkincil yazı', 'Açıklama / soluk metin', ADM_TX, ['Otomatik (temaya göre)', 'linear-gradient(135deg,#94a3b8 50%,#475569 50%)']) +
+                swRow('menutx', 'menutx', 'Menü yazı rengi', 'Kenar çubuğu yazıları', ADM_TX, ['Otomatik (zemine göre)', 'linear-gradient(135deg,#e2e8f0 50%,#0f172a 50%)']) +
+                segRow(ADM_ROWS.find(r => r[0] === 'autocon'));
+            const fontGrid = k => ADM_FONTS.map(f => `<button type="button" class="adm-font" data-fk="${k}" data-fv="${f[0]}" style="font-family:${f[3] || 'inherit'}" onclick="admUiSet('${k}','${f[0]}')"><b>Aa</b><span>${f[0] === '' && k === 'mfont' ? 'Genel ile aynı' : f[1]}</span><small>${f[2]}</small></button>`).join('');
+            document.getElementById('adm-ui-hov').innerHTML = swRow('hov', 'hov', 'Hover rengi', 'Fare üzerine gelince', ADM_ACCENTS, ['Vurgu rengiyle aynı', 'linear-gradient(135deg,#06b6d4,#f43f5e)']);
+            document.getElementById('adm-ui-fx').innerHTML = ADM_ROW_FX.map(k => segRow(ADM_ROWS.find(r => r[0] === k))).join('');
+            document.getElementById('adm-ui-font').innerHTML = fontGrid('font');
+            document.getElementById('adm-ui-mfont').innerHTML = fontGrid('mfont');
             admUiApply();
         })();
 
@@ -7281,7 +8443,8 @@
                 bgColor: bgEnabled ? document.getElementById('new-announcement-bgcolor').value : '',
                 font: document.getElementById('new-announcement-font').value || '',
                 fontSize: fontSizeVal && fontSizeVal > 0 ? fontSizeVal : 11,
-                bold: document.getElementById('new-announcement-bold').checked
+                bold: document.getElementById('new-announcement-bold').checked,
+                inMarquee: document.getElementById('new-announcement-inmarquee').checked
             };
         }
 
@@ -7296,6 +8459,7 @@
             document.getElementById('new-announcement-font').value = ann.font || '';
             document.getElementById('new-announcement-fontsize').value = ann.fontSize || 11;
             document.getElementById('new-announcement-bold').checked = !!ann.bold;
+            document.getElementById('new-announcement-inmarquee').checked = !!ann.inMarquee;
         }
 
         // Formdaki mevcut ayarlara göre canlı önizlemeyi günceller
@@ -7330,6 +8494,7 @@
                 row.innerHTML = `
                     <span class="text-slate-300 truncate max-w-xs" style="${previewStyle}">${index + 1}. ${escapeHtml(ann.text)}</span>
                     <div class="flex gap-1 shrink-0">
+                        <button class="p-1 hover:bg-slate-800 rounded ${ann.inMarquee ? 'text-yellow-400' : 'text-slate-600'}" title="Alt yazıda (kayan yazı) göster" onclick="toggleAnnouncementInMarquee(${index})"><i class="fa-solid fa-align-left"></i></button>
                         <button class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" onclick="moveAnnouncement(${index}, -1)"><i class="fa-solid fa-arrow-up"></i></button>
                         <button class="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white" onclick="moveAnnouncement(${index}, 1)"><i class="fa-solid fa-arrow-down"></i></button>
                         <button class="p-1 hover:bg-cyan-500/20 rounded text-cyan-400" onclick="editAnnouncement(${index})"><i class="fa-solid fa-pen"></i></button>
@@ -7338,6 +8503,13 @@
                 `;
                 wrapper.appendChild(row);
             });
+        }
+
+        function toggleAnnouncementInMarquee(index) {
+            if (!tempAnnouncements[index]) return;
+            tempAnnouncements[index].inMarquee = !tempAnnouncements[index].inMarquee;
+            renderAdminAnnouncements();
+            updateMarqueeLivePreview();
         }
 
         function addAnnouncementToList() {
@@ -7361,9 +8533,11 @@
                 document.getElementById('new-announcement-font').value = '';
                 document.getElementById('new-announcement-fontsize').value = 11;
                 document.getElementById('new-announcement-bold').checked = false;
+                document.getElementById('new-announcement-inmarquee').checked = true;
                 updateAnnouncementLivePreview();
             }
             renderAdminAnnouncements();
+            updateMarqueeLivePreview();
         }
 
         function editAnnouncement(index) {
@@ -7391,6 +8565,7 @@
             document.getElementById('new-announcement-font').value = '';
             document.getElementById('new-announcement-fontsize').value = 11;
             document.getElementById('new-announcement-bold').checked = false;
+            document.getElementById('new-announcement-inmarquee').checked = true;
             updateAnnouncementLivePreview();
             const btn = document.getElementById('announcement-submit-btn');
             if (btn) btn.innerHTML = '<i class="fa-solid fa-plus"></i>';
@@ -7587,7 +8762,8 @@
                 italic: document.getElementById('marq-italic').checked,
                 uppercase: document.getElementById('marq-uppercase').checked,
                 glowEnabled: document.getElementById('marq-glow-enabled').checked,
-                glowColor: document.getElementById('marq-glow-color').value || '#00e5ff'
+                glowColor: document.getElementById('marq-glow-color').value || '#00e5ff',
+                announceMode: document.getElementById('marq-announce-mode').value || 'marked'
             };
         }
 
@@ -7598,7 +8774,9 @@
             const viewport = document.getElementById('marq-live-preview-viewport');
             if (!track) return;
             const mw = readMarqueeWidgetFromForm();
-            const items = tempMarqueeItems.length > 0 ? tempMarqueeItems : [{ text: 'Kayan yazı için mesaj ekleyin.', color: '', bold: false, italic: false, icon: '' }];
+            const baseItems = tempMarqueeItems.length > 0 ? tempMarqueeItems : [];
+            const merged = getMarqueeDisplayItems(baseItems, tempAnnouncements, mw.announceMode);
+            const items = merged.length > 0 ? merged : [{ text: 'Kayan yazı için mesaj ekleyin.', color: '', bold: false, italic: false, icon: '' }];
             buildMarqueeTrack(track, viewport, items, mw);
         }
 
@@ -7623,6 +8801,8 @@
             document.getElementById('marq-uppercase').checked = !!mw.uppercase;
             document.getElementById('marq-glow-enabled').checked = !!mw.glowEnabled;
             document.getElementById('marq-glow-color').value = mw.glowColor || '#00e5ff';
+            document.getElementById('marq-announce-mode').value = mw.announceMode || 'marked';
+            syncMarqAnnounceButtons();
             renderAdminMarqueeItems();
             updateMarqueeLivePreview();
         }
@@ -7631,9 +8811,21 @@
             const _sel = document.getElementById('new-birthday-class');
             if (_sel) {
                 const keep = _sel.value;
-                const cls = isDoubleMode() ? adminClassList() : classList;
-                _sel.innerHTML = cls.map(c => `<option value="${c}">${c}</option>`).join('');
-                if (cls.includes(keep)) _sel.value = keep;
+                if (isModDouble('birthday')) {
+                    const ds = appConfig.doubleShift;
+                    _sel.innerHTML = SHIFT_KEYS.map(k => `<optgroup label="${SHIFT_LABELS[k]} öğretimi">${shiftClassesOf(k).map(c => `<option value="${c}">${c}</option>`).join('')}</optgroup>`).join('');
+                } else {
+                    _sel.innerHTML = classList.map(c => `<option value="${c}">${c}</option>`).join('');
+                }
+                if (classList.includes(keep)) _sel.value = keep;
+            }
+            const _sum = document.getElementById('birthday-shift-summary');
+            if (_sum) {
+                if (isModDouble('birthday')) {
+                    const ds = appConfig.doubleShift, cur = __boundShift || 'morning', oth = cur === 'morning' ? 'afternoon' : 'morning';
+                    _sum.classList.remove('hidden');
+                    _sum.innerHTML = `<div class="bd-sum-info"><span class="bd-pill bd-${cur}"><i class="fa-solid ${cur === 'morning' ? 'fa-sun' : 'fa-cloud-sun'}"></i> Bu liste: ${SHIFT_LABELS[cur]} (${tempBirthdays.length})</span><span class="bd-pill bd-${oth}"><i class="fa-solid ${oth === 'morning' ? 'fa-sun' : 'fa-cloud-sun'}"></i> ${SHIFT_LABELS[oth]}: ${(ds[oth].birthdays || []).length}</span><small>Kayıtlar sınıfın bağlı olduğu öğretime göre panoda gösterilir.</small></div><button type="button" class="bd-fix-btn" onclick="birthdaysFixDistribution()"><i class="fa-solid fa-wand-magic-sparkles"></i> Dağılımı Sınıflara Göre Düzelt</button>`;
+                } else { _sum.classList.add('hidden'); _sum.innerHTML = ''; }
             }
             const wrapper = document.getElementById('admin-birthdays-list-wrapper');
             wrapper.innerHTML = "";
@@ -7647,7 +8839,7 @@
                 row.innerHTML = `
                     <label class="flex items-center gap-2 flex-1 min-w-0 cursor-pointer">
                         <input type="checkbox" class="birthday-row-checkbox shrink-0" data-index="${index}" ${selectedBirthdayIndices.has(index) ? 'checked' : ''} onchange="toggleBirthdaySelect(${index}, this.checked)">
-                        <span class="text-slate-300 truncate"><i class="fa-solid fa-cake-candles text-amber-500 mr-1.5"></i> ${escapeHtml(bday.class)} - ${escapeHtml(bday.name)} (${escapeHtml(bday.date)})</span>
+                        <span class="text-slate-300 truncate"><i class="fa-solid fa-cake-candles text-amber-500 mr-1.5"></i> ${escapeHtml(bday.class)} - ${escapeHtml(bday.name)} (${escapeHtml(bday.date)})${isDoubleMode() ? ` <em class="bd-tag bd-${(appConfig.doubleShift.classShifts[bday.class] || 'morning')}">${SHIFT_LABELS[appConfig.doubleShift.classShifts[bday.class] || 'morning']}</em>` : ''}</span>
                     </label>
                     <div class="flex gap-1 shrink-0">
                         <button class="p-1 hover:bg-slate-800 rounded text-cyan-400" onclick="editBirthday(${index})"><i class="fa-solid fa-pen"></i></button>
@@ -7705,6 +8897,20 @@
             const date = document.getElementById('new-birthday-date').value.trim();
             
             if (name && date) {
+                const rec = { class: cls, name: name, date: date };
+                if (isModDouble('birthday')) {
+                    const tgt = appConfig.doubleShift.classShifts[cls] === 'afternoon' ? 'afternoon' : 'morning';
+                    if (tgt !== (__boundShift || 'morning')) {
+                        if (editingBirthdayIndex !== -1) { tempBirthdays.splice(editingBirthdayIndex, 1); cancelEditBirthday(); }
+                        appConfig.doubleShift[tgt].birthdays.push(rec);
+                        document.getElementById('new-birthday-name').value = "";
+                        document.getElementById('new-birthday-date').value = "";
+                        writeCMSLog(`Doğum günü ${SHIFT_LABELS[tgt]} listesine eklendi: ${cls} - ${name} (${date})`);
+                        showCustomNotification("Doğru Listeye Eklendi", `${cls} sınıfı ${SHIFT_LABELS[tgt]} öğretiminde olduğu için kayıt ${SHIFT_LABELS[tgt]} listesine eklendi. Kaydetmeyi unutmayın.`);
+                        renderAdminBirthdays();
+                        return;
+                    }
+                }
                 if (editingBirthdayIndex !== -1) {
                     tempBirthdays[editingBirthdayIndex] = { class: cls, name: name, date: date };
                     writeCMSLog(`Doğum günü güncellendi: ${cls} - ${name} (${date})`);
@@ -7719,6 +8925,18 @@
             } else {
                 showCustomNotification("Giriş Hatası", "Lütfen tüm doğum günü alanlarını doldurun (Tarih formatı GG.AA olmalıdır).");
             }
+        }
+
+        function birthdaysFixDistribution() {
+            if (!isModDouble('birthday')) return;
+            shiftCommitInputs();
+            const moved = shiftRebalanceBirthdays();
+            birthdaysResyncAdmin();
+            cancelEditBirthday();
+            renderAdminBirthdays();
+            try { shiftRefreshDisplay(); } catch (e) {}
+            showCustomNotification(moved ? "Dağılım Düzeltildi" : "Her Şey Yolunda", moved ? `${moved} doğum günü kaydı sınıfının öğretimine (sabah/öğle) taşındı. Kaydetmek için "Değişiklikleri Kaydet" butonuna basın.` : "Tüm doğum günleri zaten sınıflarının öğretimine göre doğru listede.");
+            writeCMSLog(`Doğum günü dağılımı sınıflara göre düzeltildi (${moved} kayıt taşındı).`);
         }
 
         function editBirthday(index) {
@@ -8767,8 +9985,8 @@ if (_cs) { _cs.innerHTML = achClassOptions(rec.cls || ''); _cs.value = rec.cls |
             const tbody = document.getElementById('weekly-schedule-matrix-body');
             const title = document.getElementById('schedule-matrix-title');
             
-            title.innerText = `${activeAdminEditClass} Sınıfı Haftalık Ders Programı Matrisi` + (isDoubleMode() ? ` — ${SHIFT_LABELS[__boundShift]} Öğretimi` : '');
-            if (isDoubleMode() && !adminClassList().includes(activeAdminEditClass)) {
+            title.innerText = `${activeAdminEditClass} Sınıfı Haftalık Ders Programı Matrisi` + (isModDouble('schedule') ? ` — ${SHIFT_LABELS[__boundShift]} Öğretimi` : '');
+            if (isModDouble('schedule') && !adminClassList().includes(activeAdminEditClass)) {
                 title.innerText = 'Bu öğretimde sınıf yok';
                 if (thead) thead.innerHTML = '';
                 tbody.innerHTML = '';
@@ -8813,7 +10031,7 @@ if (_cs) { _cs.innerHTML = achClassOptions(rec.cls || ''); _cs.value = rec.cls |
         }
 
         function saveWeeklyScheduleMatrix() {
-            if (isDoubleMode() && !adminClassList().includes(activeAdminEditClass)) return;
+            if (isModDouble('schedule') && !adminClassList().includes(activeAdminEditClass)) return;
             if (!appConfig.weeklyClassSchedules[activeAdminEditClass]) {
                 appConfig.weeklyClassSchedules[activeAdminEditClass] = {};
             }
@@ -9726,7 +10944,7 @@ if (_cs) { _cs.innerHTML = achClassOptions(rec.cls || ''); _cs.value = rec.cls |
         // Dosyada kaydı bulunan öğretimlerin listesi değiştirilir; kaydı olmayan öğretim aynen kalır.
         // Sınıfı tanınmayan kayıtlar şu an düzenlenen öğretime eklenir. commit=true ise doğrudan kaydedilir.
         function birthdaysDistributeImport(list, commit) {
-            if (!isDoubleMode()) {
+            if (!isModDouble('birthday')) {
                 if (commit) appConfig.birthdays = list; else tempBirthdays = list;
                 return null;
             }
@@ -9976,7 +11194,7 @@ if (_cs) { _cs.innerHTML = achClassOptions(rec.cls || ''); _cs.value = rec.cls |
 
             // Doğum Günleri
             const bdayRows = [["Sınıf", "Ad Soyad", "Tarih (GG.AA)"]];
-            (isDoubleMode() ? SHIFT_KEYS.flatMap(k => appConfig.doubleShift[k].birthdays || []) : (appConfig.birthdays || [])).forEach(b => {
+            (isModDouble('birthday') ? SHIFT_KEYS.flatMap(k => appConfig.doubleShift[k].birthdays || []) : (appConfig.birthdays || [])).forEach(b => {
                 bdayRows.push([b.class, b.name, b.date]);
             });
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(bdayRows), "Dogum_Gunleri");
@@ -10089,63 +11307,633 @@ if (_cs) { _cs.innerHTML = achClassOptions(rec.cls || ''); _cs.value = rec.cls |
             reader.readAsArrayBuffer(file);
         }
 
-        function exportDataToJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appConfig));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "Okul_Pano_Yedek.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-            writeCMSLog("JSON sistem yedeği indirildi.");
+        /* =====================================================================
+           YEDEKLEME MERKEZİ
+           ---------------------------------------------------------------------
+           - Bölüm seçmeli (kısmi) veya tam yedek; yedek dosyası bilgi başlığı + SHA-256
+             bütünlük özeti taşır (biçim sürümü 2). Eski (düz appConfig) yedekler de okunur.
+           - İsteğe bağlı parola ile AES-256-GCM şifreli yedek (PBKDF2-SHA256, 200.000 tur).
+           - Geri yüklemeden önce önizleme: dosyada ne var / şu an ne var / ne değişecek.
+             Yalnızca seçilen bölümler geri yüklenir; geri yüklemeden önce otomatik
+             "geri alma noktası" alınır.
+           - Yerel anlık görüntüler (geri alma noktaları): sıkıştırılır, sabitlenebilir,
+             otomatik (her kayıtta / günlük / haftalık) alınabilir; bu cihazda saklanır.
+           - İşlem geçmişi ve son yedek uyarısı. Yedek ayarları/anlık görüntüler cihaza
+             özeldir; pano yedeğine ve buluta dahil edilmez.
+        ===================================================================== */
+        const BK_FORMAT = 2;
+        const BK_META_KEY = 'okulPanoBackupMetaV1';
+        const BK_SNAP_KEY = 'okulPanoSnapshotsV1';
+        const BK_SECTIONS = [
+            { id: 'school', icon: 'fa-calendar-days', color: '#06b6d4', label: 'Öğretim & okul verileri',
+              desc: 'Ders programı, zil saatleri, nöbet çizelgesi, doğum günleri, Ayın Enleri, sınıf listesi, tekli/ikili öğretim düzeni',
+              keys: ['teachingMode', 'doubleShift', 'singleModeData', 'classList', 'classShifts', 'bellHours', 'weeklyClassSchedules', 'aylikNobet', 'weeklyDuties', 'birthdays', 'achievementCategories', 'shiftLabels', 'shiftViews', 'shiftModules'] },
+            { id: 'roster', icon: 'fa-user-shield', color: '#10b981', label: 'Nöbetçi kadrosu & nöbet yerleri',
+              desc: 'Öğretmen kadrosu (fotoğraf/ikon bağlantıları), sıralama, nöbet yerleri ve nöbet kartı görünümü',
+              keys: ['teacherRoster', 'rosterOrder', 'dutyPositions', 'dutyStyle', 'dutyAdvancedSettings'] },
+            { id: 'content', icon: 'fa-bullhorn', color: '#f59e0b', label: 'İçerik',
+              desc: 'Duyurular, günün sözleri, belirli günler, kayan yazı, görsel oynatma listesi',
+              keys: ['quote', 'quoteAuthor', 'quotes', 'announcements', 'marqueeItems', 'specialDays', 'mediaPlaylist'] },
+            { id: 'layout', icon: 'fa-table-cells-large', color: '#8b5cf6', label: 'Modül görünümü & pano yerleşimi',
+              desc: 'Modül ayarları, pano yerleşimi ve kayıtlı şablonlar, özel modüller, modül içi görünüm ayarları',
+              keys: ['moduleSettings', 'panoLayout', 'savedLayouts', 'panoDesignVersion', 'customModuleDefs', 'achievementWidget', 'birthdayWidget', 'specialDayWidget', 'marqueeWidget', 'scheduleBoardStyle', 'clockStyle', 'mediaCaptionStyle', 'bellHoursSettings'] },
+            { id: 'theme', icon: 'fa-palette', color: '#ec4899', label: 'Okul kimliği, logo & tema',
+              desc: 'Okul adı, logo, marka alanı, tema ve renkler',
+              keys: ['schoolName', 'theme', 'themeMode', 'customColors', 'schoolLogo', 'logoSize', 'schoolNameSize', 'logoPosition', 'namePosition', 'schoolNameFont', 'logoOffsetX', 'nameOffsetX', 'logoFrame', 'rosterPhotoFrame'] },
+            { id: 'general', icon: 'fa-gear', color: '#94a3b8', label: 'Genel & diğer ayarlar',
+              desc: 'Şehir/hava durumu konumu, yenileme ve veri kontrol ayarları, listelenmemiş diğer tüm ayarlar',
+              keys: null },
+            { id: 'security', icon: 'fa-lock', color: '#f43f5e', label: 'Güvenlik (yönetici PIN)', warn: true, off: true,
+              desc: 'Yönetici PIN kodu ve panel zaman aşımı. PIN yedek dosyasında açık metin durur; paylaşılacak yedeklere eklemeyin.',
+              keys: ['adminPin', 'adminIdleEnabled', 'adminIdleMinutes'] }
+        ];
+        let bkUi = { sel: null, usePass: false, pass: '', note: '', pending: null, pendSel: null, snapBefore: true };
+
+        function bkSectionOfKey(k) {
+            for (let i = 0; i < BK_SECTIONS.length; i++) {
+                const sec = BK_SECTIONS[i];
+                if (sec.keys && sec.keys.indexOf(k) >= 0) return sec.id;
+            }
+            if (/^(brand|logo)/.test(k)) return 'theme';
+            return 'general';
+        }
+        function bkLen(x) { return Array.isArray(x) ? x.length : (x && typeof x === 'object' ? Object.keys(x).length : 0); }
+        function bkShiftParts(cfg) {
+            return (cfg && cfg.teachingMode === 'double' && cfg.doubleShift) ? [cfg.doubleShift.morning || {}, cfg.doubleShift.afternoon || {}] : [cfg || {}];
+        }
+        function bkHasSection(data, id) {
+            return Object.keys(data || {}).some(k => k.indexOf('__') !== 0 && bkSectionOfKey(k) === id);
+        }
+        // Bir bölümün (düz yapılandırma ya da yedek verisi içindeki) kısa özeti
+        function bkSectionInfo(id, cfg) {
+            cfg = cfg || {};
+            if (!bkHasSection(cfg, id)) return 'Veri yok';
+            if (id === 'school') {
+                const parts = bkShiftParts(cfg);
+                let classes = 0, bells = 0, bd = 0, ach = 0;
+                parts.forEach(p => {
+                    classes += bkLen(p.weeklyClassSchedules); bells += bkLen(p.bellHours); bd += bkLen(p.birthdays);
+                    (Array.isArray(p.achievementCategories) ? p.achievementCategories : []).forEach(c => { ach += bkLen(c && c.list); });
+                });
+                return `${cfg.teachingMode === 'double' ? 'İkili öğretim' : 'Tekli öğretim'} · ${classes} sınıf programı · ${bells} ders saati · ${bd} doğum günü · ${ach} Ayın Enleri kaydı`;
+            }
+            if (id === 'roster') return `${bkLen(cfg.teacherRoster)} öğretmen · ${bkLen(cfg.dutyPositions)} nöbet yeri`;
+            if (id === 'content') return `${bkLen(cfg.announcements)} duyuru · ${bkLen(cfg.quotes)} söz · ${bkLen(cfg.specialDays)} belirli gün · ${bkLen(cfg.marqueeItems)} kayan yazı · ${bkLen(cfg.mediaPlaylist)} medya`;
+            if (id === 'layout') return `${bkLen(cfg.moduleSettings)} modül ayarı · ${bkLen(cfg.customModuleDefs)} özel modül · ${bkLen(cfg.savedLayouts)} kayıtlı yerleşim`;
+            if (id === 'theme') return `${cfg.schoolName || 'Okul adı yok'} · tema: ${cfg.theme || '—'} · logo ${cfg.schoolLogo ? 'var' : 'yok'}`;
+            if (id === 'security') return `PIN ${cfg.adminPin ? 'tanımlı' : 'tanımsız'}`;
+            const n = Object.keys(cfg).filter(k => k.indexOf('__') !== 0 && bkSectionOfKey(k) === 'general').length;
+            return `${n} ayar`;
+        }
+        function bkStable(o) {
+            if (Array.isArray(o)) return '[' + o.map(bkStable).join(',') + ']';
+            if (o && typeof o === 'object') return '{' + Object.keys(o).sort().map(k => JSON.stringify(k) + ':' + bkStable(o[k])).join(',') + '}';
+            return JSON.stringify(o === undefined ? null : o);
+        }
+        function bkPlain() { return JSON.parse(JSON.stringify(appConfig)); }
+        function bkBuildData(ids, src) {
+            const plain = src || bkPlain();
+            const out = {};
+            Object.keys(plain).forEach(k => {
+                if (k.indexOf('__') === 0) return;
+                if (ids.indexOf(bkSectionOfKey(k)) >= 0) out[k] = plain[k];
+            });
+            return out;
+        }
+        function bkAllIds(withSecurity) { return BK_SECTIONS.map(s => s.id).filter(i => withSecurity || i !== 'security'); }
+        function bkFmtBytes(n) { n = n || 0; return n < 1024 ? n + ' B' : (n < 1048576 ? (n / 1024).toFixed(1) + ' KB' : (n / 1048576).toFixed(2) + ' MB'); }
+        function bkFmtDate(iso) { try { return new Date(iso).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' }); } catch (e) { return iso || '—'; } }
+        function bkAgo(iso) {
+            const ms = Date.now() - Date.parse(iso);
+            if (isNaN(ms) || ms < 0) return '';
+            const m = Math.floor(ms / 60000);
+            if (m < 1) return 'az önce';
+            if (m < 60) return m + ' dk önce';
+            const h = Math.floor(m / 60);
+            if (h < 24) return h + ' saat önce';
+            return Math.floor(h / 24) + ' gün önce';
+        }
+        function bkSlug(str) {
+            const map = { 'ç': 'c', 'ğ': 'g', 'ı': 'i', 'ö': 'o', 'ş': 's', 'ü': 'u' };
+            return String(str || 'okul').toLocaleLowerCase('tr').replace(/[çğıöşü]/g, c => map[c]).replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 30) || 'okul';
         }
 
-        // "JSON Sistem Yedeği Al" ile indirilen bir yedek dosyasını geri yükler. Yerel
-        // (localStorage) ve buluttaki (Supabase) veriyi bu yedekle DEĞİŞTİRİR — dikkatli
-        // kullanın. Fotoğrafların kendisini geri getirmez (yedekte sadece linkleri vardır);
-        // eğer o linkler artık Supabase Storage'da yoksa (bucket silinmiş/değişmişse)
-        // fotoğraflar görünmeyecektir.
-        function importDataFromJSONFile(event) {
-            const file = event.target.files && event.target.files[0];
+        /* ---- şifreleme / özet / sıkıştırma ---- */
+        function bkB64(bytes) { let s = ''; const CH = 0x8000; for (let i = 0; i < bytes.length; i += CH) s += String.fromCharCode.apply(null, bytes.subarray(i, i + CH)); return btoa(s); }
+        function bkUnB64(b64) { const s = atob(b64); const u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; }
+        function bkCryptoOk() { return !!(typeof crypto !== 'undefined' && crypto.subtle && crypto.getRandomValues); }
+        async function bkSha256(str) {
+            if (!bkCryptoOk()) return null;
+            const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+            return Array.from(new Uint8Array(d)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        async function bkDeriveKey(pass, salt, iter) {
+            const km = await crypto.subtle.importKey('raw', new TextEncoder().encode(pass), 'PBKDF2', false, ['deriveKey']);
+            return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: salt, iterations: iter, hash: 'SHA-256' }, km, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+        }
+        async function bkEncrypt(text, pass) {
+            const salt = crypto.getRandomValues(new Uint8Array(16));
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const iter = 200000;
+            const key = await bkDeriveKey(pass, salt, iter);
+            const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, new TextEncoder().encode(text));
+            return { kdf: 'PBKDF2-SHA256', alg: 'AES-256-GCM', iter: iter, salt: bkB64(salt), iv: bkB64(iv), cipher: bkB64(new Uint8Array(ct)) };
+        }
+        async function bkDecrypt(enc, pass) {
+            const key = await bkDeriveKey(pass, bkUnB64(enc.salt), enc.iter);
+            const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bkUnB64(enc.iv) }, key, bkUnB64(enc.cipher));
+            return new TextDecoder().decode(pt);
+        }
+        async function bkGzip(str) {
+            if (typeof CompressionStream === 'undefined') return null;
+            const stream = new Blob([str]).stream().pipeThrough(new CompressionStream('gzip'));
+            return bkB64(new Uint8Array(await new Response(stream).arrayBuffer()));
+        }
+        async function bkGunzip(b64) {
+            const stream = new Blob([bkUnB64(b64)]).stream().pipeThrough(new DecompressionStream('gzip'));
+            return await new Response(stream).text();
+        }
+
+        /* ---- yerel ayar / geçmiş ---- */
+        function bkMetaGet() {
+            let m = {};
+            try { m = JSON.parse(localStorage.getItem(BK_META_KEY) || '{}') || {}; } catch (e) {}
+            return Object.assign({ autoMode: 'off', maxSnaps: 10, history: [] }, m);
+        }
+        function bkMetaSet(m) { try { localStorage.setItem(BK_META_KEY, JSON.stringify(m)); } catch (e) {} }
+        function bkLog(action, detail) {
+            const m = bkMetaGet();
+            m.history = [{ t: new Date().toISOString(), a: action, d: detail || '' }].concat(m.history || []).slice(0, 30);
+            bkMetaSet(m);
+            try { writeCMSLog('Yedekleme: ' + action + (detail ? ' — ' + detail : '')); } catch (e) {}
+        }
+        function bkNotify(title, msg) { try { showCustomNotification(title, msg); } catch (e) { alert(title + ': ' + msg); } }
+
+        /* ---- yedek dosyası oluşturma ---- */
+        async function bkMakeEnvelope(ids, opts) {
+            opts = opts || {};
+            const data = bkBuildData(ids, opts.src);
+            const json = JSON.stringify(data);
+            const sha = await bkSha256(json);
+            const cfgForInfo = data;
+            const meta = {
+                created: new Date().toISOString(), app: 'okul-pano', schoolName: (opts.src || appConfig).schoolName || '',
+                teachingMode: (opts.src ? opts.src.teachingMode === 'double' : isDoubleMode()) ? 'double' : 'single',
+                sections: ids.slice(), full: bkAllIds(true).every(i => ids.indexOf(i) >= 0),
+                note: String(opts.note || '').slice(0, 200), bytes: json.length, info: {}
+            };
+            ids.forEach(i => { meta.info[i] = bkSectionInfo(i, cfgForInfo); });
+            const env = { __panoBackup: BK_FORMAT, meta: meta, sha256: sha };
+            if (opts.password) {
+                if (!bkCryptoOk()) throw new Error('Bu tarayıcıda/bağlantıda şifreleme desteklenmiyor (güvenli bağlantı — https — gerekir).');
+                env.encrypted = true;
+                env.enc = await bkEncrypt(json, opts.password);
+            } else {
+                env.encrypted = false;
+                env.data = data;
+            }
+            return env;
+        }
+        function bkFileName(env) {
+            const d = new Date(), p = n => String(n).padStart(2, '0');
+            const stamp = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}_${p(d.getHours())}-${p(d.getMinutes())}`;
+            const m = env.meta || {};
+            return `Okul_Pano_Yedek_${bkSlug(m.schoolName)}_${stamp}${m.full ? '' : '_kismi'}${env.encrypted ? '_sifreli' : ''}.json`;
+        }
+        function bkSaveFile(env, name) {
+            const blob = new Blob([JSON.stringify(env)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = name;
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+        }
+        async function bkDownloadIds(ids, opts, logPrefix) {
+            const env = await bkMakeEnvelope(ids, opts);
+            const name = bkFileName(env);
+            bkSaveFile(env, name);
+            const m = bkMetaGet();
+            m.lastDownloadAt = env.meta.created; m.lastDownloadName = name;
+            bkMetaSet(m);
+            bkLog((logPrefix || 'Yedek indirildi'), `${name} (${env.meta.sections.length} bölüm${env.encrypted ? ', şifreli' : ''})`);
+            return name;
+        }
+        // Kontrol panelindeki "JSON Sistem Yedeği Al" düğmesi: tüm bölümler, şifresiz
+        async function exportDataToJSON() {
+            try { await bkDownloadIds(bkAllIds(true), {}, 'Hızlı tam yedek indirildi'); }
+            catch (e) { bkNotify('Hata', 'Yedek oluşturulamadı: ' + (e && e.message || e)); }
+            try { bkRenderStats(); bkRenderHist(); } catch (e) {}
+        }
+
+        /* ---- yedek dosyası okuma / doğrulama ---- */
+        function bkParseObject(obj) {
+            if (!obj || typeof obj !== 'object' || Array.isArray(obj)) throw new Error('Geçersiz yedek içeriği.');
+            if (obj.__panoBackup) return { legacy: false, env: obj };
+            return { legacy: true, env: { __panoBackup: 0, meta: { created: null, sections: null, legacy: true }, encrypted: false, data: obj, sha256: null } };
+        }
+        async function bkVerifyData(env, data) {
+            if (!env.sha256 || !bkCryptoOk()) return 'none';
+            return (await bkSha256(JSON.stringify(data))) === env.sha256 ? 'ok' : 'bad';
+        }
+        function bkLooksLikeConfig(data) {
+            const known = ['schoolName', 'moduleSettings', 'panoLayout', 'bellHours', 'weeklyClassSchedules', 'doubleShift', 'announcements', 'birthdays', 'theme', 'quotes'];
+            return Object.keys(data || {}).some(k => known.indexOf(k) >= 0);
+        }
+        async function bkLoadFile(file) {
             if (!file) return;
-            if (!confirm('Bu yedek, panodaki MEVCUT tüm ayarları/verileri üzerine yazacak. Devam edilsin mi?')) {
-                event.target.value = '';
+            let text;
+            try { text = await file.text(); } catch (e) { bkNotify('Hata', 'Yedek dosyası okunamadı.'); return; }
+            let parsed;
+            try { parsed = bkParseObject(JSON.parse(text)); } catch (e) { bkNotify('Hata', e.message && e.message.indexOf('Geçersiz yedek') === 0 ? e.message : 'Geçersiz JSON dosyası.'); return; }
+            const env = parsed.env;
+            const pend = { name: file.name, size: file.size, env: env, data: null, integrity: 'none', legacy: parsed.legacy, fromSnapshot: false };
+            if (env.encrypted) {
+                if (!env.enc) { bkNotify('Hata', 'Şifreli yedek dosyası bozuk görünüyor.'); return; }
+            } else {
+                pend.data = env.data || {};
+                pend.integrity = await bkVerifyData(env, pend.data);
+                if (!bkLooksLikeConfig(pend.data)) { bkNotify('Uyarı', 'Bu dosya bir pano yedeğine benzemiyor; yine de içeriği aşağıda inceleyebilirsiniz.'); }
+            }
+            bkUi.pending = pend;
+            bkUi.pendSel = new Set(pend.data ? bkAllIds(false).filter(i => bkHasSection(pend.data, i)) : []);
+            if (pend.data && bkHasSection(pend.data, 'security') && !env.meta.full) bkUi.pendSel.add('security');
+            bkRenderRestore();
+            bkLog('Yedek dosyası açıldı', file.name);
+            bkRenderHist();
+        }
+        function bkOnFile(ev) { const f = ev.target.files && ev.target.files[0]; ev.target.value = ''; bkLoadFile(f); }
+        function bkOnDrop(ev) { ev.preventDefault(); const f = ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files[0]; if (f) bkLoadFile(f); }
+        async function bkDecryptPending() {
+            const pend = bkUi.pending; if (!pend || !pend.env.encrypted) return;
+            const inp = document.getElementById('bk-dec-pass');
+            const pass = inp ? inp.value : '';
+            if (!pass) { bkNotify('Parola', 'Lütfen yedek parolasını girin.'); return; }
+            try {
+                const json = await bkDecrypt(pend.env.enc, pass);
+                pend.data = JSON.parse(json);
+                pend.integrity = (pend.env.sha256 && bkCryptoOk()) ? ((await bkSha256(json)) === pend.env.sha256 ? 'ok' : 'bad') : 'none';
+                bkUi.pendSel = new Set(bkAllIds(false).filter(i => bkHasSection(pend.data, i)));
+                if (bkHasSection(pend.data, 'security') && !pend.env.meta.full) bkUi.pendSel.add('security');
+                bkLog('Şifreli yedek çözüldü', pend.name);
+                bkRenderRestore(); bkRenderHist();
+            } catch (e) {
+                bkNotify('Hata', 'Parola yanlış ya da dosya bozulmuş.');
+            }
+        }
+        function bkCancelPending() { bkUi.pending = null; bkUi.pendSel = null; bkRenderRestore(); }
+
+        /* ---- geri yükleme ---- */
+        function bkPendToggle(id, on) { if (!bkUi.pendSel) return; if (on) bkUi.pendSel.add(id); else bkUi.pendSel.delete(id); bkRenderRestore(); }
+        function bkPendAll(on) {
+            const pend = bkUi.pending; if (!pend || !pend.data) return;
+            bkUi.pendSel = new Set(on ? bkAllIds(true).filter(i => bkHasSection(pend.data, i) && (i !== 'security' || bkUi.pendSel.has('security'))) : []);
+            bkRenderRestore();
+        }
+        function bkApplyRestore() {
+            const pend = bkUi.pending; if (!pend || !pend.data) return;
+            const ids = bkAllIds(true).filter(i => bkUi.pendSel.has(i) && bkHasSection(pend.data, i));
+            if (!ids.length) { bkNotify('Seçim yok', 'Geri yüklenecek en az bir bölüm seçin.'); return; }
+            const names = ids.map(i => BK_SECTIONS.find(s => s.id === i).label).join(', ');
+            const warn = pend.integrity === 'bad' ? '\n\nUYARI: Dosyanın bütünlük özeti uyuşmuyor; dosya değiştirilmiş veya bozulmuş olabilir.' : '';
+            askCustomConfirmation('Yedeği Geri Yükle', `Şu bölümler yedekteki verilerle DEĞİŞTİRİLECEK: ${names}.\nSeçilmeyen bölümlere dokunulmaz.${bkUi.snapBefore ? '\nÖnce mevcut durumunuzun geri alma noktası alınacak.' : ''}${warn}`, async function () {
+                try {
+                    if (bkUi.snapBefore) await bkSnapshotCreate('Geri yükleme öncesi (otomatik)', true);
+                    const next = bkPlain();
+                    Object.keys(next).forEach(k => { if (k.indexOf('__') !== 0 && ids.indexOf(bkSectionOfKey(k)) >= 0) delete next[k]; });
+                    Object.keys(pend.data).forEach(k => { if (k.indexOf('__') !== 0 && ids.indexOf(bkSectionOfKey(k)) >= 0) next[k] = pend.data[k]; });
+                    next.__syncVersion = (appConfig.__syncVersion || 0) + 1;
+                    appConfig = next;
+                    shiftInstall(); // ikili/tekli öğretim veri bağlantısını yeniden kur
+                    appConfig.__syncVersion = next.__syncVersion;
+                    localStorage.setItem('okulPanoDataV8', JSON.stringify(appConfig));
+                    bkLog('Geri yükleme yapıldı', `${pend.name} → ${ids.length} bölüm`);
+                    bkNotify('Yükleniyor', 'Yedek buluta yazılıyor, lütfen bekleyin...');
+                    cloudPushNow(function () {
+                        bkNotify('Tamam', 'Yedek geri yüklendi. Sayfa yenileniyor...');
+                        setTimeout(() => location.reload(), 400);
+                    });
+                } catch (e) {
+                    bkNotify('Hata', 'Geri yükleme başarısız: ' + (e && e.message || e));
+                }
+            });
+        }
+        // Eski çağrı noktası (kontrol paneli "Yedekten Geri Yükle" düğmesi): Yedekleme Merkezi'ne yönlendirir
+        function importDataFromJSONFile(event) {
+            const f = event.target.files && event.target.files[0];
+            event.target.value = '';
+            try { adminGoTab('tab-backup'); } catch (e) {}
+            if (f) bkLoadFile(f);
+        }
+
+        /* ---- yerel anlık görüntüler (geri alma noktaları) ---- */
+        function bkSnapsGet() { try { return JSON.parse(localStorage.getItem(BK_SNAP_KEY) || '[]') || []; } catch (e) { return []; } }
+        function bkSnapsSet(arr) { localStorage.setItem(BK_SNAP_KEY, JSON.stringify(arr)); }
+        function bkPrune(arr) {
+            const max = Math.max(1, bkMetaGet().maxSnaps || 10);
+            while (arr.length > max) {
+                let idx = -1;
+                for (let i = arr.length - 1; i >= 0; i--) { if (!arr[i].pinned) { idx = i; break; } }
+                if (idx < 0) break;
+                arr.splice(idx, 1);
+            }
+            return arr;
+        }
+        async function bkSnapshotCreate(label, auto) {
+            const data = bkBuildData(bkAllIds(true));
+            const json = JSON.stringify(data);
+            let payload = json, enc = 'raw';
+            try { const gz = await bkGzip(json); if (gz) { payload = gz; enc = 'gz'; } } catch (e) {}
+            const snap = { id: 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), t: new Date().toISOString(), label: label || '', auto: !!auto, pinned: false, enc: enc, payload: payload, size: json.length, sha: await bkSha256(json), info: bkSectionInfo('school', data) };
+            let arr = bkSnapsGet();
+            arr.unshift(snap);
+            arr = bkPrune(arr);
+            for (let tries = 0; tries < 40; tries++) {
+                try { bkSnapsSet(arr); break; }
+                catch (e) {
+                    let idx = -1;
+                    for (let i = arr.length - 1; i > 0; i--) { if (!arr[i].pinned) { idx = i; break; } }
+                    if (idx < 0) { bkLog('Anlık görüntü alınamadı', 'tarayıcı depolama alanı dolu'); return null; }
+                    arr.splice(idx, 1);
+                }
+            }
+            bkLog(auto ? 'Otomatik anlık görüntü alındı' : 'Anlık görüntü alındı', snap.label || bkFmtBytes(snap.size));
+            return snap;
+        }
+        async function bkSnapshotData(snap) {
+            const json = snap.enc === 'gz' ? await bkGunzip(snap.payload) : snap.payload;
+            return { json: json, data: JSON.parse(json) };
+        }
+        async function bkSnapNow() {
+            const inp = document.getElementById('bk-snap-label');
+            const snap = await bkSnapshotCreate((inp && inp.value || '').trim(), false);
+            if (inp) inp.value = '';
+            if (!snap) bkNotify('Hata', 'Anlık görüntü kaydedilemedi (tarayıcı depolama alanı dolu olabilir). Eski görüntüleri silin veya dosya olarak yedek alın.');
+            bkRenderStats(); bkRenderSnaps(); bkRenderHist();
+        }
+        async function bkSnapOpen(id) {
+            const snap = bkSnapsGet().find(s => s.id === id); if (!snap) return;
+            try {
+                const r = await bkSnapshotData(snap);
+                const env = { __panoBackup: BK_FORMAT, meta: { created: snap.t, sections: bkAllIds(true), full: true, schoolName: r.data.schoolName || '', teachingMode: r.data.teachingMode === 'double' ? 'double' : 'single', note: snap.label || '', info: {} }, encrypted: false, data: r.data, sha256: snap.sha };
+                bkUi.pending = { name: 'Anlık görüntü · ' + bkFmtDate(snap.t), size: r.json.length, env: env, data: r.data, integrity: await bkVerifyData(env, r.data), legacy: false, fromSnapshot: true };
+                bkUi.pendSel = new Set(bkAllIds(false).filter(i => bkHasSection(r.data, i)));
+                bkRenderRestore();
+                const el = document.getElementById('bk-restore'); if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (e) { bkNotify('Hata', 'Anlık görüntü açılamadı.'); }
+        }
+        async function bkSnapDownload(id) {
+            const snap = bkSnapsGet().find(s => s.id === id); if (!snap) return;
+            try {
+                const r = await bkSnapshotData(snap);
+                const env = await bkMakeEnvelope(bkAllIds(true), { src: r.data, note: snap.label || 'Anlık görüntü' });
+                env.meta.created = snap.t;
+                const name = bkFileName(env);
+                bkSaveFile(env, name);
+                const m = bkMetaGet(); m.lastDownloadAt = new Date().toISOString(); m.lastDownloadName = name; bkMetaSet(m);
+                bkLog('Anlık görüntü dosya olarak indirildi', name);
+                bkRenderStats(); bkRenderHist();
+            } catch (e) { bkNotify('Hata', 'Anlık görüntü indirilemedi.'); }
+        }
+        function bkSnapPin(id) { const arr = bkSnapsGet(); const s = arr.find(x => x.id === id); if (!s) return; s.pinned = !s.pinned; try { bkSnapsSet(arr); } catch (e) {} bkRenderSnaps(); }
+        function bkSnapRename(id) {
+            const arr = bkSnapsGet(); const s = arr.find(x => x.id === id); if (!s) return;
+            const v = prompt('Anlık görüntü adı:', s.label || '');
+            if (v === null) return;
+            s.label = v.trim().slice(0, 80); try { bkSnapsSet(arr); } catch (e) {} bkRenderSnaps();
+        }
+        function bkSnapDelete(id) {
+            askCustomConfirmation('Anlık Görüntüyü Sil', 'Bu geri alma noktası kalıcı olarak silinecek. Devam edilsin mi?', function () {
+                bkSnapsSet(bkSnapsGet().filter(s => s.id !== id));
+                bkLog('Anlık görüntü silindi', id);
+                bkRenderStats(); bkRenderSnaps(); bkRenderHist();
+            });
+        }
+        function bkSnapDeleteAuto() {
+            askCustomConfirmation('Otomatik Görüntüleri Sil', 'Sabitlenmemiş tüm otomatik anlık görüntüler silinecek. Devam edilsin mi?', function () {
+                bkSnapsSet(bkSnapsGet().filter(s => !s.auto || s.pinned));
+                bkLog('Otomatik anlık görüntüler silindi', '');
+                bkRenderStats(); bkRenderSnaps(); bkRenderHist();
+            });
+        }
+        function bkSetAuto(mode) { const m = bkMetaGet(); m.autoMode = mode; bkMetaSet(m); bkLog('Otomatik yedek ayarı', ({ off: 'Kapalı', onsave: 'Her kayıtta', daily: 'Günlük', weekly: 'Haftalık' })[mode] || mode); bkRenderStats(); bkRenderSnaps(); bkRenderHist(); }
+        function bkSetMax(n) { const m = bkMetaGet(); m.maxSnaps = parseInt(n, 10) || 10; bkMetaSet(m); try { bkSnapsSet(bkPrune(bkSnapsGet())); } catch (e) {} bkRenderStats(); bkRenderSnaps(); }
+        const BK_AUTO_MS = { daily: 86400000, weekly: 604800000 };
+        async function bkAutoRun(kind) {
+            if (typeof IS_DISPLAY_MODE !== 'undefined' && IS_DISPLAY_MODE) return;
+            const m = bkMetaGet();
+            const last = m.lastAutoAt ? Date.parse(m.lastAutoAt) : 0;
+            let due = false, label = '';
+            if (kind === 'save' && m.autoMode === 'onsave') { due = Date.now() - last >= 600000; label = 'Otomatik (kayıt öncesi)'; }
+            else if (kind === 'tick' && (m.autoMode === 'daily' || m.autoMode === 'weekly')) { due = Date.now() - last >= BK_AUTO_MS[m.autoMode]; label = 'Otomatik (' + (m.autoMode === 'daily' ? 'günlük' : 'haftalık') + ')'; }
+            if (!due) return;
+            m.lastAutoAt = new Date().toISOString(); bkMetaSet(m); // çifte tetiklemeyi önle
+            const snap = await bkSnapshotCreate(label, true);
+            if (snap) { try { bkRenderStats(); bkRenderSnaps(); bkRenderHist(); } catch (e) {} }
+        }
+        function bkAutoOnSave() { bkAutoRun('save'); }
+        setInterval(function () {
+            try { const p = document.getElementById('admin-panel'); if (p && !p.classList.contains('hidden')) bkAutoRun('tick'); } catch (e) {}
+        }, 5 * 60 * 1000);
+
+        /* ---- arayüz ---- */
+        function bkStorageUsed() {
+            let n = 0;
+            try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); n += (k.length + (localStorage.getItem(k) || '').length) * 2; } } catch (e) {}
+            return n;
+        }
+        function renderBackupTab() {
+            if (!bkUi.sel) bkUi.sel = new Set(bkAllIds(false));
+            bkRenderStats(); bkRenderMake(); bkRenderRestore(); bkRenderSnaps(); bkRenderHist();
+            bkAutoRun('tick');
+        }
+        function bkRenderStats() {
+            const el = document.getElementById('bk-stats'); if (!el) return;
+            const m = bkMetaGet(), snaps = bkSnapsGet();
+            const snapBytes = snaps.reduce((a, s) => a + (s.payload ? s.payload.length * 2 : 0), 0);
+            const used = bkStorageUsed(), quota = 5 * 1024 * 1024, pct = Math.min(100, Math.round(used * 100 / quota));
+            let last, lastCls;
+            if (!m.lastDownloadAt) { last = 'Hiç yedek indirilmedi'; lastCls = 'text-rose-400'; }
+            else {
+                const days = Math.floor((Date.now() - Date.parse(m.lastDownloadAt)) / 86400000);
+                last = bkAgo(m.lastDownloadAt) + ' · ' + bkFmtDate(m.lastDownloadAt);
+                lastCls = days > 30 ? 'text-rose-400' : (days > 7 ? 'text-amber-400' : 'text-emerald-400');
+            }
+            const dirty = (typeof adminDirty !== 'undefined' && adminDirty);
+            const autoTxt = ({ off: 'Kapalı', onsave: 'Her kayıtta', daily: 'Günlük', weekly: 'Haftalık' })[m.autoMode] || 'Kapalı';
+            const card = (ic, col, title, val, sub, cls) => `<div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-start gap-3"><div class="w-10 h-10 rounded-lg flex items-center justify-center text-lg shrink-0" style="background:${col}22;color:${col}"><i class="fa-solid ${ic}"></i></div><div class="min-w-0"><div class="text-[10px] uppercase tracking-wide text-slate-500 font-bold">${title}</div><div class="text-sm font-bold ${cls || 'text-white'}">${val}</div><div class="text-[10px] text-slate-500">${sub || ''}</div></div></div>`;
+            el.innerHTML = `
+                ${dirty ? '<div class="mb-3 p-3 rounded-xl border border-amber-500/40 bg-amber-500/10 text-[11px] text-amber-300"><i class="fa-solid fa-triangle-exclamation"></i> Kaydedilmemiş değişiklikleriniz var. Yedekler yalnızca <b>kaydedilmiş</b> veriyi içerir; önce "Değişiklikleri Kaydet" düğmesine basın.</div>' : ''}
+                <div class="grid grid-cols-4 gap-4">
+                    ${card('fa-clock-rotate-left', '#10b981', 'Son yedek dosyası', last, m.lastDownloadName ? escapeHtml(m.lastDownloadName) : 'Düzenli yedek almanız önerilir', lastCls)}
+                    ${card('fa-camera-rotate', '#06b6d4', 'Geri alma noktaları', snaps.length + ' adet', bkFmtBytes(snapBytes) + ' · en çok ' + (m.maxSnaps || 10))}
+                    ${card('fa-database', '#f59e0b', 'Mevcut veri boyutu', bkFmtBytes(JSON.stringify(appConfig).length), 'Tarayıcı depolama: %' + pct + ' (' + bkFmtBytes(used) + ')', pct > 80 ? 'text-rose-400' : 'text-white')}
+                    ${card('fa-robot', '#8b5cf6', 'Otomatik anlık görüntü', autoTxt, m.lastAutoAt ? 'Son: ' + bkAgo(m.lastAutoAt) : 'Henüz alınmadı')}
+                </div>`;
+        }
+        function bkToggleSel(id, on) { if (on) bkUi.sel.add(id); else bkUi.sel.delete(id); bkRenderMake(); }
+        function bkPreset(name) {
+            const sets = { all: bkAllIds(true), safe: bkAllIds(false), data: ['school', 'roster', 'content'], look: ['layout', 'theme'], none: [] };
+            bkUi.sel = new Set(sets[name] || []);
+            bkRenderMake();
+        }
+        function bkRenderMake() {
+            const el = document.getElementById('bk-make'); if (!el) return;
+            if (!bkUi.sel) bkUi.sel = new Set(bkAllIds(false));
+            const cur = bkPlain();
+            const ids = bkAllIds(true).filter(i => bkUi.sel.has(i));
+            const est = ids.length ? JSON.stringify(bkBuildData(ids, cur)).length : 0;
+            const cards = BK_SECTIONS.map(sec => {
+                const on = bkUi.sel.has(sec.id);
+                return `<label class="flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition ${on ? 'border-cyan-500/60 bg-cyan-900/20' : 'border-slate-800 bg-slate-900/40 hover:border-slate-600'}">
+                    <input type="checkbox" class="mt-1 accent-cyan-500" ${on ? 'checked' : ''} onchange="bkToggleSel('${sec.id}', this.checked)">
+                    <div class="min-w-0">
+                        <div class="text-xs font-bold text-white flex items-center gap-2 flex-wrap"><i class="fa-solid ${sec.icon}" style="color:${sec.color}"></i>${sec.label}${sec.warn ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40">Hassas</span>' : ''}</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">${sec.desc}</div>
+                        <div class="text-[10px] text-cyan-300/80 mt-1 font-mono">${escapeHtml(bkSectionInfo(sec.id, cur))}</div>
+                    </div></label>`;
+            }).join('');
+            const pbtn = (k, t) => `<button type="button" onclick="bkPreset('${k}')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold border border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800">${t}</button>`;
+            const secSel = bkUi.sel.has('security');
+            el.innerHTML = `
+                <div class="flex flex-wrap gap-2 mb-3">${pbtn('safe', 'Tümü (PIN hariç)')}${pbtn('all', 'Tümü (PIN dahil)')}${pbtn('data', 'Yalnızca veriler')}${pbtn('look', 'Yalnızca görünüm')}${pbtn('none', 'Temizle')}</div>
+                <div class="grid grid-cols-2 gap-3">${cards}</div>
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2">
+                        <label class="flex items-center gap-2 text-xs text-white font-bold cursor-pointer"><input type="checkbox" class="accent-cyan-500" ${bkUi.usePass ? 'checked' : ''} ${bkCryptoOk() ? '' : 'disabled'} onchange="bkUi.usePass=this.checked; bkRenderMake()"><i class="fa-solid fa-key text-amber-400"></i> Parola ile şifrele (AES-256)</label>
+                        ${bkUi.usePass ? `<input type="password" id="bk-pass" value="${escapeHtml(bkUi.pass)}" oninput="bkUi.pass=this.value" placeholder="Parola (en az 6 karakter)" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white" autocomplete="new-password"><p class="text-[10px] text-amber-400/90">Parolayı unutursanız yedek açılamaz; parola kurtarılamaz.</p>` : `<p class="text-[10px] text-slate-500">${bkCryptoOk() ? 'Öğretmen/öğrenci bilgileri içerdiği için yedeği paylaşacaksanız şifrelemeniz önerilir.' : 'Şifreleme için güvenli bağlantı (https) gerekir.'}</p>`}
+                        ${(secSel && !bkUi.usePass) ? '<p class="text-[10px] text-rose-400"><i class="fa-solid fa-triangle-exclamation"></i> Yönetici PIN kodu şifresiz dosyada açık metin olarak yer alır.</p>' : ''}
+                    </div>
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2">
+                        <label class="text-xs text-white font-bold block"><i class="fa-solid fa-pen text-cyan-400"></i> Yedek notu <span class="text-slate-500 font-normal">(isteğe bağlı)</span></label>
+                        <input type="text" maxlength="200" value="${escapeHtml(bkUi.note)}" oninput="bkUi.note=this.value" placeholder="Örn: Dönem başı, ders programı güncellemesinden önce" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white">
+                        <p class="text-[10px] text-slate-500">Not, dosyanın içine yazılır ve geri yüklerken görünür.</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between flex-wrap gap-3 mt-4">
+                    <span class="text-[11px] text-slate-400">Seçili bölüm: <b class="text-white">${ids.length}</b> · Tahmini boyut: <b class="text-white">${bkFmtBytes(est)}</b></span>
+                    <button type="button" onclick="bkDoDownload()" class="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-lg text-xs flex items-center gap-2 ${ids.length ? '' : 'opacity-40 pointer-events-none'}"><i class="fa-solid fa-download"></i> Yedeği İndir</button>
+                </div>`;
+        }
+        async function bkDoDownload() {
+            const ids = bkAllIds(true).filter(i => bkUi.sel.has(i));
+            if (!ids.length) { bkNotify('Seçim yok', 'Yedeğe eklenecek en az bir bölüm seçin.'); return; }
+            if (bkUi.usePass && (bkUi.pass || '').length < 6) { bkNotify('Parola', 'Parola en az 6 karakter olmalıdır.'); return; }
+            try {
+                await bkDownloadIds(ids, { password: bkUi.usePass ? bkUi.pass : '', note: bkUi.note }, 'Yedek indirildi');
+            } catch (e) { bkNotify('Hata', 'Yedek oluşturulamadı: ' + (e && e.message || e)); }
+            bkRenderStats(); bkRenderHist();
+        }
+        function bkRenderRestore() {
+            const el = document.getElementById('bk-restore'); if (!el) return;
+            const pend = bkUi.pending;
+            const drop = `<label for="bk-file-input" ondragover="event.preventDefault(); this.classList.add('border-cyan-500')" ondragleave="this.classList.remove('border-cyan-500')" ondrop="this.classList.remove('border-cyan-500'); bkOnDrop(event)" class="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-slate-700 hover:border-cyan-500 rounded-xl p-6 cursor-pointer transition text-center">
+                    <i class="fa-solid fa-file-arrow-up text-3xl text-cyan-400"></i>
+                    <span class="text-xs text-white font-bold">Yedek dosyasını buraya sürükleyin veya seçmek için tıklayın</span>
+                    <span class="text-[10px] text-slate-500">.json · şifreli yedekler ve eski sürüm yedekleri de desteklenir · dosya hemen yüklenmez, önce incelenir</span>
+                </label><input type="file" id="bk-file-input" accept="application/json,.json" class="hidden" onchange="bkOnFile(event)">`;
+            if (!pend) { el.innerHTML = drop; return; }
+            const meta = pend.env.meta || {};
+            const head = (k, v) => `<div class="bg-slate-900/60 rounded-lg px-3 py-2"><div class="text-[9px] uppercase text-slate-500 font-bold">${k}</div><div class="text-[11px] text-white break-words">${v}</div></div>`;
+            if (!pend.data) {
+                el.innerHTML = `<div class="space-y-3">
+                    <div class="grid grid-cols-3 gap-2">${head('Dosya', escapeHtml(pend.name))}${head('Boyut', bkFmtBytes(pend.size))}${head('Oluşturma', meta.created ? bkFmtDate(meta.created) : '—')}</div>
+                    <div class="p-3 rounded-xl border border-amber-500/40 bg-amber-500/10 space-y-2">
+                        <div class="text-xs text-amber-300 font-bold"><i class="fa-solid fa-lock"></i> Bu yedek parola ile şifrelenmiş.</div>
+                        ${meta.note ? `<div class="text-[11px] text-slate-300">Not: ${escapeHtml(meta.note)}</div>` : ''}
+                        <div class="flex gap-2"><input type="password" id="bk-dec-pass" placeholder="Yedek parolası" onkeydown="if(event.key==='Enter') bkDecryptPending()" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white" autocomplete="off">
+                        <button type="button" onclick="bkDecryptPending()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg text-xs">Çöz</button>
+                        <button type="button" onclick="bkCancelPending()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg text-xs">İptal</button></div>
+                    </div></div>`;
                 return;
             }
-            const reader = new FileReader();
-            reader.onerror = () => {
-                showCustomNotification('Hata', 'Yedek dosyası okunamadı.');
-            };
-            reader.onload = () => {
-                let restored;
-                try {
-                    restored = JSON.parse(reader.result);
-                } catch (e) {
-                    showCustomNotification('Hata', 'Geçersiz JSON dosyası.');
-                    return;
+            const cur = bkPlain();
+            const data = pend.data;
+            const integ = ({ ok: '<span class="text-emerald-400"><i class="fa-solid fa-circle-check"></i> Doğrulandı (SHA-256)</span>', bad: '<span class="text-rose-400"><i class="fa-solid fa-triangle-exclamation"></i> Uyuşmuyor — dosya değişmiş/bozuk olabilir</span>', none: '<span class="text-slate-400">' + (pend.legacy ? 'Eski biçim — özet yok' : 'Özet yok / doğrulanamadı') + '</span>' })[pend.integrity];
+            const fileMode = data.teachingMode === 'double' ? 'İkili öğretim' : 'Tekli öğretim';
+            const curMode = isDoubleMode() ? 'İkili öğretim' : 'Tekli öğretim';
+            const rows = BK_SECTIONS.map(sec => {
+                const present = bkHasSection(data, sec.id);
+                const on = present && bkUi.pendSel.has(sec.id);
+                let status = '<span class="text-slate-500">Dosyada yok</span>';
+                if (present) {
+                    const same = bkStable(bkBuildData([sec.id], data)) === bkStable(bkBuildData([sec.id], cur));
+                    status = same ? '<span class="text-slate-400">Aynı (değişiklik yok)</span>' : '<span class="text-amber-300 font-bold">Değişecek</span>';
                 }
-                if (!restored || typeof restored !== 'object') {
-                    showCustomNotification('Hata', 'Geçersiz yedek içeriği.');
-                    return;
-                }
-                appConfig = restored;
-                shiftInstall(); // yedek ikili öğretimdeyse veri bağlantısını kur
-                // Geri yüklenen veriyi buluttaki mevcut sürümden daha yeni işaretle,
-                // böylece cloudPushNow() bunu buluta da yazar (diğer cihazlar da alır).
-                appConfig.__syncVersion = (appConfig.__syncVersion || 0) + 1;
-                localStorage.setItem('okulPanoDataV8', JSON.stringify(appConfig));
-                writeCMSLog('Yedekten geri yükleme yapıldı: ' + file.name);
-                showCustomNotification('Yükleniyor', 'Yedek buluta yazılıyor, lütfen bekleyin...');
-                // ÖNEMLİ: Sayfa, buluta yazma işi GERÇEKTEN bitmeden yenilenmemeli — aksi
-                // halde yavaş bağlantıda sayfa açılışın buluttan çektiği ESKİ veri (henüz
-                // güncellenmemiş) yedeği sessizce geri alabilir.
-                cloudPushNow((errMsg) => {
-                    showCustomNotification('Tamam', 'Yedek geri yüklendi. Sayfa yenileniyor...');
-                    setTimeout(() => location.reload(), 400);
-                });
-            };
-            reader.readAsText(file);
+                return `<tr class="border-t border-slate-800 ${present ? '' : 'opacity-50'}">
+                    <td class="py-2 pr-2"><input type="checkbox" class="accent-cyan-500" ${on ? 'checked' : ''} ${present ? '' : 'disabled'} onchange="bkPendToggle('${sec.id}', this.checked)"></td>
+                    <td class="py-2 pr-3 text-[11px] text-white font-bold whitespace-nowrap"><i class="fa-solid ${sec.icon}" style="color:${sec.color}"></i> ${sec.label}</td>
+                    <td class="py-2 pr-3 text-[10px] text-slate-300 font-mono">${present ? escapeHtml(bkSectionInfo(sec.id, data)) : '—'}</td>
+                    <td class="py-2 pr-3 text-[10px] text-slate-400 font-mono">${escapeHtml(bkSectionInfo(sec.id, cur))}</td>
+                    <td class="py-2 text-[10px]">${status}</td></tr>`;
+            }).join('');
+            const modeWarn = (bkUi.pendSel.has('school') && data.teachingMode !== (isDoubleMode() ? 'double' : 'single') && bkHasSection(data, 'school'))
+                ? `<div class="p-2.5 rounded-lg border border-amber-500/40 bg-amber-500/10 text-[11px] text-amber-300"><i class="fa-solid fa-triangle-exclamation"></i> Yedek <b>${fileMode}</b>, şu anki düzen <b>${curMode}</b>. Öğretim verileri geri yüklenince pano yedekteki düzene geçer.</div>` : '';
+            const bad = pend.integrity === 'bad' ? '<div class="p-2.5 rounded-lg border border-rose-500/50 bg-rose-500/10 text-[11px] text-rose-300"><i class="fa-solid fa-triangle-exclamation"></i> Dosyanın bütünlük özeti içerikle uyuşmuyor. Dosya sonradan elle değiştirilmiş veya bozulmuş olabilir; yalnızca güvendiğiniz bir dosyaysa devam edin.</div>' : '';
+            const selCount = bkAllIds(true).filter(i => bkUi.pendSel.has(i) && bkHasSection(data, i)).length;
+            el.innerHTML = `<div class="space-y-3">
+                <div class="grid grid-cols-4 gap-2">
+                    ${head('Dosya', escapeHtml(pend.name))}${head('Oluşturma', meta.created ? bkFmtDate(meta.created) + ' <span class="text-slate-500">(' + bkAgo(meta.created) + ')</span>' : 'Bilinmiyor (eski biçim)')}
+                    ${head('Okul', escapeHtml(meta.schoolName || data.schoolName || '—'))}${head('Öğretim düzeni', fileMode)}
+                    ${head('Biçim', pend.legacy ? 'Eski (v1)' : 'v' + (pend.env.__panoBackup || BK_FORMAT) + (pend.env.encrypted ? ' · şifreli' : ''))}${head('Boyut', bkFmtBytes(pend.size))}
+                    ${head('Bütünlük', integ)}${head('Not', meta.note ? escapeHtml(meta.note) : '—')}
+                </div>
+                ${bad}${modeWarn}
+                <div class="overflow-x-auto"><table class="w-full text-left">
+                    <thead><tr class="text-[9px] uppercase text-slate-500"><th class="pb-1"></th><th class="pb-1">Bölüm</th><th class="pb-1">Dosyada</th><th class="pb-1">Şu an</th><th class="pb-1">Durum</th></tr></thead>
+                    <tbody>${rows}</tbody></table></div>
+                <div class="flex items-center justify-between flex-wrap gap-3 pt-1">
+                    <label class="flex items-center gap-2 text-[11px] text-slate-300 cursor-pointer"><input type="checkbox" class="accent-cyan-500" ${bkUi.snapBefore ? 'checked' : ''} onchange="bkUi.snapBefore=this.checked"> Geri yüklemeden önce mevcut durumun geri alma noktasını al</label>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="bkPendAll(true)" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg text-[11px]">Tümünü seç</button>
+                        <button type="button" onclick="bkPendAll(false)" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg text-[11px]">Hiçbiri</button>
+                        <button type="button" onclick="bkCancelPending()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg text-[11px]">İptal</button>
+                        <button type="button" onclick="bkApplyRestore()" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg text-xs flex items-center gap-2 ${selCount ? '' : 'opacity-40 pointer-events-none'}"><i class="fa-solid fa-rotate-left"></i> Seçili ${selCount} bölümü geri yükle</button>
+                    </div>
+                </div></div>`;
         }
+        function bkRenderSnaps() {
+            const el = document.getElementById('bk-snaps'); if (!el) return;
+            const m = bkMetaGet(), snaps = bkSnapsGet();
+            const opt = (v, t) => `<option value="${v}" ${m.autoMode === v ? 'selected' : ''}>${t}</option>`;
+            const mopt = n => `<option value="${n}" ${(m.maxSnaps || 10) === n ? 'selected' : ''}>${n}</option>`;
+            const list = snaps.length ? snaps.map(s => `
+                <div class="flex items-center gap-3 p-3 rounded-xl border ${s.pinned ? 'border-amber-500/50 bg-amber-500/5' : 'border-slate-800 bg-slate-900/40'}">
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${s.auto ? 'bg-violet-500/15 text-violet-300' : 'bg-cyan-500/15 text-cyan-300'}"><i class="fa-solid ${s.auto ? 'fa-robot' : 'fa-camera'}"></i></div>
+                    <div class="min-w-0 flex-1">
+                        <div class="text-xs text-white font-bold truncate">${escapeHtml(s.label || (s.auto ? 'Otomatik anlık görüntü' : 'Anlık görüntü'))}${s.pinned ? ' <i class="fa-solid fa-thumbtack text-amber-400 text-[10px]"></i>' : ''}</div>
+                        <div class="text-[10px] text-slate-400">${bkFmtDate(s.t)} · ${bkAgo(s.t)} · ${bkFmtBytes(s.size)}${s.enc === 'gz' ? ' (sıkıştırılmış: ' + bkFmtBytes(s.payload.length) + ')' : ''}</div>
+                        <div class="text-[10px] text-slate-500 font-mono truncate">${escapeHtml(s.info || '')}</div>
+                    </div>
+                    <div class="flex gap-1.5 shrink-0">
+                        <button type="button" title="İncele ve geri yükle" onclick="bkSnapOpen('${s.id}')" class="px-2.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-[11px] font-bold"><i class="fa-solid fa-rotate-left"></i> Geri yükle</button>
+                        <button type="button" title="Dosya olarak indir" onclick="bkSnapDownload('${s.id}')" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[11px]"><i class="fa-solid fa-download"></i></button>
+                        <button type="button" title="Sabitle (otomatik silinmesin)" onclick="bkSnapPin('${s.id}')" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 ${s.pinned ? 'text-amber-400' : 'text-slate-400'} rounded-lg text-[11px]"><i class="fa-solid fa-thumbtack"></i></button>
+                        <button type="button" title="Yeniden adlandır" onclick="bkSnapRename('${s.id}')" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg text-[11px]"><i class="fa-solid fa-pen"></i></button>
+                        <button type="button" title="Sil" onclick="bkSnapDelete('${s.id}')" class="px-2.5 py-1.5 bg-slate-800 hover:bg-red-600 text-slate-400 hover:text-white rounded-lg text-[11px]"><i class="fa-solid fa-trash"></i></button>
+                    </div></div>`).join('') : '<div class="text-[11px] text-slate-500 p-4 text-center border border-dashed border-slate-800 rounded-xl">Henüz geri alma noktası yok. "Şimdi anlık görüntü al" ile oluşturabilir veya otomatik yedeği açabilirsiniz.</div>';
+            el.innerHTML = `
+                <div class="flex items-end gap-3 flex-wrap mb-3">
+                    <div class="flex-1 min-w-[200px]"><label class="text-[10px] text-slate-400 block mb-1">Ad (isteğe bağlı)</label><input type="text" id="bk-snap-label" maxlength="80" placeholder="Örn: Yeni dönem öncesi" class="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white"></div>
+                    <button type="button" onclick="bkSnapNow()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-lg text-xs flex items-center gap-2"><i class="fa-solid fa-camera"></i> Şimdi anlık görüntü al</button>
+                </div>
+                <div class="flex items-center gap-4 flex-wrap mb-3 p-3 bg-slate-950 border border-slate-800 rounded-xl">
+                    <label class="text-[11px] text-slate-300 flex items-center gap-2"><i class="fa-solid fa-robot text-violet-400"></i> Otomatik:
+                        <select onchange="bkSetAuto(this.value)" class="bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs text-white">${opt('off', 'Kapalı')}${opt('onsave', 'Her kayıtta (en çok 10 dkda bir)')}${opt('daily', 'Günde bir')}${opt('weekly', 'Haftada bir')}</select></label>
+                    <label class="text-[11px] text-slate-300 flex items-center gap-2">En çok saklanacak: <select onchange="bkSetMax(this.value)" class="bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs text-white">${[5, 10, 20, 30].map(mopt).join('')}</select> adet</label>
+                    <button type="button" onclick="bkSnapDeleteAuto()" class="ml-auto px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px]"><i class="fa-solid fa-broom"></i> Otomatik olanları temizle</button>
+                </div>
+                <div class="space-y-2">${list}</div>
+                <p class="text-[10px] text-slate-500 mt-3">Anlık görüntüler bu cihazın/tarayıcının depolama alanında tutulur (sıkıştırılır); tarayıcı verisi silinirse kaybolur ve diğer cihazlara/buluta aktarılmaz. Kalıcı koruma için dosya olarak da yedek alın. Sınırı aşınca sabitlenmemiş en eski görüntüler silinir; otomatik görüntüler yalnızca yönetim paneli açıkken alınır.</p>`;
+        }
+        function bkRenderHist() {
+            const el = document.getElementById('bk-hist'); if (!el) return;
+            const h = bkMetaGet().history || [];
+            el.innerHTML = h.length
+                ? `<div class="space-y-1">${h.map(x => `<div class="flex gap-3 text-[11px] border-b border-slate-800/60 py-1.5"><span class="text-slate-500 font-mono whitespace-nowrap">${bkFmtDate(x.t)}</span><span class="text-white font-bold">${escapeHtml(x.a)}</span><span class="text-slate-400 truncate">${escapeHtml(x.d || '')}</span></div>`).join('')}</div><button type="button" onclick="bkClearHist()" class="mt-2 text-[10px] text-slate-500 hover:text-white"><i class="fa-solid fa-trash-can"></i> Geçmişi temizle</button>`
+                : '<div class="text-[11px] text-slate-500">Henüz işlem yok.</div>';
+        }
+        function bkClearHist() { const m = bkMetaGet(); m.history = []; bkMetaSet(m); bkRenderHist(); }
+        /* ===================== YEDEKLEME MERKEZİ SONU ===================== */
 
 
 // ============================================================================
@@ -10195,3 +11983,172 @@ if (_cs) { _cs.innerHTML = achClassOptions(rec.cls || ''); _cs.value = rec.cls |
     }
   }, 5000); // her 5 saniyede bir kontrol et
 })();
+
+
+/* =========================================================================
+   ADMİN İÇİ SAYFA ÖNİZLEMESİ (oturumu kapatmadan, farklı TV boyutlarında)
+   ========================================================================= */
+const PANO_PREVIEW_DEVICES = [
+    ['1920x1080', 'Full HD TV (1920×1080)'], ['3840x2160', '4K TV (3840×2160)'], ['1366x768', 'HD TV (1366×768)'],
+    ['1280x720', 'HD Ready (1280×720)'], ['1920x1200', '16:10 (1920×1200)'], ['1024x768', '4:3 (1024×768)'],
+    ['2560x1080', 'Ultra geniş 21:9 (2560×1080)'], ['1080x1920', 'Dikey TV (1080×1920)'], ['1280x800', 'Tablet (1280×800)']
+];
+
+function panoPreviewOpen() {
+    const modal = document.getElementById('pano-preview-modal');
+    if (!modal) return;
+    const dev = document.getElementById('pano-pv-device');
+    if (dev && !dev.options.length) dev.innerHTML = PANO_PREVIEW_DEVICES.map(d => `<option value="${d[0]}">${d[1]}</option>`).join('');
+    const prof = document.getElementById('pano-pv-profile');
+    if (prof) {
+        const cur = prof.value;
+        prof.innerHTML = '<option value="">Varsayılan ekran ayarı</option>' + Object.keys(appConfig.screenProfiles || {}).map(n => `<option value="${n.replace(/"/g, '&quot;')}">TV profili: ${n.replace(/</g, '&lt;')}</option>`).join('');
+        prof.value = cur || '';
+    }
+    modal.style.display = 'flex';
+    panoPreviewRender(true);
+}
+
+function panoPreviewClose() {
+    const modal = document.getElementById('pano-preview-modal');
+    if (modal) modal.style.display = 'none';
+    const fr = document.getElementById('pano-pv-iframe');
+    if (fr) fr.src = 'about:blank';
+}
+
+function panoPreviewRender(reload) {
+    const fr = document.getElementById('pano-pv-iframe');
+    const stage = document.getElementById('pano-pv-stage');
+    const outer = document.getElementById('pano-pv-outer');
+    if (!fr || !stage || !outer) return;
+    const dims = (document.getElementById('pano-pv-device').value || '1920x1080').split('x').map(Number);
+    const W = dims[0], H = dims[1];
+    const scale = Math.min((stage.clientWidth - 24) / W, (stage.clientHeight - 24) / H, 1);
+    outer.style.width = Math.floor(W * scale) + 'px';
+    outer.style.height = Math.floor(H * scale) + 'px';
+    fr.style.width = W + 'px';
+    fr.style.height = H + 'px';
+    fr.style.transform = 'scale(' + scale + ')';
+    const lbl = document.getElementById('pano-pv-info');
+    if (lbl) lbl.textContent = W + '×' + H + ' • %' + Math.round(scale * 100);
+    if (!reload) return;
+    // Kaydedilmemiş canlı düzenleme dahil güncel durumun kopyası iframe'e sessionStorage ile aktarılır.
+    const cfg = JSON.parse(JSON.stringify(appConfig));
+    if (typeof panoEditActive !== 'undefined' && panoEditActive && panoEditWorkingLayout) cfg.panoLayout = panoEditWorkingLayout;
+    try { sessionStorage.setItem('okulPanoPreviewConfig', JSON.stringify(cfg)); } catch (e) {}
+    const prof = document.getElementById('pano-pv-profile').value;
+    const base = location.href.split('#')[0].split('?')[0];
+    fr.src = base + '?onizleme=1' + (prof ? '&ekran=' + encodeURIComponent(prof) : '') + '&t=' + Date.now();
+}
+window.addEventListener('resize', function () {
+    const m = document.getElementById('pano-preview-modal');
+    if (m && m.style.display !== 'none') panoPreviewRender(false);
+});
+
+/* ---------- TV / Ekran ayarları (admin formu + profiller) ---------- */
+function panoScreenFormRead() {
+    return {
+        mode: document.getElementById('scr-mode').value,
+        ratio: document.getElementById('scr-ratio').value,
+        overscan: parseInt(document.getElementById('scr-overscan').value, 10) || 0,
+        uiScale: parseInt(document.getElementById('scr-uiscale').value, 10) || 100,
+        rotate: parseInt(document.getElementById('scr-rotate').value, 10) || 0
+    };
+}
+
+function panoScreenFormFill(st) {
+    document.getElementById('scr-mode').value = st.mode;
+    document.getElementById('scr-ratio').value = st.ratio;
+    document.getElementById('scr-overscan').value = st.overscan;
+    document.getElementById('scr-uiscale').value = st.uiScale;
+    document.getElementById('scr-rotate').value = String(st.rotate);
+    document.getElementById('scr-overscan-val').textContent = st.overscan;
+    document.getElementById('scr-uiscale-val').textContent = st.uiScale;
+    document.getElementById('scr-ratio-wrap').style.opacity = st.mode === 'ratio' ? '1' : '.4';
+}
+
+function panoScreenFormChanged() {
+    const st = panoScreenFormRead();
+    appConfig.screenSettings = st;
+    document.getElementById('scr-overscan-val').textContent = st.overscan;
+    document.getElementById('scr-uiscale-val').textContent = st.uiScale;
+    document.getElementById('scr-ratio-wrap').style.opacity = st.mode === 'ratio' ? '1' : '.4';
+    panoPersist();
+    panoApplyScreenSettings();
+}
+
+function panoScreenProfileSave() {
+    const input = document.getElementById('scr-profile-name');
+    const name = (input.value || '').trim().replace(/[&?#=\s]+/g, '-');
+    if (!name) { showCustomNotification('İsim Gerekli', 'TV profili için kısa bir isim girin (örn: Salon-TV).'); return; }
+    if (!appConfig.screenProfiles) appConfig.screenProfiles = {};
+    appConfig.screenProfiles[name] = { ...panoScreenFormRead(), layout: document.getElementById('scr-profile-layout').value };
+    panoPersist();
+    input.value = '';
+    panoRenderScreenAdmin();
+    showCustomNotification('Profil Kaydedildi', `"${name}" profili kaydedildi. O TV'de panoyu şu adresle açın: ...index.html?ekran=${name}`);
+}
+
+function panoScreenProfileDelete(name) {
+    askCustomConfirmation('Profili Sil', `"${name}" TV profilini silmek istediğinize emin misiniz?`, function () {
+        delete appConfig.screenProfiles[name];
+        panoPersist();
+        panoRenderScreenAdmin();
+    });
+}
+
+function panoScreenProfileLoad(name) {
+    const p = (appConfig.screenProfiles || {})[name];
+    if (!p) return;
+    panoScreenFormFill({ ...PANO_SCREEN_DEFAULTS, ...p });
+    document.getElementById('scr-profile-layout').value = p.layout || '';
+    document.getElementById('scr-profile-name').value = name;
+}
+
+function panoScreenProfileCopyLink(name) {
+    const url = location.href.split('#')[0].split('?')[0] + '?ekran=' + encodeURIComponent(name);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(() => showCustomNotification('Bağlantı Kopyalandı', url));
+    } else {
+        showCustomNotification('Bağlantı', url);
+    }
+}
+
+function panoScreenProfilePreview(name) {
+    panoPreviewOpen();
+    const prof = document.getElementById('pano-pv-profile');
+    if (prof) { prof.value = name; panoPreviewRender(true); }
+}
+
+function panoRenderScreenAdmin() {
+    if (!document.getElementById('scr-mode')) return;
+    panoScreenFormFill({ ...PANO_SCREEN_DEFAULTS, ...(appConfig.screenSettings || {}) });
+    const layoutSel = document.getElementById('scr-profile-layout');
+    const keep = layoutSel.value;
+    layoutSel.innerHTML = '<option value="">Ana düzen</option>' + Object.keys(appConfig.savedLayouts || {}).map(n => `<option value="${n.replace(/"/g, '&quot;')}">${n.replace(/</g, '&lt;')}</option>`).join('');
+    layoutSel.value = keep;
+    const wrap = document.getElementById('scr-profile-list');
+    const names = Object.keys(appConfig.screenProfiles || {});
+    wrap.innerHTML = names.length ? '' : '<p class="text-[11px] text-slate-600 italic">Henüz TV profili yok.</p>';
+    const modeTxt = { classic: 'Klasik', fill: 'Ekranı doldur', ratio: 'Sabit oran' };
+    names.forEach(n => {
+        const p = { ...PANO_SCREEN_DEFAULTS, ...appConfig.screenProfiles[n] };
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between gap-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2';
+        row.innerHTML = `<div class="min-w-0"><div class="text-sm font-bold text-slate-200 truncate"><i class="fa-solid fa-tv text-cyan-400"></i> <span class="pn"></span></div>
+            <div class="text-[10px] text-slate-500">${modeTxt[p.mode] || p.mode}${p.mode === 'ratio' ? ' ' + p.ratio.replace('/', ':') : ''} • güvenli alan %${p.overscan} • yazı %${p.uiScale}${p.rotate ? ' • ' + p.rotate + '°' : ''}${p.layout ? ' • düzen: ' + p.layout.replace(/</g, '&lt;') : ''}</div></div>
+            <div class="flex items-center gap-1 shrink-0">
+                <button type="button" class="px-2 py-1 bg-slate-800 hover:bg-cyan-600 text-white text-[10px] rounded" title="Önizle"><i class="fa-solid fa-eye"></i></button>
+                <button type="button" class="px-2 py-1 bg-slate-800 hover:bg-cyan-600 text-white text-[10px] rounded" title="Forma yükle"><i class="fa-solid fa-pen"></i></button>
+                <button type="button" class="px-2 py-1 bg-slate-800 hover:bg-cyan-600 text-white text-[10px] rounded" title="Bağlantıyı kopyala"><i class="fa-solid fa-link"></i></button>
+                <button type="button" class="px-2 py-1 bg-red-600/80 hover:bg-red-600 text-white text-[10px] rounded" title="Sil"><i class="fa-solid fa-trash"></i></button>
+            </div>`;
+        row.querySelector('.pn').textContent = n;
+        const b = row.querySelectorAll('button');
+        b[0].onclick = () => panoScreenProfilePreview(n);
+        b[1].onclick = () => panoScreenProfileLoad(n);
+        b[2].onclick = () => panoScreenProfileCopyLink(n);
+        b[3].onclick = () => panoScreenProfileDelete(n);
+        wrap.appendChild(row);
+    });
+}
