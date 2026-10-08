@@ -700,7 +700,7 @@
 
         // Geçerli yerleşimi (kaydedilmiş halini) döndürür; yoksa klasik şablonu kurar.
         // ---- TV / EKRAN AYARLARI (varsayılan + isimli profiller; profil ?ekran=ad ile seçilir) ----
-        const PANO_SCREEN_DEFAULTS = { mode: 'classic', ratio: '16/9', overscan: 0, uiScale: 100, rotate: 0, layout: '' };
+        const PANO_SCREEN_DEFAULTS = { mode: 'classic', ratio: '16/9', ratioW: 16, ratioH: 9, base: 1920, overscan: 0, uiScale: 100, rotate: 0, layout: '' };
 
         function panoActiveScreenName() {
             return (PANO_SCREEN_PARAM && appConfig.screenProfiles && appConfig.screenProfiles[PANO_SCREEN_PARAM]) ? PANO_SCREEN_PARAM : '';
@@ -712,31 +712,53 @@
         }
 
         // Ekran ayarını gerçek boyutlara uygular (oran kilidi, güvenli alan, döndürme).
+        function panoRatioValue(st) {
+            if (st.ratio === 'custom') {
+                const w = parseFloat(st.ratioW) || 16, h = parseFloat(st.ratioH) || 9;
+                return (w / h) || (16 / 9);
+            }
+            const p = String(st.ratio || '16/9').split('/').map(Number);
+            return (p[0] / p[1]) || (16 / 9);
+        }
+
+        // Modlar: classic (en çok 1920x1080) • fill (ekranı doldur, esnek) •
+        // ratio (sabit oran, ölçekli: sanal tuval ekrana sığdırılır, kenarlarda boşluk) •
+        // cover (sabit oran, ölçekli: ekranı kaplar, taşan kısım kırpılır) •
+        // stretch (sanal tuval ekrana esnetilir, oran korunmaz).
+        // Ölçekli modlarda tüm içerik (yazılar dahil) tuvalle birlikte orantılı küçülür/büyür.
         function panoFitScreen() {
             const grid = document.getElementById('pano-main-dashboard');
             if (!grid) return;
             const st = panoGetScreenSettings();
             const rot = parseInt(st.rotate, 10) || 0;
             document.body.style.padding = st.overscan > 0 ? ('calc(10px + ' + st.overscan + 'vmin)') : '';
-            ['width', 'height', 'maxWidth', 'maxHeight', 'transform', 'flex'].forEach(k => grid.style[k] = '');
+            ['width', 'height', 'maxWidth', 'maxHeight', 'transform', 'flex', 'flexShrink'].forEach(k => grid.style[k] = '');
             if (st.mode === 'classic' && !rot) return;
             const cs = getComputedStyle(document.body);
             const padX = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
             const padY = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
             let aw = window.innerWidth - padX, ah = window.innerHeight - padY;
             if (rot) { const t = aw; aw = ah; ah = t; }
-            let w = aw, h = ah;
-            if (st.mode === 'ratio') {
-                const p = String(st.ratio || '16/9').split('/').map(Number);
-                const r = (p[0] / p[1]) || (16 / 9);
-                if (aw / ah > r) { w = ah * r; } else { h = aw / r; }
-            } else if (st.mode === 'classic') {
-                w = Math.min(aw, 1920); h = Math.min(ah, 1080);
-            }
             grid.style.maxWidth = 'none'; grid.style.maxHeight = 'none';
+            grid.style.flex = 'none'; grid.style.flexShrink = '0';
+            const rotTxt = rot ? ('rotate(' + rot + 'deg) ') : '';
+            if (st.mode === 'ratio' || st.mode === 'cover' || st.mode === 'stretch') {
+                const r = panoRatioValue(st);
+                const base = Math.min(7680, Math.max(640, parseInt(st.base, 10) || 1920));
+                const W = r >= 1 ? base : Math.round(base * r);
+                const H = r >= 1 ? Math.round(base / r) : base;
+                let kx, ky;
+                if (st.mode === 'stretch') { kx = aw / W; ky = ah / H; }
+                else if (st.mode === 'cover') { kx = ky = Math.max(aw / W, ah / H); }
+                else { kx = ky = Math.min(aw / W, ah / H); }
+                grid.style.width = W + 'px'; grid.style.height = H + 'px';
+                grid.style.transform = rotTxt + 'scale(' + kx + ',' + ky + ')';
+                return;
+            }
+            let w = aw, h = ah;
+            if (st.mode === 'classic') { w = Math.min(aw, 1920); h = Math.min(ah, 1080); }
             grid.style.width = Math.floor(w) + 'px'; grid.style.height = Math.floor(h) + 'px';
-            grid.style.flex = 'none';
-            if (rot) grid.style.transform = 'rotate(' + rot + 'deg)';
+            if (rot) grid.style.transform = rotTxt.trim();
         }
 
         function panoApplyScreenSettings() {
@@ -12358,6 +12380,9 @@ function panoScreenFormRead() {
     return {
         mode: document.getElementById('scr-mode').value,
         ratio: document.getElementById('scr-ratio').value,
+        ratioW: Math.max(1, parseFloat(document.getElementById('scr-ratio-w').value) || 16),
+        ratioH: Math.max(1, parseFloat(document.getElementById('scr-ratio-h').value) || 9),
+        base: parseInt(document.getElementById('scr-base').value, 10) || 1920,
         overscan: parseInt(document.getElementById('scr-overscan').value, 10) || 0,
         uiScale: parseInt(document.getElementById('scr-uiscale').value, 10) || 100,
         rotate: parseInt(document.getElementById('scr-rotate').value, 10) || 0
@@ -12367,12 +12392,22 @@ function panoScreenFormRead() {
 function panoScreenFormFill(st) {
     document.getElementById('scr-mode').value = st.mode;
     document.getElementById('scr-ratio').value = st.ratio;
+    document.getElementById('scr-ratio-w').value = st.ratioW || 16;
+    document.getElementById('scr-ratio-h').value = st.ratioH || 9;
+    document.getElementById('scr-base').value = String(st.base || 1920);
     document.getElementById('scr-overscan').value = st.overscan;
     document.getElementById('scr-uiscale').value = st.uiScale;
     document.getElementById('scr-rotate').value = String(st.rotate);
     document.getElementById('scr-overscan-val').textContent = st.overscan;
     document.getElementById('scr-uiscale-val').textContent = st.uiScale;
-    document.getElementById('scr-ratio-wrap').style.opacity = st.mode === 'ratio' ? '1' : '.4';
+    panoScreenFormToggle(st);
+}
+
+function panoScreenFormToggle(st) {
+    const scaled = ['ratio', 'cover', 'stretch'].indexOf(st.mode) >= 0;
+    ['scr-ratio-wrap', 'scr-base-wrap'].forEach(id => { const el = document.getElementById(id); if (el) el.style.opacity = scaled ? '1' : '.4'; });
+    const c = document.getElementById('scr-ratio-custom');
+    if (c) c.style.display = (scaled && st.ratio === 'custom') ? '' : 'none';
 }
 
 function panoScreenFormChanged() {
@@ -12380,7 +12415,7 @@ function panoScreenFormChanged() {
     appConfig.screenSettings = st;
     document.getElementById('scr-overscan-val').textContent = st.overscan;
     document.getElementById('scr-uiscale-val').textContent = st.uiScale;
-    document.getElementById('scr-ratio-wrap').style.opacity = st.mode === 'ratio' ? '1' : '.4';
+    panoScreenFormToggle(st);
     panoPersist();
     panoApplyScreenSettings();
 }
@@ -12438,13 +12473,13 @@ function panoRenderScreenAdmin() {
     const wrap = document.getElementById('scr-profile-list');
     const names = Object.keys(appConfig.screenProfiles || {});
     wrap.innerHTML = names.length ? '' : '<p class="text-[11px] text-slate-600 italic">Henüz TV profili yok.</p>';
-    const modeTxt = { classic: 'Klasik', fill: 'Ekranı doldur', ratio: 'Sabit oran' };
+    const modeTxt = { classic: 'Klasik', fill: 'Ekranı doldur', ratio: 'Sabit oran', cover: 'Kırparak doldur', stretch: 'Esnet' };
     names.forEach(n => {
         const p = { ...PANO_SCREEN_DEFAULTS, ...appConfig.screenProfiles[n] };
         const row = document.createElement('div');
         row.className = 'flex items-center justify-between gap-2 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2';
         row.innerHTML = `<div class="min-w-0"><div class="text-sm font-bold text-slate-200 truncate"><i class="fa-solid fa-tv text-cyan-400"></i> <span class="pn"></span></div>
-            <div class="text-[10px] text-slate-500">${modeTxt[p.mode] || p.mode}${p.mode === 'ratio' ? ' ' + p.ratio.replace('/', ':') : ''} • güvenli alan %${p.overscan} • yazı %${p.uiScale}${p.rotate ? ' • ' + p.rotate + '°' : ''}${p.layout ? ' • düzen: ' + p.layout.replace(/</g, '&lt;') : ''}</div></div>
+            <div class="text-[10px] text-slate-500">${modeTxt[p.mode] || p.mode}${['ratio', 'cover', 'stretch'].indexOf(p.mode) >= 0 ? ' ' + (p.ratio === 'custom' ? (p.ratioW + ':' + p.ratioH) : p.ratio.replace('/', ':')) : ''} • güvenli alan %${p.overscan} • yazı %${p.uiScale}${p.rotate ? ' • ' + p.rotate + '°' : ''}${p.layout ? ' • düzen: ' + p.layout.replace(/</g, '&lt;') : ''}</div></div>
             <div class="flex items-center gap-1 shrink-0">
                 <button type="button" class="px-2 py-1 bg-slate-800 hover:bg-cyan-600 text-white text-[10px] rounded" title="Önizle"><i class="fa-solid fa-eye"></i></button>
                 <button type="button" class="px-2 py-1 bg-slate-800 hover:bg-cyan-600 text-white text-[10px] rounded" title="Forma yükle"><i class="fa-solid fa-pen"></i></button>
