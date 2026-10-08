@@ -171,8 +171,8 @@
             min-width: 0;
         }
         .pano-gridded > * { min-width: 0; }
-        .pano-gridded > .achievement-separator,
-        .pano-gridded > .sdw-separator { display: none !important; }
+        .pano-gridded > .achievement-separator:not(.ach-gv):not(.ach-gh),
+        .pano-gridded > .sdw-separator { display: none !important; } /* ızgara ayırıcıları (ach-gv/ach-gh) gizlenmez */
 
         /* ".dashboard-card > *" kuralı (position: relative) tutamaç/etiketi akışa sokup sola
            itiyordu; özgüllüğü yüksek bu kurallar onları tekrar köşeye sabitler. */
@@ -2504,3 +2504,63 @@ body.mode-light .duty-name-pill { background: #fff; border: 1px solid #cbd5e1; }
 .marq-announce-box .mab-opt:hover{border-color:#f59e0b}
 .marq-announce-box .mab-opt.is-active{border-color:#f59e0b;background:rgba(245,158,11,.25);color:#fff;box-shadow:0 0 14px rgba(245,158,11,.35)}
 .marq-announce-box .mab-opt small{display:block;font-weight:500;font-size:10px;color:#94a3b8}
+
+
+/* Kayan yazı CANLI ÖNİZLEME: yönetim paneli "hareket kapalı" modunda bile kaysın
+   (aksi halde #admin-panel.adm-nomotion * { animation:none!important } önizlemeyi donduruyordu) */
+#admin-panel.adm-nomotion #marq-live-preview-track {
+    animation-name: marqueeScroll !important;
+    animation-duration: var(--mq-dur, 20s) !important;
+    animation-timing-function: linear !important;
+    animation-iteration-count: infinite !important;
+    animation-direction: var(--mq-dir, normal) !important;
+}
+
+
+/* ==========================================================================
+   AYIN ENLERİ — ayırıcılar: özel renk, kesikli / gölge türleri ve IZGARA (çok sütun) ayırıcıları
+   ========================================================================== */
+.achievements-flex { --ach-sep-c: var(--ach-sep-color, color-mix(in srgb, var(--neon-blue) 75%, transparent)); }
+.achievements-flex .achievement-separator { color: var(--ach-sep-c); }
+
+/* Tek sıra düzenlerde (yan yana / üst üste) çizgi + noktalı + yeni türler, özel renge saygı duyar */
+.achievements-flex.ach-layout-row .achievement-separator.ach-sep-line   { background: linear-gradient(to bottom, transparent, var(--ach-sep-c), transparent); }
+.achievements-flex.ach-layout-column .achievement-separator.ach-sep-line { background: linear-gradient(to right, transparent, var(--ach-sep-c), transparent); }
+.achievements-flex.ach-layout-row .achievement-separator.ach-sep-dots   { background-image: repeating-linear-gradient(to bottom, var(--ach-sep-c) 0 3px, transparent 3px 8px); }
+.achievements-flex.ach-layout-column .achievement-separator.ach-sep-dots { background-image: repeating-linear-gradient(to right, var(--ach-sep-c) 0 3px, transparent 3px 8px); }
+.achievements-flex.ach-layout-row .achievement-separator.ach-sep-dashed   { width: 2px; background-image: repeating-linear-gradient(to bottom, var(--ach-sep-c) 0 9px, transparent 9px 14px); }
+.achievements-flex.ach-layout-column .achievement-separator.ach-sep-dashed { height: 2px; background-image: repeating-linear-gradient(to right, var(--ach-sep-c) 0 9px, transparent 9px 14px); }
+.achievements-flex.ach-layout-row .achievement-separator.ach-sep-shadow   { width: 2px; background: linear-gradient(to bottom, transparent, var(--ach-sep-c) 20%, var(--ach-sep-c) 80%, transparent); box-shadow: 0 0 10px 2px color-mix(in srgb, var(--ach-sep-c) 55%, transparent); }
+.achievements-flex.ach-layout-column .achievement-separator.ach-sep-shadow { height: 2px; background: linear-gradient(to right, transparent, var(--ach-sep-c) 20%, var(--ach-sep-c) 80%, transparent); box-shadow: 0 0 10px 2px color-mix(in srgb, var(--ach-sep-c) 55%, transparent); }
+
+/* Izgara düzeni: ayırıcılar hücre alanına konur, sütun/satır boşluğunun ortasına kayar */
+.achievements-flex.ach-gsep-on { column-gap: 24px; row-gap: 24px; }
+.achievements-flex.ach-gsep-on .achievement-separator { pointer-events: none; }
+.achievements-flex.ach-gsep-on .achievement-separator.ach-gv { justify-self: end; align-self: stretch; width: 1px; transform: translateX(calc(12px + 50%)); }
+.achievements-flex.ach-gsep-on .achievement-separator.ach-gh { align-self: end; justify-self: stretch; height: 1px; transform: translateY(calc(12px + 50%)); }
+
+.achievements-flex.ach-gsep-on .ach-sep-line.ach-gv    { background: linear-gradient(to bottom, transparent, var(--ach-sep-c), transparent); }
+.achievements-flex.ach-gsep-on .ach-sep-line.ach-gh    { background: linear-gradient(to right, transparent, var(--ach-sep-c), transparent); }
+.achievements-flex.ach-gsep-on .ach-sep-dots.ach-gv    { background-image: repeating-linear-gradient(to bottom, var(--ach-sep-c) 0 3px, transparent 3px 8px); }
+.achievements-flex.ach-gsep-on .ach-sep-dots.ach-gh    { background-image: repeating-linear-gradient(to right, var(--ach-sep-c) 0 3px, transparent 3px 8px); }
+.achievements-flex.ach-gsep-on .ach-sep-dashed.ach-gv  { background-image: repeating-linear-gradient(to bottom, var(--ach-sep-c) 0 9px, transparent 9px 14px); }
+.achievements-flex.ach-gsep-on .ach-sep-dashed.ach-gh  { background-image: repeating-linear-gradient(to right, var(--ach-sep-c) 0 9px, transparent 9px 14px); }
+.achievements-flex.ach-gsep-on .ach-sep-shadow.ach-gv  { background: linear-gradient(to bottom, transparent, var(--ach-sep-c) 20%, var(--ach-sep-c) 80%, transparent); box-shadow: 0 0 10px 2px color-mix(in srgb, var(--ach-sep-c) 55%, transparent); }
+.achievements-flex.ach-gsep-on .ach-sep-shadow.ach-gh  { background: linear-gradient(to right, transparent, var(--ach-sep-c) 20%, var(--ach-sep-c) 80%, transparent); box-shadow: 0 0 10px 2px color-mix(in srgb, var(--ach-sep-c) 55%, transparent); }
+.achievements-flex.ach-gsep-on .ach-sep-icon.ach-gv    { width: auto !important; height: auto; align-self: center; padding: 0; }
+.achievements-flex.ach-gsep-on .ach-sep-icon.ach-gh    { height: auto !important; width: auto; justify-self: center; padding: 0; }
+
+
+/* ===== Modül önizleme alanları ===== */
+.mod-preview-panel { position: sticky; top: 0; z-index: 20; background: #02040a; border: 1px solid #12506b; border-radius: 12px; padding: 8px 10px; margin-bottom: 14px; box-shadow: 0 6px 18px rgba(0,0,0,.55); }
+.mod-preview-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #67e8f9; font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+.mod-preview-head small { color: #64748b; font-weight: 500; margin-left: 4px; }
+.mod-preview-toggle { background: #0f172a; color: #94a3b8; border: 1px solid #1e293b; border-radius: 6px; padding: 2px 10px; font-size: 11px; cursor: pointer; }
+.mod-preview-body { overflow: hidden; border-radius: 8px; background: repeating-conic-gradient(#070b13 0% 25%, #0a0f1a 0% 50%) 0 0 / 16px 16px; }
+
+/* Ayın Enleri ızgara: dikey ayırıcı tüm satır yüksekliğini, yatay ayırıcı tüm satır genişliğini kaplasın (düzen sınıfından gelen sabit ölçüleri ez) */
+.achievements-flex.ach-gsep-on .achievement-separator.ach-gv:not(.ach-sep-icon) { height: auto !important; }
+.achievements-flex.ach-gsep-on .achievement-separator.ach-gh:not(.ach-sep-icon) { width: auto !important; }
+
+/* Üstteki ortak önizleme varken eski (alttaki) önizlemeler gizlenir; JS bu öğelere erişmeye devam eder */
+.mod-pv-legacy { display: none !important; }

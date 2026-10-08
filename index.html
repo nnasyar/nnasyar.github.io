@@ -593,7 +593,7 @@
                         <h3 class="text-white font-bold flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles text-cyan-400"></i> Çerçeve, Arkaplan & Efekt</h3>
 
                         <!-- Canlı Önizleme -->
-                        <div>
+                        <div class="mod-pv-legacy">
                             <label class="text-xs text-slate-400 block mb-2"><i class="fa-solid fa-eye text-cyan-400"></i> Canlı Önizleme</label>
                             <div class="school-brand" id="brand-live-preview-box" style="cursor: default; pointer-events: none; padding: 10px 14px;">
                                 <div class="brand-zone" style="flex: 0 1 auto; justify-content: flex-start;">
@@ -1909,34 +1909,58 @@
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                             <div class="form-group">
                                 <label class="text-xs text-slate-400 block mb-1">Hücre Yerleşimi</label>
-                                <select id="input-ach-layout" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs">
+                                <select id="input-ach-layout" onchange="achWidgetLivePreview()" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs">
                                     <option value="column">Üst Üste (Dikey)</option>
                                     <option value="row">Yan Yana (Yatay)</option>
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label class="text-xs text-slate-400 block mb-1">Satır Başına Hücre Sayısı</label>
-                                <input type="number" id="input-ach-columns" min="0" max="12" step="1" value="0" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs" placeholder="0 = Otomatik">
+                                <input type="number" id="input-ach-columns" oninput="achWidgetLivePreview()" min="0" max="12" step="1" value="0" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs" placeholder="0 = Otomatik">
                             </div>
                             <div class="form-group">
-                                <label class="text-xs text-slate-400 block mb-1">Ayırıcı Türü</label>
+                                <label class="text-xs text-slate-400 block mb-1">Sütun Ayırıcı Türü (yan yana hücreler arası)</label>
                                 <select id="input-ach-separator" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs" onchange="toggleAchSeparatorIconField()">
                                     <option value="line">Çizgi</option>
                                     <option value="dots">Noktalı Desen</option>
+                                    <option value="dashed">Kesikli Çizgi</option>
+                                    <option value="shadow">Gölge (Yumuşak Işıma)</option>
                                     <option value="icon">Simge (İkon)</option>
                                     <option value="none">Yok</option>
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label class="text-xs text-slate-400 block mb-1">Satır Ayırıcı Türü (alt alta hücreler arası)</label>
+                                <select id="input-ach-row-separator" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs" onchange="toggleAchSeparatorIconField()">
+                                    <option value="same">Sütunla Aynı</option>
+                                    <option value="line">Çizgi</option>
+                                    <option value="dots">Noktalı Desen</option>
+                                    <option value="dashed">Kesikli Çizgi</option>
+                                    <option value="shadow">Gölge (Yumuşak Işıma)</option>
+                                    <option value="icon">Simge (İkon)</option>
+                                    <option value="none">Yok</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="ach-row-thickness-wrapper" style="display:none">
+                                <label class="text-xs text-slate-400 block mb-1">Satır Ayırıcı Kalınlığı (px)</label>
+                                <input type="number" id="input-ach-row-thickness" oninput="achWidgetLivePreview()" min="1" max="20" step="1" value="1" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs">
+                            </div>
                             <div class="form-group" id="ach-separator-icon-wrapper">
                                 <label class="text-xs text-slate-400 block mb-1">Ayırıcı Simgesi (Font Awesome sınıfı)</label>
-                                <input type="text" id="input-ach-separator-icon" placeholder="fa-star" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs font-mono">
+                                <input type="text" id="input-ach-separator-icon" oninput="achWidgetLivePreview()" placeholder="fa-star" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs font-mono">
                             </div>
                             <div class="form-group" id="ach-separator-thickness-wrapper">
-                                <label class="text-xs text-slate-400 block mb-1">Ayırıcı Kalınlığı (px)</label>
-                                <input type="number" id="input-ach-separator-thickness" min="1" max="20" step="1" value="1" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs">
+                                <label class="text-xs text-slate-400 block mb-1">Sütun Ayırıcı Kalınlığı (px)</label>
+                                <input type="number" id="input-ach-separator-thickness" oninput="achWidgetLivePreview()" min="1" max="20" step="1" value="1" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs">
+                            </div>
+                            <div class="form-group" id="ach-separator-color-wrapper">
+                                <label class="text-xs text-slate-400 mb-1 flex items-center gap-2">
+                                    <input type="checkbox" id="input-ach-separator-color-enabled" onchange="document.getElementById('input-ach-separator-color').disabled = !this.checked; achWidgetLivePreview()"> Ayırıcı Rengi (özel)
+                                </label>
+                                <input type="color" id="input-ach-separator-color" oninput="achWidgetLivePreview()" value="#00b4d8" disabled class="w-full h-8 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer disabled:opacity-40">
                             </div>
                         </div>
-                        <p class="text-[10px] text-slate-500"><i class="fa-solid fa-circle-info"></i> Hücrelerdeki başlık ve görseller her zaman dikey olarak ortalanır. "Satır Başına Hücre Sayısı" sadece "Yan Yana (Yatay)" seçiliyken geçerlidir; çok sayıda alan eklendiğinde panonun taşmaması için hücreler belirttiğiniz sayı kadar sütun halinde alt satırlara bölünür. 0 bırakırsanız eski davranış (tek satır) devam eder.</p>
+                        <p class="text-[10px] text-slate-500"><i class="fa-solid fa-circle-info"></i> Hücrelerdeki başlık ve görseller her zaman dikey olarak ortalanır. "Satır Başına Hücre Sayısı" sadece "Yan Yana (Yatay)" seçiliyken geçerlidir; çok sayıda alan eklendiğinde panonun taşmaması için hücreler belirttiğiniz sayı kadar sütun halinde alt satırlara bölünür. 0 bırakırsanız eski davranış (tek satır) devam eder. Izgara (çok sütunlu) düzende — yönetim panelinden ya da canlı düzenlemedeki "Sütun / Satır Sayısı" ile — ayırıcı hem sütunlar hem satırlar arasına çizilir. Bu bölümdeki değişiklikler kaydetmeden pano üzerinde anında önizlenir; kapatıp kaydetmezseniz eski haline döner.</p>
                     </div>
 
                     <!-- DİNAMİK ALAN (HÜCRE) LİSTESİ -->
@@ -2323,7 +2347,7 @@
                     </div>
 
                     <!-- CANLI ÖNİZLEME -->
-                    <div class="bg-slate-950 border border-cyan-500/20 rounded-xl p-5">
+                    <div class="mod-pv-legacy bg-slate-950 border border-cyan-500/20 rounded-xl p-5">
                         <h4 class="text-white font-bold text-xs flex items-center gap-2 mb-3"><i class="fa-solid fa-eye text-cyan-400"></i> Canlı Önizleme</h4>
                         <div class="clock-box" id="clks-live-preview" style="max-width:260px;min-height:170px;border-radius:10px;">
                             <div class="clk-date-wrap"><div class="digital-date" id="clks-preview-date">25.07.2026 | Cumartesi</div></div>
@@ -2577,7 +2601,7 @@
                     </div>
 
                     <!-- CANLI ÖNİZLEME -->
-                    <div class="bg-slate-950 border border-cyan-500/20 rounded-xl p-5">
+                    <div class="mod-pv-legacy bg-slate-950 border border-cyan-500/20 rounded-xl p-5">
                         <h4 class="text-white font-bold text-xs flex items-center gap-2 mb-3"><i class="fa-solid fa-eye text-cyan-400"></i> Canlı Önizleme</h4>
                         <div class="marquee-box" style="border:1px solid var(--card-border); border-radius:10px; overflow:hidden; height:56px;">
                             <div class="marquee-viewport" id="marq-live-preview-viewport">

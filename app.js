@@ -186,7 +186,8 @@
                 layout: "column",           // column (üst üste) / row (yan yana)
                 separator: "line",          // line / dots / icon / none
                 separatorIcon: "fa-star",
-                separatorThickness: 1,      // Ayırıcı çizgi/desenin kalınlığı (px) — sadece 'line' ve 'dots' türlerinde geçerli
+                separatorThickness: 1,      // Ayırıcı çizgi/desenin kalınlığı (px) — 'line', 'dots', 'dashed', 'shadow' türlerinde geçerli
+                separatorColor: "",         // Boşsa tema rengi (neon mavi); dolu ise özel ayırıcı rengi
                 columns: 0                  // "Yan Yana" seçiliyken satır başına kaç hücre gösterileceği (0 = otomatik/tek satır)
             },
             mediaPlaylist: [
@@ -820,6 +821,10 @@
                             gridEl.style.gridTemplateColumns = '';
                             gridEl.style.gridTemplateRows = '';
                             gridEl.style.gridAutoFlow = '';
+                        }
+                        // Ayın Enleri: sütun/satır sayısı değişince ayırıcıları ızgaraya göre yeniden çiz
+                        if (id === 'achievements' && typeof achLayoutSeparators === 'function') {
+                            try { achLayoutSeparators(gridEl, null, { gc, gr }); } catch (e) {}
                         }
                     }
                 }
@@ -1854,7 +1859,7 @@
 
         /* ---- Modül Görünümü (canlı düzenleme paneli, açılır kompakt menü) ---- */
         const PANO_LOOK_RESET = {
-            color: '', titleColor: '', bgType: '', bgColor1: '', bgColor2: '', titleBgType: '', titleBgColor1: '', titleBgColor2: '',
+            color: '', titleColor: '', bgType: '', bgColor1: '', bgColor2: '', bgColor3: '', bgDir: '', titleBgType: '', titleBgColor1: '', titleBgColor2: '',
             font: '', size: 'normal', cellEffect: 'none', cellEffectColor: '#00b4d8', moduleOpacity: 100, effectIntensity: 100, borderWidth: 1, cornerRadius: ''
         };
 
@@ -1874,6 +1879,16 @@
             const inp = document.getElementById(inputId);
             if (inp) inp.disabled = !on;
             panoLookSet(key, on && inp ? inp.value : '');
+        }
+
+        function panoLookApplyPreset(idx) {
+            const p = PANO_BG_PRESETS[parseInt(idx, 10)];
+            if (!p || !panoEditSelectedModule) return;
+            const st = panoLookSettings(panoEditSelectedModule);
+            if (!['gradient', 'gradient3', 'radial'].includes(st.bgType)) st.bgType = 'gradient3';
+            st.bgColor1 = p.c1; st.bgColor2 = p.c2; st.bgColor3 = p.c3;
+            applyModuleSettingsToDashboard();
+            panoBuildLookUI(panoEditSelectedModule);
         }
 
         function panoLookReset() {
@@ -1899,9 +1914,34 @@
                         <option value="" ${!s[typeKey] ? 'selected' : ''}>Varsayılan</option>
                         <option value="solid" ${s[typeKey] === 'solid' ? 'selected' : ''}>Düz</option>
                         <option value="gradient" ${s[typeKey] === 'gradient' ? 'selected' : ''}>Degrade</option>
+                        <option value="transparent" ${s[typeKey] === 'transparent' ? 'selected' : ''}>Şeffaf / Renksiz</option>
                     </select>
-                    ${s[typeKey] ? clr(c1, s[c1], d1) : ''}${s[typeKey] === 'gradient' ? clr(c2, s[c2], d2) : ''}
+                    ${(s[typeKey] && s[typeKey] !== 'transparent') ? clr(c1, s[c1], d1) : ''}${s[typeKey] === 'gradient' ? clr(c2, s[c2], d2) : ''}
                 </div>`;
+            // Modül (kart) arka planı: düz / 2-3 renkli yönlü degrade / radyal + hazır palet
+            const modBgGroup = () => {
+                const t = s.bgType || '';
+                const two = t === 'gradient' || t === 'gradient3' || t === 'radial';
+                return `
+                <div class="pl-row"><span>Arka plan</span>
+                    <select onchange="panoLookSet('bgType', this.value); panoBuildLookUI('${id}')">
+                        <option value="" ${!t ? 'selected' : ''}>Varsayılan</option>
+                        <option value="solid" ${t === 'solid' ? 'selected' : ''}>Düz</option>
+                        <option value="gradient" ${t === 'gradient' ? 'selected' : ''}>Degrade (2 renk)</option>
+                        <option value="gradient3" ${t === 'gradient3' ? 'selected' : ''}>Degrade (3 renk)</option>
+                        <option value="radial" ${t === 'radial' ? 'selected' : ''}>Radyal</option>
+                        <option value="transparent" ${t === 'transparent' ? 'selected' : ''}>Şeffaf / Renksiz</option>
+                    </select>
+                    ${(t && t !== 'transparent') ? clr('bgColor1', s.bgColor1, '#070b13') : ''}${two ? clr('bgColor2', s.bgColor2, '#0d1b35') : ''}${t === 'gradient3' ? clr('bgColor3', s.bgColor3, '#1e3a5f') : ''}
+                </div>
+                ${(t === 'gradient' || t === 'gradient3') ? `<div class="pl-row"><span>Degrade yönü</span>${sel('bgDir', PANO_BG_DIRS, s.bgDir || '135deg')}</div>` : ''}
+                <div class="pl-row"><span>Hazır palet</span>
+                    <select onchange="panoLookApplyPreset(this.value)">
+                        <option value="">Seçin…</option>
+                        ${PANO_BG_PRESETS.map((p, i) => `<option value="${i}">${p.name}</option>`).join('')}
+                    </select>
+                </div>`;
+            };
             const fonts = [['', 'Varsayılan'], ["'Rajdhani', sans-serif", 'Rajdhani'], ["'Roboto', sans-serif", 'Roboto'], ["Arial, sans-serif", 'Arial'], ["Georgia, serif", 'Georgia'], ["'Times New Roman', serif", 'Times'], ["Verdana, sans-serif", 'Verdana']];
             const _viewRow = (typeof isModDouble === 'function')
                 ? `<div class="pl-row" style="flex-wrap:wrap;gap:6px"><span style="width:100%"><i class="fa-solid fa-layer-group"></i> Öğretim (yalnız bu modül)</span>${shiftModeButtonsHtml(id)}${isModDouble(id) ? `<span style="width:100%;font-size:11px;opacity:.8">Panoda görünsün:</span>${shiftViewButtonsHtml(id)}` : ''}</div>` : '';
@@ -1918,7 +1958,7 @@
                     <input type="color" id="pl-color" value="${esc(s.color || '#00b4d8')}" ${s.color ? '' : 'disabled'} oninput="panoLookSet('color', this.value)"></div>
                 <div class="pl-row"><label class="${ht ? '' : 'pl-dis'}"><input type="checkbox" ${s.titleColor ? 'checked' : ''} ${ht ? '' : 'disabled'} onchange="panoLookToggleColor('titleColor','pl-tcolor',this.checked)"> Başlık yazısı</label>
                     <input type="color" id="pl-tcolor" value="${esc(s.titleColor || '#ffffff')}" ${(s.titleColor && ht) ? '' : 'disabled'} oninput="panoLookSet('titleColor', this.value)"></div>
-                ${bgGroup('bgType', 'bgColor1', 'bgColor2', 'Arka plan', '#070b13', '#0d1b35', false)}
+                ${modBgGroup()}
                 ${bgGroup('titleBgType', 'titleBgColor1', 'titleBgColor2', 'Başlık zemin', '#6b1111', '#300a0a', !ht)}
                 <div class="pl-row"><span>Efekt</span>
                     ${sel('cellEffect', [['none', 'Yok'], ['glow', 'Parıltı'], ['pulse', 'Nabız'], ['border', 'Yanıp sönen çerçeve'], ['shine', 'Kayan ışık'], ['neon', 'Neon'], ['flicker', 'Titreşim'], ['corner', 'Köşe ışıması']], s.cellEffect || 'none')}
@@ -2909,9 +2949,10 @@
                 .shift-badge-morning{background:rgba(255,183,3,.18);color:#ffb703;border:1px solid rgba(255,183,3,.5)}
                 .shift-badge-afternoon{background:rgba(99,102,241,.35);color:#e0e7ff;border:1px solid rgba(165,180,252,.8)}
                 .shift-badge-all{background:rgba(34,211,238,.18);color:#67e8f9;border:1px solid rgba(34,211,238,.55)}
-                .ach-shift-tag{display:inline-block;margin-left:6px;padding:0 6px;border-radius:999px;font-size:.62em;font-weight:700;letter-spacing:.04em;vertical-align:middle;white-space:nowrap}
-                .ach-shift-tag-morning{background:rgba(255,183,3,.18);color:#ffb703;border:1px solid rgba(255,183,3,.5)}
-                .ach-shift-tag-afternoon{background:rgba(99,102,241,.35);color:#e0e7ff;border:1px solid rgba(165,180,252,.8)}
+                .ach-shift-tag{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;font-size:.62em;font-weight:800;letter-spacing:.05em;vertical-align:middle;white-space:nowrap;text-shadow:none;box-shadow:0 1px 4px rgba(0,0,0,.45)}
+                /* Dolu (solid) rozetler: ayın enleri yazısının sarısıyla karışmaz, iki öğretim de belirgin ve birbirinden ayrışır */
+                .ach-shift-tag-morning{background:#10b981;color:#022c22;border:1px solid #6ee7b7}
+                .ach-shift-tag-afternoon{background:#6366f1;color:#ffffff;border:1px solid #c7d2fe}
             `;
             document.head.appendChild(st);
         })();
@@ -3808,15 +3849,36 @@
             // Hıza göre animasyon süresini gerçek (render edilmiş) genişliğe bakarak hesapla.
             // Bir sonraki animasyon karesinde ölçmek, tarayıcının layout'u oturtmuş
             // olmasını garanti eder (0 genişlik okuma riskini önler).
-            requestAnimationFrame(() => {
+            // Sekme gizliyken (display:none) genişlik 0 ölçülür; bu durumda süre HESAPLANMAZ ve
+            // eleman görünür olup boyutlanınca (ResizeObserver) otomatik yeniden ölçülür.
+            // (Eskiden 0 genişlik 3 sn'lik hatalı süreye yol açıp önizlemeyi bozuyordu.)
+            trackEl.__mqCfg = mw;
+            trackEl.__mqApply = () => {
                 const segEl = trackEl.querySelector('.marquee-seg');
-                const segWidth = segEl ? segEl.getBoundingClientRect().width : 400;
-                const speed = Math.max(5, mw.speed || 60);
+                const segWidth = segEl ? segEl.getBoundingClientRect().width : 0;
+                if (!segWidth) return false;
+                const cfg = trackEl.__mqCfg || mw;
+                const speed = Math.max(5, cfg.speed || 60);
                 const duration = Math.max(3, segWidth / speed);
-                trackEl.style.animationDuration = duration + 's';
-                trackEl.style.animationDirection = (mw.direction === 'right') ? 'reverse' : 'normal';
+                const dir = (cfg.direction === 'right') ? 'reverse' : 'normal';
+                const key = duration.toFixed(2) + dir;
+                if (trackEl.__mqKey !== key) {
+                    trackEl.__mqKey = key;
+                    trackEl.style.animationDuration = duration + 's';
+                    trackEl.style.animationDirection = dir;
+                    // Yönetim paneli "hareket kapalı" modunda önizleme yine de kayabilsin diye CSS değişkenleri
+                    trackEl.style.setProperty('--mq-dur', duration + 's');
+                    trackEl.style.setProperty('--mq-dir', dir);
+                }
                 trackEl.style.animationPlayState = 'running';
-            });
+                return true;
+            };
+            trackEl.__mqKey = null; // içerik/ayar değişti: yeniden uygula
+            requestAnimationFrame(() => trackEl.__mqApply());
+            if (typeof ResizeObserver !== 'undefined' && !trackEl.__mqRO) {
+                trackEl.__mqRO = new ResizeObserver(() => { if (trackEl.__mqApply) trackEl.__mqApply(); });
+                trackEl.__mqRO.observe(trackEl);
+            }
         }
 
         function setMarqAnnounceMode(mode) {
@@ -5660,17 +5722,27 @@
         }
 
         // AYIN ENLERİ: iki hücre arasına, genel ayarlara göre çizgi / noktalı desen / simge / (yok) ayırıcı üretir
+        // Sütun arası ('v') ve satır arası ('h') ayırıcı ayarları ayrı okunur (satır ayırıcı 'same' ise sütunla aynı)
+        function achSepCfg(aw, orient) {
+            const clamp = v => Math.min(20, Math.max(1, parseInt(v, 10) || 1));
+            if (orient === 'h' && aw.rowSeparator && aw.rowSeparator !== 'same') {
+                return { type: aw.rowSeparator, thickness: clamp(aw.rowSeparatorThickness !== undefined && aw.rowSeparatorThickness !== '' ? aw.rowSeparatorThickness : aw.separatorThickness) };
+            }
+            return { type: aw.separator || 'line', thickness: clamp(aw.separatorThickness) };
+        }
+
         function buildAchievementSeparator(aw) {
             const sep = document.createElement('div');
-            const type = aw.separator || 'line';
-            const thickness = Math.min(20, Math.max(1, parseInt(aw.separatorThickness, 10) || 1));
+            const _cfg = achSepCfg(aw, (aw.layout || 'column') === 'row' ? 'v' : 'h');
+            const type = _cfg.type;
+            const thickness = _cfg.thickness;
             if (type === 'none') {
                 sep.className = 'achievement-separator ach-sep-none';
             } else if (type === 'icon') {
                 sep.className = 'achievement-separator ach-sep-icon';
                 sep.innerHTML = `<i class="fa-solid ${aw.separatorIcon || 'fa-star'}"></i>`;
-            } else if (type === 'dots') {
-                sep.className = 'achievement-separator ach-sep-dots';
+            } else if (type === 'dots' || type === 'dashed' || type === 'shadow') {
+                sep.className = 'achievement-separator ach-sep-' + type;
                 // Kalınlık: yatay yerleşimde genişlik, dikey yerleşimde yükseklik olarak uygulanır
                 if ((aw.layout || 'column') === 'row') sep.style.width = thickness + 'px';
                 else sep.style.height = thickness + 'px';
@@ -5678,6 +5750,26 @@
                 sep.className = 'achievement-separator ach-sep-line';
                 if ((aw.layout || 'column') === 'row') sep.style.width = thickness + 'px';
                 else sep.style.height = thickness + 'px';
+            }
+            return sep;
+        }
+
+        // AYIN ENLERİ (ızgara/çok sütunlu düzen): hücreler arasına sütun (v) ve satır (h) ayırıcısı üretir.
+        // Ayırıcı, grid'de ilgili hücrenin alanına yerleştirilir ve CSS ile boşluğun ortasına kaydırılır.
+        function buildAchievementGridSeparator(aw, orient, col, row, span) {
+            const _cfg = achSepCfg(aw, orient);
+            const type = _cfg.type;
+            const thickness = _cfg.thickness;
+            const sep = document.createElement('div');
+            sep.className = 'achievement-separator ach-sep-' + type + ' ' + (orient === 'v' ? 'ach-gv' : 'ach-gh');
+            sep.style.gridColumn = (span && span > 1) ? ((col + 1) + ' / span ' + span) : String(col + 1);
+            sep.style.gridRow = String(row + 1);
+            if (type === 'icon') {
+                sep.innerHTML = `<i class="fa-solid ${aw.separatorIcon || 'fa-star'}"></i>`;
+            } else if (orient === 'v') {
+                sep.style.width = thickness + 'px';
+            } else {
+                sep.style.height = thickness + 'px';
             }
             return sep;
         }
@@ -5766,6 +5858,105 @@
 
         // AYIN ENLERİ: appConfig.achievementCategories listesine göre panodaki kartın içini
         // (istenen sayıda hücre + aralarında ayırıcı ile) baştan üretir.
+        // AYIN ENLERİ — canlı düzenlemedeki "Sütun / Satır Sayısı" (gc/gr) değerleri
+        function achPanoDims() {
+            try {
+                const L = __panoShownLayout || panoGetLayoutState();
+                const m = (L || {}).achievements || {};
+                return { gc: parseInt(m.gc, 10) || 0, gr: parseInt(m.gr, 10) || 0 };
+            } catch (e) { return { gc: 0, gr: 0 }; }
+        }
+
+        // AYIN ENLERİ — yerleşim + ayırıcılar TEK yerde: hücrelerin düzenini (tek sıra / ızgara) belirler,
+        // eski ayırıcıları siler ve doğru yerlere yeniden çizer. Kartlar yeniden kurulmaz; bu yüzden
+        // yönetim panelindeki ayarlar kaydedilmeden önizlenebilir (aw = geçici ayar).
+        //  • Izgara kaynağı 1: canlı düzenleme "Sütun / Satır Sayısı" (gc/gr) → öncelikli
+        //  • Izgara kaynağı 2: yönetim paneli "Yan Yana + Satır Başına Hücre Sayısı"
+        function achLayoutSeparators(container, aw, dims) {
+            container = container || document.getElementById('achievements-container');
+            if (!container) return;
+            aw = aw || appConfig.achievementWidget || defaultAppConfig.achievementWidget;
+            dims = dims || achPanoDims();
+
+            container.querySelectorAll(':scope > .achievement-separator').forEach(e => e.remove());
+            const sliders = Array.from(container.querySelectorAll(':scope > .achievement-slider'));
+            const n = sliders.length;
+            const _colT = achSepCfg(aw, 'v').type, _rowT = achSepCfg(aw, 'h').type;
+            const type = (_colT === 'none' && _rowT === 'none') ? 'none' : 'on';
+
+            // Önceki yerleşimi temizle
+            sliders.forEach(el => { el.style.gridColumn = ''; el.style.gridRow = ''; });
+            container.classList.remove('ach-layout-row', 'ach-layout-column', 'ach-layout-grid', 'ach-gsep-on');
+            container.style.removeProperty('--ach-cols');
+            if (aw.separatorColor) container.style.setProperty('--ach-sep-color', aw.separatorColor);
+            else container.style.removeProperty('--ach-sep-color');
+
+            const gc = parseInt(dims.gc, 10) || 0, gr = parseInt(dims.gr, 10) || 0;
+            const adminCols = aw.layout === 'row' ? (parseInt(aw.columns, 10) || 0) : 0;
+            const panoDriven = gc > 0 || gr > 0;
+            let cols = 0, rows = 0, colMajor = false;
+            if (gc > 0) { cols = gc; }
+            else if (gr > 0) { colMajor = true; rows = gr; cols = Math.max(1, Math.ceil(n / gr)); }
+            else if (adminCols > 0) { cols = adminCols; }
+            const isGrid = cols > 0;
+
+            // Yerleşim sınıfları (canlı düzenleme ızgarayı kendi kurar; yalnızca yönetim paneli ızgarası ach-layout-grid kullanır)
+            if (isGrid && !panoDriven) {
+                container.classList.add('ach-layout-grid');
+                container.style.setProperty('--ach-cols', cols);
+            } else {
+                container.classList.add(aw.layout === 'row' ? 'ach-layout-row' : 'ach-layout-column');
+            }
+            if (isGrid && colMajor) container.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+
+            if (type === 'none') return;
+
+            if (!isGrid) {
+                // Tek sıra: her iki hücre arasına bir ayırıcı
+                if ((aw.layout === 'row' ? _colT : _rowT) === 'none') return;
+                sliders.forEach((el, i) => { if (i > 0) container.insertBefore(buildAchievementSeparator(aw), el); });
+                return;
+            }
+
+            // Izgara: kartları açık konumlandır, sütun ve satırlar arasına ayırıcı ekle
+            container.classList.add('ach-gsep-on');
+            const posOf = i => colMajor ? { col: Math.floor(i / rows), row: i % rows } : { col: i % cols, row: Math.floor(i / cols) };
+            sliders.forEach((el, i) => {
+                const p = posOf(i);
+                el.style.gridColumn = String(p.col + 1);
+                el.style.gridRow = String(p.row + 1);
+            });
+            for (let i = 0; i < n; i++) {
+                const p = posOf(i);
+                const rightIdx = colMajor ? i + rows : (p.col < cols - 1 ? i + 1 : -1);
+                const belowIdx = colMajor ? (p.row < rows - 1 ? i + 1 : -1) : i + cols;
+                if (_colT !== 'none' && rightIdx >= 0 && rightIdx < n) container.appendChild(buildAchievementGridSeparator(aw, 'v', p.col, p.row));
+                if (_rowT !== 'none' && p.col === 0 && belowIdx >= 0 && belowIdx < n) container.appendChild(buildAchievementGridSeparator(aw, 'h', 0, p.row, cols));
+            }
+        }
+
+        // Yönetim paneli formundaki (kaydedilmemiş) Ayın Enleri yerleşim/ayırıcı ayarlarını okur
+        function achReadWidgetFromForm() {
+            const g = id => document.getElementById(id);
+            const base = appConfig.achievementWidget || defaultAppConfig.achievementWidget;
+            return {
+                ...base,
+                layout: (g('input-ach-layout') || {}).value || 'column',
+                separator: (g('input-ach-separator') || {}).value || 'line',
+                separatorIcon: ((g('input-ach-separator-icon') || {}).value || '').trim() || 'fa-star',
+                separatorThickness: Math.min(20, Math.max(1, parseInt((g('input-ach-separator-thickness') || {}).value, 10) || 1)),
+                rowSeparator: (g('input-ach-row-separator') || {}).value || 'same',
+                rowSeparatorThickness: Math.min(20, Math.max(1, parseInt((g('input-ach-row-thickness') || {}).value, 10) || 1)),
+                columns: Math.max(0, parseInt((g('input-ach-columns') || {}).value, 10) || 0),
+                separatorColor: (g('input-ach-separator-color-enabled') || {}).checked ? g('input-ach-separator-color').value : ''
+            };
+        }
+
+        // Kaydetmeden CANLI ÖNİZLEME: panodaki Ayın Enleri kartı, formdaki ayarlarla yeniden yerleştirilir
+        function achWidgetLivePreview() {
+            try { achLayoutSeparators(document.getElementById('achievements-container'), achReadWidgetFromForm()); } catch (e) {}
+        }
+
         function renderAchievementsCard() {
             const container = document.getElementById('achievements-container');
             if (!container) return;
@@ -5773,29 +5964,10 @@
             const showTag = isModDouble('achievements') && shiftViewKeys('achievements').length > 1;
             const aw = appConfig.achievementWidget || defaultAppConfig.achievementWidget;
 
-            // "Yan Yana" (row) düzeninde, kullanıcı satır başına gösterilecek hücre sayısını
-            // belirlediyse (columns > 0), taşmayı önlemek için çok satırlı bir IZGARA (grid)
-            // kullanılır. 0/boş ise eski davranış (tek satır, taşma yok) korunur.
-            const cols = parseInt(aw.columns, 10) || 0;
-            const useGrid = aw.layout === 'row' && cols > 0;
-
-            container.classList.remove('ach-layout-row', 'ach-layout-column', 'ach-layout-grid');
-            container.style.removeProperty('--ach-cols');
             container.innerHTML = '';
-
-            if (useGrid) {
-                container.classList.add('ach-layout-grid');
-                container.style.setProperty('--ach-cols', cols);
-            } else {
-                container.classList.add(aw.layout === 'row' ? 'ach-layout-row' : 'ach-layout-column');
-            }
 
             entries.forEach((entry, idx) => {
                 const cat = entry.cat;
-                // Izgara (grid) modunda ayırıcı öğeler sütun hizasını bozacağından eklenmez;
-                // hücreler arasındaki boşluk (gap) görsel ayrım için yeterlidir.
-                if (!useGrid && idx > 0) container.appendChild(buildAchievementSeparator(aw));
-
                 const slider = document.createElement('div');
                 slider.className = 'achievement-slider';
                 slider.dataset.catId = entry.key;
@@ -5809,6 +5981,9 @@
                 container.appendChild(slider);
                 applyAchievementCategoryStyle(cat, slider);
             });
+
+            // Yerleşim + ayırıcılar (ızgara / tek sıra) — canlı düzenleme sütun/satır sayısına da uyar
+            achLayoutSeparators(container, aw);
         }
 
         // AYIN ENLERİ: belirli bir kategori (alan) için sıradaki aktif kaydı ekrana getirir (slayt döngüsü)
@@ -6347,6 +6522,34 @@
             });
         }
 
+        // ---- Modül Arka Planı: ortak tipler / hazır paletler / CSS üretimi ----
+        // Tipler: '' (varsayılan) | solid | gradient (yönlü, 2 renk) | gradient3 (yönlü, 3 renk) | radial
+        const PANO_BG_DIRS = [['135deg', 'Çapraz ↘'], ['45deg', 'Çapraz ↗'], ['90deg', 'Soldan sağa →'], ['270deg', 'Sağdan sola ←'], ['180deg', 'Yukarıdan aşağı ↓'], ['0deg', 'Aşağıdan yukarı ↑']];
+        const PANO_BG_PRESETS = [
+            { name: 'Okyanus',      c1: '#0f2027', c2: '#203a43', c3: '#2c5364' },
+            { name: 'Gece Mavisi',  c1: '#0f0c29', c2: '#302b63', c3: '#24243e' },
+            { name: 'Gün Batımı',   c1: '#42275a', c2: '#734b6d', c3: '#b06a7a' },
+            { name: 'Orman',        c1: '#0b3d2e', c2: '#134e5e', c3: '#71b280' },
+            { name: 'Kızıl',        c1: '#3a0f14', c2: '#7a1f2b', c3: '#b3363f' },
+            { name: 'Mor Neon',     c1: '#1a0b2e', c2: '#4b1d6e', c3: '#8b3fd9' },
+            { name: 'Çelik Gri',    c1: '#232526', c2: '#2f3133', c3: '#414345' },
+            { name: 'Altın',        c1: '#2b2100', c2: '#6b5200', c3: '#c9a227' },
+            { name: 'Açık / Beyaz', c1: '#f8fafc', c2: '#e2e8f0', c3: '#cbd5e1' }
+        ];
+        function panoModuleBgCss(s) {
+            if (s && s.bgType === 'transparent') return 'transparent'; // Şeffaf / renksiz
+            if (!s || !s.bgType || !s.bgColor1) return '';
+            const c1 = s.bgColor1, c2 = s.bgColor2 || s.bgColor1, c3 = s.bgColor3 || c2;
+            const dir = /^\d{1,3}deg$/.test(s.bgDir || '') ? s.bgDir : '135deg';
+            switch (s.bgType) {
+                case 'solid':     return c1;
+                case 'gradient':  return `linear-gradient(${dir}, ${c1}, ${c2})`;
+                case 'gradient3': return `linear-gradient(${dir}, ${c1}, ${c2}, ${c3})`;
+                case 'radial':    return `radial-gradient(circle at center, ${c1}, ${c2})`;
+            }
+            return '';
+        }
+
         function applyModuleSettingsToDashboard() {
             captureModuleDefaultAppearance();
             const zoomMap = { small: 0.85, normal: 1, large: 1.15 };
@@ -6388,10 +6591,9 @@
                 // kartın kendi "background"ı değil, --pano-module-bg CSS değişkeni üzerinden
                 // ::after katmanına aktarılıyor (Modül Saydamlığı'nın SADECE bu katmanı
                 // etkileyebilmesi için).
-                if (s.bgType === 'gradient' && s.bgColor1 && s.bgColor2) {
-                    card.style.setProperty('--pano-module-bg', `linear-gradient(135deg, ${s.bgColor1}, ${s.bgColor2})`);
-                } else if (s.bgType === 'solid' && s.bgColor1) {
-                    card.style.setProperty('--pano-module-bg', s.bgColor1);
+                const moduleBgCss = panoModuleBgCss(s);
+                if (moduleBgCss) {
+                    card.style.setProperty('--pano-module-bg', moduleBgCss);
                 } else {
                     card.style.removeProperty('--pano-module-bg'); // temanın --card-bg varsayılanına düşer
                 }
@@ -6417,6 +6619,8 @@
                 if (headerEl) {
                     if (s.titleBgType === 'gradient' && s.titleBgColor1 && s.titleBgColor2) {
                         headerEl.style.background = `linear-gradient(to right, ${s.titleBgColor1}, ${s.titleBgColor2})`;
+                    } else if (s.titleBgType === 'transparent') {
+                        headerEl.style.background = 'transparent';
                     } else if (s.titleBgType === 'solid' && s.titleBgColor1) {
                         headerEl.style.background = s.titleBgColor1;
                     } else {
@@ -6820,16 +7024,32 @@
                                 <select id="mod-bgtype-${def.id}" onchange="panoToggleBgTypeUI('${def.id}','bg'); moduleSettingsOnChange('${def.id}')" class="bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs">
                                     <option value="" ${!s.bgType ? 'selected' : ''}>Varsayılan</option>
                                     <option value="solid" ${s.bgType === 'solid' ? 'selected' : ''}>Düz Renk</option>
-                                    <option value="gradient" ${s.bgType === 'gradient' ? 'selected' : ''}>Degrade</option>
+                                    <option value="gradient" ${s.bgType === 'gradient' ? 'selected' : ''}>Degrade (2 renk)</option>
+                                    <option value="gradient3" ${s.bgType === 'gradient3' ? 'selected' : ''}>Degrade (3 renk)</option>
+                                    <option value="radial" ${s.bgType === 'radial' ? 'selected' : ''}>Radyal (Merkezden)</option>
+                                    <option value="transparent" ${s.bgType === 'transparent' ? 'selected' : ''}>Şeffaf / Renksiz</option>
                                 </select>
-                                <span id="mod-bgcolor1-wrap-${def.id}" style="display:${s.bgType ? 'inline-flex' : 'none'}">
+                                <span id="mod-bgcolor1-wrap-${def.id}" style="display:${(s.bgType && s.bgType !== 'transparent') ? 'inline-flex' : 'none'}">
                                     <input type="color" id="mod-bgcolor1-${def.id}" value="${s.bgColor1 || '#070b13'}"
                                         onchange="moduleSettingsOnChange('${def.id}')" class="w-9 h-8 bg-slate-900 border border-slate-800 rounded cursor-pointer">
                                 </span>
-                                <span id="mod-bgcolor2-wrap-${def.id}" style="display:${s.bgType === 'gradient' ? 'inline-flex' : 'none'}">
+                                <span id="mod-bgcolor2-wrap-${def.id}" style="display:${(s.bgType === 'gradient' || s.bgType === 'gradient3' || s.bgType === 'radial') ? 'inline-flex' : 'none'}">
                                     <input type="color" id="mod-bgcolor2-${def.id}" value="${s.bgColor2 || '#0d1b35'}"
                                         onchange="moduleSettingsOnChange('${def.id}')" class="w-9 h-8 bg-slate-900 border border-slate-800 rounded cursor-pointer">
                                 </span>
+                                <span id="mod-bgcolor3-wrap-${def.id}" style="display:${s.bgType === 'gradient3' ? 'inline-flex' : 'none'}">
+                                    <input type="color" id="mod-bgcolor3-${def.id}" value="${s.bgColor3 || '#1e3a5f'}"
+                                        onchange="moduleSettingsOnChange('${def.id}')" class="w-9 h-8 bg-slate-900 border border-slate-800 rounded cursor-pointer">
+                                </span>
+                                <span id="mod-bgdir-wrap-${def.id}" style="display:${(s.bgType === 'gradient' || s.bgType === 'gradient3') ? 'inline-flex' : 'none'}">
+                                    <select id="mod-bgdir-${def.id}" onchange="moduleSettingsOnChange('${def.id}')" title="Degrade yönü" class="bg-slate-900 border border-slate-800 rounded-lg p-2 text-white text-xs">
+                                        ${PANO_BG_DIRS.map(d => `<option value="${d[0]}" ${(s.bgDir || '135deg') === d[0] ? 'selected' : ''}>${d[1]}</option>`).join('')}
+                                    </select>
+                                </span>
+                                <select id="mod-bgpreset-${def.id}" onchange="panoApplyBgPreset('${def.id}', this.value); this.value='';" title="Hazır renk paleti seç" class="bg-slate-900 border border-slate-800 rounded-lg p-2 text-slate-300 text-xs">
+                                    <option value="">Hazır palet…</option>
+                                    ${PANO_BG_PRESETS.map((p, i) => `<option value="${i}">${p.name}</option>`).join('')}
+                                </select>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="text-[10px] uppercase text-slate-500 font-bold whitespace-nowrap">Başlık Arka Planı</span>
@@ -6837,8 +7057,9 @@
                                     <option value="" ${!s.titleBgType ? 'selected' : ''}>Varsayılan</option>
                                     <option value="solid" ${s.titleBgType === 'solid' ? 'selected' : ''}>Düz Renk</option>
                                     <option value="gradient" ${s.titleBgType === 'gradient' ? 'selected' : ''}>Degrade</option>
+                                    <option value="transparent" ${s.titleBgType === 'transparent' ? 'selected' : ''}>Şeffaf / Renksiz</option>
                                 </select>
-                                <span id="mod-titlebgcolor1-wrap-${def.id}" style="display:${s.titleBgType ? 'inline-flex' : 'none'}">
+                                <span id="mod-titlebgcolor1-wrap-${def.id}" style="display:${(s.titleBgType && s.titleBgType !== 'transparent') ? 'inline-flex' : 'none'}">
                                     <input type="color" id="mod-titlebgcolor1-${def.id}" value="${s.titleBgColor1 || '#6b1111'}"
                                         onchange="moduleSettingsOnChange('${def.id}')" class="w-9 h-8 bg-slate-900 border border-slate-800 rounded cursor-pointer">
                                 </span>
@@ -6982,10 +7203,23 @@
         // ilgili renk seçicilerini gösterir, "Varsayılan" olduğunda gizler.
         function panoToggleBgTypeUI(id, prefix) {
             const type = document.getElementById(`mod-${prefix}type-${id}`).value;
-            const c1 = document.getElementById(`mod-${prefix}color1-wrap-${id}`);
-            const c2 = document.getElementById(`mod-${prefix}color2-wrap-${id}`);
-            if (c1) c1.style.display = type ? 'inline-flex' : 'none';
-            if (c2) c2.style.display = (type === 'gradient') ? 'inline-flex' : 'none';
+            const show = (name, on) => { const el = document.getElementById(`mod-${prefix}${name}-wrap-${id}`); if (el) el.style.display = on ? 'inline-flex' : 'none'; };
+            show('color1', !!type && type !== 'transparent');
+            show('color2', type === 'gradient' || type === 'gradient3' || type === 'radial');
+            show('color3', type === 'gradient3');
+            show('dir', type === 'gradient' || type === 'gradient3');
+        }
+
+        // Hazır paleti yönetim paneli satırına uygular (tip seçili değilse 3 renkli degrade yapar)
+        function panoApplyBgPreset(id, idx) {
+            const p = PANO_BG_PRESETS[parseInt(idx, 10)];
+            if (!p) return;
+            const t = document.getElementById(`mod-bgtype-${id}`);
+            if (t && !['gradient', 'gradient3', 'radial'].includes(t.value)) t.value = 'gradient3';
+            const set = (n, v) => { const el = document.getElementById(`mod-${n}-${id}`); if (el) el.value = v; };
+            set('bgcolor1', p.c1); set('bgcolor2', p.c2); set('bgcolor3', p.c3);
+            panoToggleBgTypeUI(id, 'bg');
+            moduleSettingsOnChange(id);
         }
 
         // Bir modülün tüm görsel özelleştirmelerini (kenarlık, arka plan, başlık arka planı,
@@ -7008,6 +7242,10 @@
             const bgc2 = document.getElementById(`mod-bgcolor2-${id}`);
             if (bgc1) bgc1.value = '#070b13';
             if (bgc2) bgc2.value = '#0d1b35';
+            const bgc3 = document.getElementById(`mod-bgcolor3-${id}`);
+            if (bgc3) bgc3.value = '#1e3a5f';
+            const bgDirEl = document.getElementById(`mod-bgdir-${id}`);
+            if (bgDirEl) bgDirEl.value = '135deg';
             panoToggleBgTypeUI(id, 'bg');
 
             const tbgType = document.getElementById(`mod-titlebgtype-${id}`);
@@ -7061,6 +7299,8 @@
                 const bgTypeInput = document.getElementById(`mod-bgtype-${def.id}`);
                 const bgColor1Input = document.getElementById(`mod-bgcolor1-${def.id}`);
                 const bgColor2Input = document.getElementById(`mod-bgcolor2-${def.id}`);
+                const bgColor3Input = document.getElementById(`mod-bgcolor3-${def.id}`);
+                const bgDirInput = document.getElementById(`mod-bgdir-${def.id}`);
                 const titleBgTypeInput = document.getElementById(`mod-titlebgtype-${def.id}`);
                 const titleBgColor1Input = document.getElementById(`mod-titlebgcolor1-${def.id}`);
                 const titleBgColor2Input = document.getElementById(`mod-titlebgcolor2-${def.id}`);
@@ -7090,6 +7330,8 @@
                     bgType: bgTypeInput ? bgTypeInput.value : "",
                     bgColor1: bgColor1Input ? bgColor1Input.value : "",
                     bgColor2: bgColor2Input ? bgColor2Input.value : "",
+                    bgColor3: bgColor3Input ? bgColor3Input.value : ((appConfig.moduleSettings[def.id] || {}).bgColor3 || ""),
+                    bgDir: bgDirInput ? bgDirInput.value : ((appConfig.moduleSettings[def.id] || {}).bgDir || ""),
                     titleBgType: titleBgTypeInput ? titleBgTypeInput.value : "",
                     titleBgColor1: titleBgColor1Input ? titleBgColor1Input.value : "",
                     titleBgColor2: titleBgColor2Input ? titleBgColor2Input.value : "",
@@ -7463,7 +7705,9 @@
                 return;
             }
             if (!supabaseClient) {
-                showCustomNotification("Bağlantı Yok", "Giriş yapmak için internet/Supabase bağlantısı gerekli.");
+                const why = !CLOUD_SYNC_ENABLED ? 'Bulut eşitleme ayarı kapalı (CLOUD_SYNC_ENABLED).'
+                    : (!(window.supabase && window.supabase.createClient) ? 'Supabase kütüphanesi yüklenemedi (internet, reklam engelleyici veya ağ filtresi olabilir).' : 'Supabase istemcisi başlatılamadı.');
+                showCustomNotification("Bağlantı Yok", "Giriş yapmak için Supabase bağlantısı gerekli. " + why);
                 return;
             }
             const entered = document.getElementById('pin-prompt-input').value.trim();
@@ -7475,6 +7719,10 @@
                     closePinPrompt();
                     writeCMSLog("Güvenlik girişi başarılı (Supabase Auth).");
                     openAdminPanel();
+                } else if (!/invalid login credentials/i.test(error.message || '') && !(error.status === 400 && /credential|password/i.test(error.message || ''))) {
+                    // Şifre yanlış değil: sunucu/ağ/hesap sorunu. Gerçek nedeni göster, kilit sayacını artırma.
+                    console.error('Supabase giriş hatası:', error);
+                    showCustomNotification("Giriş Yapılamadı", "Sunucu yanıtı: " + (error.message || 'bilinmeyen hata') + (error.status ? ' (kod ' + error.status + ')' : '') + ". Şifre hatası değil; Supabase projesinin aktif olduğunu ve " + ADMIN_EMAIL + " kullanıcısının var olduğunu kontrol edin.");
                 } else {
                     pinWrongAttempts++;
                     const waitMs = PIN_LOCK_STEPS_MS[Math.min(pinWrongAttempts, PIN_LOCK_STEPS_MS.length - 1)];
@@ -7487,7 +7735,8 @@
                     document.getElementById('pin-prompt-input').focus();
                 }
             } catch (e) {
-                showCustomNotification("Hata", "Giriş doğrulanamadı, tekrar deneyin.");
+                console.error('Supabase giriş istisnası:', e);
+                showCustomNotification("Hata", "Giriş doğrulanamadı: " + ((e && e.message) || e) + ". İnternet bağlantısını ve Supabase projesinin (duraklatılmış olabilir) durumunu kontrol edin.");
             }
         }
 
@@ -7719,7 +7968,11 @@
             document.getElementById('input-ach-separator').value = aws.separator || 'line';
             document.getElementById('input-ach-separator-icon').value = aws.separatorIcon || 'fa-star';
             document.getElementById('input-ach-separator-thickness').value = (aws.separatorThickness !== undefined && aws.separatorThickness !== null) ? aws.separatorThickness : 1;
+            document.getElementById('input-ach-row-separator').value = aws.rowSeparator || 'same';
+            document.getElementById('input-ach-row-thickness').value = (aws.rowSeparatorThickness !== undefined && aws.rowSeparatorThickness !== null) ? aws.rowSeparatorThickness : (aws.separatorThickness || 1);
             document.getElementById('input-ach-columns').value = (aws.columns !== undefined && aws.columns !== null) ? aws.columns : 0;
+            const _acEn = document.getElementById('input-ach-separator-color-enabled'), _acIn = document.getElementById('input-ach-separator-color');
+            if (_acEn && _acIn) { _acEn.checked = !!aws.separatorColor; _acIn.value = aws.separatorColor || '#00b4d8'; _acIn.disabled = !aws.separatorColor; }
             toggleAchSeparatorIconField();
 
             renderAdminAnnouncements();
@@ -7760,6 +8013,7 @@
         }
 
         function closeAdminPanelWithoutSaving() {
+            try { achLayoutSeparators(document.getElementById('achievements-container')); } catch (e) {} // kaydedilmemiş önizlemeyi geri al
             document.getElementById('admin-panel').classList.add('hidden');
             adminLeaveSession();
             writeCMSLog("Yönetim Paneli kapatıldı (ana sayfaya dönüldü).");
@@ -7845,7 +8099,10 @@
                 separator: document.getElementById('input-ach-separator').value || 'line',
                 separatorIcon: document.getElementById('input-ach-separator-icon').value.trim() || 'fa-star',
                 separatorThickness: Math.min(20, Math.max(1, parseInt(document.getElementById('input-ach-separator-thickness').value, 10) || 1)),
-                columns: Math.max(0, parseInt(document.getElementById('input-ach-columns').value, 10) || 0)
+                rowSeparator: (document.getElementById('input-ach-row-separator') || {}).value || 'same',
+                rowSeparatorThickness: Math.min(20, Math.max(1, parseInt((document.getElementById('input-ach-row-thickness') || {}).value, 10) || 1)),
+                columns: Math.max(0, parseInt(document.getElementById('input-ach-columns').value, 10) || 0),
+                separatorColor: (document.getElementById('input-ach-separator-color-enabled') || {}).checked ? document.getElementById('input-ach-separator-color').value : ''
             };
 
             appConfig.announcements = [...tempAnnouncements];
@@ -7984,6 +8241,7 @@
             const vp = document.getElementById('cms-content-viewport');
             if (vp) vp.scrollTop = 0;
             if (tabId === 'tab-modules') { try { panoAccRender(); } catch (e) {} }
+            if (tabId === 'tab-marquee') { try { requestAnimationFrame(() => updateMarqueeLivePreview()); } catch (e) {} }
             if (tabId === 'tab-backup') { try { renderBackupTab(); } catch (e) { console.warn(e); } }
             writeCMSLog(`Sekme değiştirildi: ${tabId}`);
         }
@@ -9434,10 +9692,17 @@
         // Ayırıcı türü "Simge" seçilmediyse simge alanını, "Çizgi/Noktalı Desen" değilse kalınlık alanını gizle
         function toggleAchSeparatorIconField() {
             const sepType = document.getElementById('input-ach-separator').value;
+            const rowSel = (document.getElementById('input-ach-row-separator') || {}).value || 'same';
+            const rowEff = rowSel === 'same' ? sepType : rowSel;
+            const rowThW = document.getElementById('ach-row-thickness-wrapper');
+            if (rowThW) rowThW.style.display = ['line', 'dots', 'dashed', 'shadow'].includes(rowSel) ? '' : 'none';
             const wrapper = document.getElementById('ach-separator-icon-wrapper');
-            if (wrapper) wrapper.style.display = sepType === 'icon' ? '' : 'none';
+            if (wrapper) wrapper.style.display = (sepType === 'icon' || rowEff === 'icon') ? '' : 'none';
             const thicknessWrapper = document.getElementById('ach-separator-thickness-wrapper');
-            if (thicknessWrapper) thicknessWrapper.style.display = (sepType === 'line' || sepType === 'dots') ? '' : 'none';
+            if (thicknessWrapper) thicknessWrapper.style.display = ['line', 'dots', 'dashed', 'shadow'].includes(sepType) ? '' : 'none';
+            const colorWrapper = document.getElementById('ach-separator-color-wrapper');
+            if (colorWrapper) colorWrapper.style.display = (sepType === 'none' && rowEff === 'none') ? 'none' : '';
+            achWidgetLivePreview(); // kaydetmeden panoda önizle
         }
 
         // BELİRLİ GÜN & HAVA DURUMU: ayırıcı türüne göre simge/kalınlık alanlarını göster-gizle
@@ -12152,3 +12417,58 @@ function panoRenderScreenAdmin() {
         wrap.appendChild(row);
     });
 }
+
+
+// ===== MODÜL ÖNİZLEME ALANLARI =====
+// Her modül sekmesinin üstüne, panodaki kartın canlı bir kopyasını gösteren önizleme alanı ekler.
+// Kopya, panodaki gerçek kart değiştikçe (kaydetmeden yapılan canlı önizlemeler dahil) otomatik yenilenir.
+(function () {
+    const panels = [];
+    function render(p) {
+        const o = p.orig;
+        const w = o.offsetWidth || 480, h = o.offsetHeight || 240;
+        const bw = p.body.clientWidth || 600;
+        const s = Math.min(1, bw / w, (window.innerHeight * 0.4) / h);
+        const stage = document.createElement('div');
+        stage.className = 'dashboard-container mod-preview-stage';
+        stage.style.cssText = 'display:block;position:relative;padding:0;margin:0;background:none;overflow:hidden;pointer-events:none;transform-origin:top left;width:' + w + 'px;height:' + h + 'px;transform:scale(' + s + ');margin-left:' + Math.max(0, Math.round((bw - w * s) / 2)) + 'px;';
+        const c = o.cloneNode(true);
+        c.removeAttribute('onclick');
+        const f = { position: 'relative', left: '0', top: '0', right: 'auto', bottom: 'auto', width: '100%', height: '100%', margin: '0', transform: 'none', 'grid-area': 'auto' };
+        Object.keys(f).forEach(k => c.style.setProperty(k, f[k], 'important'));
+        if (getComputedStyle(o).display === 'none') c.style.setProperty('display', 'block', 'important');
+        stage.appendChild(c);
+        p.body.style.height = Math.round(h * s) + 'px';
+        p.body.replaceChildren(stage);
+    }
+    function init() {
+        document.querySelectorAll('[id^="module-embed-"]').forEach(embed => {
+            const key = embed.id.replace('module-embed-', '');
+            const orig = document.querySelector('.pano-module[data-module="' + key + '"]');
+            const tab = embed.closest('.tab-content');
+            if (!orig || !tab || tab.querySelector(':scope > .mod-preview-panel')) return;
+            const host = document.createElement('div');
+            host.className = 'mod-preview-panel';
+            host.innerHTML = '<div class="mod-preview-head"><span><i class="fa-solid fa-eye"></i> Önizleme <small>(kaydetmeden anlık görünür)</small></span><button type="button" class="mod-preview-toggle">Gizle</button></div><div class="mod-preview-body"></div>';
+            const bar = tab.querySelector(':scope > .shift-edit-bar');
+            if (bar) bar.after(host); else tab.prepend(host);
+            const p = { tab, orig, body: host.querySelector('.mod-preview-body'), dirty: true, collapsed: false };
+            host.querySelector('.mod-preview-toggle').onclick = function () {
+                p.collapsed = !p.collapsed;
+                p.body.style.display = p.collapsed ? 'none' : '';
+                this.textContent = p.collapsed ? 'Göster' : 'Gizle';
+                p.dirty = true;
+            };
+            new MutationObserver(() => { p.dirty = true; }).observe(orig, { subtree: true, childList: true, attributes: true, characterData: true });
+            panels.push(p);
+        });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+    setInterval(() => {
+        panels.forEach(p => {
+            if (p.collapsed || !p.dirty || p.tab.classList.contains('hidden') || !p.tab.offsetParent) return;
+            p.dirty = false;
+            try { render(p); } catch (e) {}
+        });
+    }, 300);
+})();
