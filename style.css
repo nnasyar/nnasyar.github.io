@@ -2564,3 +2564,14 @@ body.mode-light .duty-name-pill { background: #fff; border: 1px solid #cbd5e1; }
 
 /* Üstteki ortak önizleme varken eski (alttaki) önizlemeler gizlenir; JS bu öğelere erişmeye devam eder */
 .mod-pv-legacy { display: none !important; }
+
+/* Ekran düzenleme paneli: akordeon menü + içerik hizalama */
+.pano-edit-panel .pep-sec { border-top: 1px solid rgba(148,163,184,.18); margin-top: 4px; }
+.pano-edit-panel .pep-sec > summary { cursor: pointer; padding: 7px 2px; font-size: 12px; font-weight: 700; color: #cbd5e1; list-style: none; display: flex; align-items: center; gap: 6px; }
+.pano-edit-panel .pep-sec > summary::-webkit-details-marker { display: none; }
+.pano-edit-panel .pep-sec > summary::after { content: '\25BE'; margin-left: auto; color: #64748b; transition: transform .15s; }
+.pano-edit-panel .pep-sec[open] > summary::after { transform: rotate(180deg); }
+.pano-edit-panel .pep-sec-body { padding: 2px 2px 8px; }
+.pano-edit-panel .pep-align { display: flex; gap: 4px; margin: 3px 0 6px; }
+.pano-edit-panel .pep-align button { flex: 1; background: #0f172a; color: #94a3b8; border: 1px solid #1e293b; border-radius: 6px; padding: 6px 0; cursor: pointer; font-size: 13px; }
+.pano-edit-panel .pep-align button.active { background: #0e7490; color: #fff; border-color: #22d3ee; }

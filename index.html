@@ -198,24 +198,34 @@
             <i class="fa-solid fa-up-down-left-right" style="font-size:11px;color:#64748b;"></i>
             <span id="pano-edit-panel-title">Modül</span>
         </h4>
+        <details class="pep-sec" open><summary><i class="fa-solid fa-up-down-left-right"></i> Boyut &amp; Konum</summary><div class="pep-sec-body">
         <label>Genişlik (sütun: <span class="pep-value" id="pano-panel-cs-val">12</span>/96)</label>
         <input type="range" min="1" max="96" id="pano-panel-cs" oninput="panoPanelUpdate()">
         <label>Yükseklik (satır: <span class="pep-value" id="pano-panel-rs-val">12</span>/64)</label>
         <input type="range" min="1" max="64" id="pano-panel-rs" oninput="panoPanelUpdate()">
+        </div></details>
+        <details class="pep-sec"><summary><i class="fa-solid fa-font"></i> Yazı &amp; Başlık</summary><div class="pep-sec-body">
         <label>Yazı Boyutu: <span class="pep-value" id="pano-panel-fs-val">100</span>%</label>
         <input type="range" min="40" max="250" id="pano-panel-fs" oninput="panoPanelUpdate()">
         <label>Modül Başlığı Yüksekliği: <span class="pep-value" id="pano-panel-hh-val">32</span>px</label>
         <input type="range" min="16" max="120" id="pano-panel-hh" oninput="panoPanelUpdate()">
         <label>Modül Başlığı Yazı Boyutu: <span class="pep-value" id="pano-panel-hfs-val">15</span>px</label>
         <input type="range" min="8" max="48" id="pano-panel-hfs" oninput="panoPanelUpdate()">
-        <!-- Kart/öğe listesi olan modüllerde görünür (Nöbet, Ders Programı, Ayın Enleri, Duyurular, Belirli Gün) -->
-        <div id="pano-panel-grid-wrap" style="display:none;">
+        </div></details>
+        <details class="pep-sec"><summary><i class="fa-solid fa-align-center"></i> İçerik Hizalama</summary><div class="pep-sec-body">
+            <label>Yatay hizalama</label>
+            <div class="pep-align" id="pano-panel-ha"><button type="button" data-ha="left" onclick="panoPanelAlign('ha','left')" title="Sola"><i class="fa-solid fa-align-left"></i></button><button type="button" data-ha="center" onclick="panoPanelAlign('ha','center')" title="Ortala"><i class="fa-solid fa-align-center"></i></button><button type="button" data-ha="right" onclick="panoPanelAlign('ha','right')" title="Sağa"><i class="fa-solid fa-align-right"></i></button></div>
+            <label>Dikey hizalama</label>
+            <div class="pep-align" id="pano-panel-va"><button type="button" data-va="top" onclick="panoPanelAlign('va','top')" title="Üste"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-va="center" onclick="panoPanelAlign('va','center')" title="Ortala"><i class="fa-solid fa-arrows-up-down"></i></button><button type="button" data-va="bottom" onclick="panoPanelAlign('va','bottom')" title="Alta"><i class="fa-solid fa-arrow-down"></i></button></div>
+            <div style="font-size:10px;color:#64748b;margin-top:3px;">Seçili düğmeye tekrar basarsanız hizalama varsayılana döner.</div>
+        </div></details>
+        <details class="pep-sec" id="pano-panel-grid-wrap" style="display:none;"><summary><i class="fa-solid fa-table-cells"></i> Izgara (Sütun / Satır)</summary><div class="pep-sec-body">
             <label>Sütun Sayısı: <span class="pep-value" id="pano-panel-gc-val">Otomatik</span></label>
             <input type="range" min="0" max="12" id="pano-panel-gc" oninput="panoPanelUpdate()">
             <label>Satır Sayısı: <span class="pep-value" id="pano-panel-gr-val">Otomatik</span></label>
             <input type="range" min="0" max="12" id="pano-panel-gr" oninput="panoPanelUpdate()">
             <div style="font-size:10px;color:#64748b;margin-top:3px;">0 = otomatik. Öğeler seçtiğiniz sütun/satır sayısına göre ızgaraya dizilir.</div>
-        </div>
+        </div></details>
         <!-- Açılır kompakt menü: başlık gizleme, renk, arka plan, efekt, çerçeve... -->
         <details class="pep-look" id="pano-panel-look">
             <summary><i class="fa-solid fa-sliders"></i> Modül Görünümü</summary>
@@ -381,7 +391,7 @@
                     </div>
                     <div class="adm-nav-group"><div class="adm-nav-title">İçerik</div>
                         <button class="cms-nav-btn" data-tab="tab-excel" style="display:none" tabindex="-1" aria-hidden="true" onclick="switchTab('tab-excel', this)"><i class="fa-solid fa-file-excel"></i><span>Excel Entegrasyonu</span></button>
-                        <button class="cms-nav-btn" data-tab="tab-schedule" onclick="switchTab('tab-schedule', this)"><i class="fa-solid fa-calendar-days"></i><span>Haftalık Ders Programı</span></button>
+                        <button class="cms-nav-btn" data-tab="tab-schedule" onclick="switchTab('tab-schedule', this)"><i class="fa-solid fa-calendar-days"></i><span>Haftalık Ders Matrisi</span></button>
                         <button class="cms-nav-btn" data-tab="tab-playlist" onclick="switchTab('tab-playlist', this)"><i class="fa-solid fa-images"></i><span>Görsel Oynatma Listesi</span></button>
                         <button class="cms-nav-btn" data-tab="tab-listmanagers" onclick="switchTab('tab-listmanagers', this)"><i class="fa-solid fa-bullhorn"></i><span>Duyurular</span></button>
                         <button class="cms-nav-btn" data-tab="tab-specialday" onclick="switchTab('tab-specialday', this)"><i class="fa-solid fa-cloud-sun"></i><span>Belirli Gün & Hava Durumu</span></button>

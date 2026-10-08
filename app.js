@@ -767,6 +767,8 @@
             if (m.hfs) m.hfs = Math.min(Math.max(8, Math.round(m.hfs)), 48);
             if (m.gc) m.gc = Math.min(Math.max(0, Math.round(m.gc)), 12);
             if (m.gr) m.gr = Math.min(Math.max(0, Math.round(m.gr)), 12);
+            if (['left', 'center', 'right'].indexOf(m.ha) < 0) delete m.ha;
+            if (['top', 'center', 'bottom'].indexOf(m.va) < 0) delete m.va;
             return m;
         }
 
@@ -805,6 +807,31 @@
                     if (m.hcolor) header.style.color = m.hcolor;
                 }
                 if (body) body.style.zoom = scale;
+                // İçerik hizalama (yatay: ha, dikey: va). Boşsa varsayılan düzen bozulmaz.
+                const algEl = body || ((!header) ? el : null);
+                if (algEl) {
+                    const hMap = { left: 'flex-start', center: 'center', right: 'flex-end' };
+                    const vMap = { top: 'flex-start', center: 'center', bottom: 'flex-end' };
+                    if (m.ha || m.va) {
+                        algEl.style.display = 'flex';
+                        algEl.style.flexDirection = 'column';
+                        algEl.style.justifyContent = m.va ? vMap[m.va] : '';
+                        algEl.style.alignItems = m.ha ? hMap[m.ha] : '';
+                        algEl.style.textAlign = m.ha || '';
+                        algEl.dataset.panoAlign = '1';
+                    } else if (algEl.dataset.panoAlign) {
+                        ['display', 'flexDirection', 'justifyContent', 'alignItems', 'textAlign'].forEach(k => { algEl.style[k] = ''; });
+                        delete algEl.dataset.panoAlign;
+                    }
+                    const gSel = PANO_GRID_TARGETS[id];
+                    const gEl = gSel ? document.querySelector(gSel) : null;
+                    if (gEl) {
+                        gEl.style.alignSelf = (m.ha || m.va) ? 'stretch' : '';
+                        gEl.style.width = (m.ha || m.va) ? '100%' : '';
+                        gEl.style.justifyItems = m.ha ? ({ left: 'start', center: 'center', right: 'end' })[m.ha] : '';
+                        gEl.style.alignItems = m.va ? ({ top: 'start', center: 'center', bottom: 'end' })[m.va] : '';
+                    }
+                }
                 // Sütun / satır sayısı (liste içeren modüller). 0/boş = otomatik.
                 const gridSel = PANO_GRID_TARGETS[id];
                 if (gridSel) {
@@ -1998,6 +2025,7 @@
             document.getElementById('pano-panel-hh-val').textContent = hhVal;
             document.getElementById('pano-panel-hfs').value = hfsVal;
             document.getElementById('pano-panel-hfs-val').textContent = hfsVal;
+            ['ha', 'va'].forEach(k => document.querySelectorAll('#pano-panel-' + k + ' button').forEach(b => b.classList.toggle('active', m[k] === b.dataset[k])));
             const gridWrap = document.getElementById('pano-panel-grid-wrap');
             if (gridWrap) {
                 const supportsGrid = !!PANO_GRID_TARGETS[moduleId];
@@ -2011,6 +2039,21 @@
                 }
             }
         }
+
+        function panoPanelAlign(k, v) {
+            if (!panoEditSelectedModule) return;
+            const m = panoEditWorkingLayout[panoEditSelectedModule];
+            if (m[k] === v) delete m[k]; else m[k] = v;
+            applyPanoLayout(panoEditWorkingLayout);
+            panoRefreshPanelValues(panoEditSelectedModule);
+        }
+
+        // Menü (akordeon): panelde aynı anda yalnızca bir bölüm açık kalır
+        document.addEventListener('toggle', function (ev) {
+            const t = ev.target;
+            if (!t || !t.open || !t.closest || !t.closest('#pano-edit-panel')) return;
+            document.querySelectorAll('#pano-edit-panel > details').forEach(d => { if (d !== t) d.open = false; });
+        }, true);
 
         function panoPanelUpdate() {
             if (!panoEditSelectedModule) return;
