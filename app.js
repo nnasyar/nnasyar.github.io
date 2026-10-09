@@ -1083,6 +1083,7 @@
                         offsetY: 0,
                         zoomPct: 100,
                         aspect: (opts && opts.aspect) || 1,
+                        srcMime: (file && file.type) || '',
                         onDone: onDone
                     };
                     imgEl.src = e.target.result;
@@ -1250,7 +1251,9 @@
             ctx.drawImage(imgEl, -(ieState.naturalW * scale) / 2, -(ieState.naturalH * scale) / 2, ieState.naturalW * scale, ieState.naturalH * scale);
             ctx.restore();
 
-            const resultDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+            // Şeffaflık olabilecek kaynaklar (PNG/WebP/GIF/SVG) PNG olarak çıkar; JPEG şeffaf alanı siyaha çevirirdi.
+            const keepAlpha = /^image\/(png|webp|gif|svg)/.test(ieState.srcMime || '');
+            const resultDataUrl = keepAlpha ? canvas.toDataURL('image/png') : canvas.toDataURL('image/jpeg', 0.9);
             modal.classList.add('hidden');
             const cb = ieState.onDone;
             ieState = null;
@@ -12569,15 +12572,14 @@ function panoRenderScreenAdmin() {
 })();
 
 
-// ===== TEŞHİS EKRANI (?debug=1) =====
-// Pano adresinin sonuna ?debug=1 eklenince sol altta kod sürümü ve bulut senkron durumu görünür.
+// ===== TEŞHİS KUTUSU =====
+// Bulut sekmesindeki düğmeyle (veya adrese ?debug=1 ekleyerek) sol altta kod sürümü ve bulut senkron durumu gösterilir.
 (function () {
-    if (!/[?&]debug=1/.test(location.search)) return;
-    const box = document.createElement('div');
-    box.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:200000;background:rgba(0,0,0,.88);color:#7CFC9A;font:14px/1.45 monospace;padding:10px 14px;border:1px solid #22d3ee;border-radius:8px;max-width:60vw;white-space:pre-wrap;pointer-events:none;';
-    document.body.appendChild(box);
+    const KEY = 'panoDebugBox';
+    let box = null, timer = null;
     async function refresh() {
-        const L = ['Kod sürümü: v79', 'Adres: ' + location.host, 'Yerel sürüm: ' + ((window.appConfig || appConfig || {}).__syncVersion || 0)];
+        if (!box) return;
+        const L = ['Kod sürümü: v80', 'Adres: ' + location.host, 'Yerel sürüm: ' + ((window.appConfig || appConfig || {}).__syncVersion || 0)];
         try {
             if (!supabaseClient) { L.push('Supabase: BAĞLANTI YOK'); }
             else {
@@ -12592,6 +12594,26 @@ function panoRenderScreenAdmin() {
         L.push('Çalışma: ' + new Date().toLocaleTimeString('tr-TR'));
         box.textContent = L.join('\n');
     }
-    setTimeout(refresh, 1500);
-    setInterval(refresh, 10000);
+    function setOn(on, persist) {
+        if (persist) { try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {} }
+        clearInterval(timer);
+        if (on) {
+            if (!box) {
+                box = document.createElement('div');
+                box.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:200000;background:rgba(0,0,0,.88);color:#7CFC9A;font:14px/1.45 monospace;padding:10px 14px;border:1px solid #22d3ee;border-radius:8px;max-width:60vw;white-space:pre-wrap;pointer-events:none;';
+                document.body.appendChild(box);
+            }
+            box.style.display = '';
+            refresh();
+            timer = setInterval(refresh, 10000);
+        } else if (box) {
+            box.style.display = 'none';
+        }
+        const b = document.getElementById('btn-debug-toggle');
+        if (b) b.innerHTML = on ? '<i class="fa-solid fa-eye-slash"></i> Teşhis Kutusunu Gizle' : '<i class="fa-solid fa-bug"></i> Teşhis Kutusunu Göster';
+    }
+    window.panoDebugToggle = function () { setOn(!(box && box.style.display !== 'none'), true); };
+    let initial = /[?&]debug=1/.test(location.search), persisted = false;
+    try { if (localStorage.getItem(KEY) === '1') { initial = true; persisted = true; } } catch (e) {}
+    if (initial) setTimeout(() => setOn(true, false), 1200);
 })();
