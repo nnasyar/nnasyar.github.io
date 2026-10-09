@@ -1561,7 +1561,9 @@
                     const cloudVersion = data.sync_version || 0;
                     const localVersion = appConfig.__syncVersion || 0;
                     lastSyncedVersion = cloudVersion;
-                    if (cloudVersion > localVersion) {
+                    // ?zorla=bulut: yerel sürüm numarası bulutunkinden büyük olsa bile (bayat yerel veri) buluttaki veri alınır
+                    const forceCloud = /[?&]zorla=bulut/.test(location.search);
+                    if (cloudVersion > localVersion || (forceCloud && cloudVersion !== localVersion)) {
                         localStorage.setItem('okulPanoDataV8', JSON.stringify(data.data));
                         location.reload();
                     }
@@ -1659,6 +1661,7 @@
                 return;
             }
             const versionToSend = appConfig.__syncVersion || 0;
+            const doUpsert = () => {
             lastSyncedVersion = versionToSend;
             supabaseClient
                 .from(SUPABASE_CONFIG.table)
@@ -1677,6 +1680,20 @@
                     }
                     if (typeof onDone === 'function') onDone(error ? (error.message || 'Bilinmeyen hata') : null);
                 });
+            };
+            // Koruma: buluttaki kayıt bu cihazdakinden DAHA YENİYSE üzerine yazma (bayat cihaz güncel veriyi silmesin).
+            supabaseClient.from(SUPABASE_CONFIG.table).select('sync_version').eq('id', SUPABASE_CONFIG.rowId).maybeSingle()
+                .then(({ data: cv, error: ce }) => {
+                    const cloudV = (!ce && cv && cv.sync_version) || 0;
+                    if (cloudV > versionToSend) {
+                        const msg = 'Bulutta daha yeni bir kayıt var (bulut sürümü ' + cloudV + ', bu cihaz ' + versionToSend + '). Güncel veriyi ezmemek için gönderilmedi. Önce yedek alın, sayfayı yenileyip tekrar deneyin.';
+                        if (typeof writeCMSLog === 'function') writeCMSLog('⚠ ' + msg);
+                        if (typeof onDone === 'function') onDone(msg);
+                        return;
+                    }
+                    doUpsert();
+                })
+                .catch(() => doUpsert());
         }
         // ============================================================================
 
@@ -11931,7 +11948,7 @@ if (_cs) { _cs.innerHTML = achClassOptions(rec.cls || ''); _cs.value = rec.cls |
                     const next = bkPlain();
                     Object.keys(next).forEach(k => { if (k.indexOf('__') !== 0 && ids.indexOf(bkSectionOfKey(k)) >= 0) delete next[k]; });
                     Object.keys(pend.data).forEach(k => { if (k.indexOf('__') !== 0 && ids.indexOf(bkSectionOfKey(k)) >= 0) next[k] = pend.data[k]; });
-                    next.__syncVersion = (appConfig.__syncVersion || 0) + 1;
+                    next.__syncVersion = Math.max(appConfig.__syncVersion || 0, (typeof lastSyncedVersion !== 'undefined' ? lastSyncedVersion : 0) || 0) + 1;
                     appConfig = next;
                     shiftInstall(); // ikili/tekli öğretim veri bağlantısını yeniden kur
                     appConfig.__syncVersion = next.__syncVersion;
@@ -12549,4 +12566,32 @@ function panoRenderScreenAdmin() {
             try { render(p); } catch (e) {}
         });
     }, 300);
+})();
+
+
+// ===== TEŞHİS EKRANI (?debug=1) =====
+// Pano adresinin sonuna ?debug=1 eklenince sol altta kod sürümü ve bulut senkron durumu görünür.
+(function () {
+    if (!/[?&]debug=1/.test(location.search)) return;
+    const box = document.createElement('div');
+    box.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:200000;background:rgba(0,0,0,.88);color:#7CFC9A;font:14px/1.45 monospace;padding:10px 14px;border:1px solid #22d3ee;border-radius:8px;max-width:60vw;white-space:pre-wrap;pointer-events:none;';
+    document.body.appendChild(box);
+    async function refresh() {
+        const L = ['Kod sürümü: v79', 'Adres: ' + location.host, 'Yerel sürüm: ' + ((window.appConfig || appConfig || {}).__syncVersion || 0)];
+        try {
+            if (!supabaseClient) { L.push('Supabase: BAĞLANTI YOK'); }
+            else {
+                const r = await supabaseClient.from(SUPABASE_CONFIG.table).select('sync_version, updated_at').eq('id', SUPABASE_CONFIG.rowId).maybeSingle();
+                if (r.error) L.push('Bulut OKUMA HATASI: ' + r.error.message);
+                else if (!r.data) L.push('Bulut: kayıt yok');
+                else L.push('Bulut sürüm: ' + r.data.sync_version, 'Bulut güncelleme: ' + new Date(r.data.updated_at).toLocaleString('tr-TR'));
+                const s = await supabaseClient.auth.getSession();
+                L.push('Oturum: ' + (s && s.data && s.data.session ? 'açık' : 'kapalı (bu cihazdan buluta yazılamaz)'));
+            }
+        } catch (e) { L.push('Hata: ' + e.message); }
+        L.push('Çalışma: ' + new Date().toLocaleTimeString('tr-TR'));
+        box.textContent = L.join('\n');
+    }
+    setTimeout(refresh, 1500);
+    setInterval(refresh, 10000);
 })();
