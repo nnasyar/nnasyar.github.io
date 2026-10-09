@@ -12579,7 +12579,7 @@ function panoRenderScreenAdmin() {
     let box = null, timer = null;
     async function refresh() {
         if (!box) return;
-        const L = ['Kod sürümü: v80', 'Adres: ' + location.host, 'Yerel sürüm: ' + ((window.appConfig || appConfig || {}).__syncVersion || 0)];
+        const L = ['Kod sürümü: v81', 'Adres: ' + location.host, 'Yerel sürüm: ' + ((window.appConfig || appConfig || {}).__syncVersion || 0)];
         try {
             if (!supabaseClient) { L.push('Supabase: BAĞLANTI YOK'); }
             else {
@@ -12616,4 +12616,66 @@ function panoRenderScreenAdmin() {
     let initial = /[?&]debug=1/.test(location.search), persisted = false;
     try { if (localStorage.getItem(KEY) === '1') { initial = true; persisted = true; } } catch (e) {}
     if (initial) setTimeout(() => setOn(true, false), 1200);
+})();
+
+
+// ===== KAYDETMEDEN CANLI ÖNİZLEME (tüm modüller) =====
+// Bir modül sekmesinde form değiştikçe, değerler "deneme modunda" panoya uygulanır: kayda/buluta HİÇBİR ŞEY yazılmaz,
+// appConfig deneme sonrası eski haline döndürülür. Panel kaydetmeden kapanırsa pano kayıtlı hâline geri döner.
+(function () {
+    const STUBS = ['panoPersist', 'showCustomNotification', 'writeCMSLog', 'bkAutoOnSave', 'cloudSyncStartListening',
+        'fetchLiveWeather', 'startCyclingModuleIntervals', 'shiftSyncBinding', 'cloudPushDebounced', 'cloudPushNow'];
+    let timer = null, running = false, draft = false;
+
+    function restoreInPlace(t, s) {
+        Object.keys(t).forEach(k => { if (!(k in s)) delete t[k]; });
+        Object.keys(s).forEach(k => {
+            const a = t[k], b = s[k];
+            if (a && b && typeof a === 'object' && typeof b === 'object' && Array.isArray(a) === Array.isArray(b)) {
+                if (Array.isArray(a)) { a.length = 0; b.forEach(v => a.push(v)); } else restoreInPlace(a, b);
+            } else t[k] = b;
+        });
+    }
+
+    function dryRun() {
+        if (running || typeof saveAdminChanges !== 'function') return;
+        running = true;
+        const snap = JSON.stringify(appConfig), dirty = adminDirty, saved = {};
+        STUBS.forEach(n => { if (typeof window[n] === 'function') { saved[n] = window[n]; window[n] = function () {}; } });
+        try { saveAdminChanges(); draft = true; }
+        catch (e) { console.warn('Canlı önizleme uygulanamadı:', e); }
+        finally {
+            Object.keys(saved).forEach(n => { window[n] = saved[n]; });
+            try { restoreInPlace(appConfig, JSON.parse(snap)); } catch (e) { console.warn(e); }
+            adminDirty = dirty;
+            running = false;
+        }
+    }
+
+    function revert() {
+        if (!draft) return;
+        draft = false;
+        try { renderPanoData(); applyModuleSettingsToDashboard(); } catch (e) { console.warn(e); }
+    }
+
+    function init() {
+        const panel = document.getElementById('admin-panel');
+        if (!panel) return;
+        ['input', 'change'].forEach(ev => panel.addEventListener(ev, function (e) {
+            const t = e.target;
+            if (running || !t || !t.closest || t.closest('.mod-preview-panel') || t.type === 'file') return;
+            const tab = t.closest('.tab-content');
+            if (!tab || !tab.querySelector(':scope > .mod-preview-panel')) return;
+            clearTimeout(timer);
+            timer = setTimeout(dryRun, 400);
+        }, true));
+        // Gerçek kayıt yapılınca taslak biter; panel kaydetmeden kapanınca pano kayıtlı hâline döner
+        const origSave = window.saveAdminChanges;
+        if (typeof origSave === 'function') {
+            window.saveAdminChanges = function () { if (!running) { draft = false; clearTimeout(timer); } return origSave.apply(this, arguments); };
+        }
+        new MutationObserver(() => { if (panel.classList.contains('hidden')) { clearTimeout(timer); revert(); } })
+            .observe(panel, { attributes: true, attributeFilter: ['class'] });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
